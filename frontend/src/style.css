@@ -1022,6 +1022,44 @@ button.act.danger[data-armed="yes"] {
 .arch-edge.against { stroke: var(--alarm); opacity: 0.85; }
 .arch-edge.dim { opacity: 0.05; }
 
+/* ---------- isometric ----------
+   The same model, projected through a fixed 2:1 matrix rather than drawn in
+   bands. Colour and line weight carry exactly what they carry in the flat view;
+   the only thing the third axis adds is that a surface can now have a top. */
+
+.arch-seg button { font: 400 11px var(--mono); }
+
+/* The ground a band provides. Faint on purpose: it is scaffolding for reading
+   height, not a thing anybody stated. */
+.arch-plane {
+  fill: color-mix(in oklch, var(--holo) 4%, transparent);
+  stroke: color-mix(in oklch, var(--holo) 16%, transparent);
+  stroke-width: 1;
+}
+
+/* Three faces, one hue, three lightnesses -- the whole of the shading. Anything
+   more would spend a channel the drawing rule reserves for what was stated. */
+.arch-glyph .face { stroke: var(--holo); stroke-width: 1.3; }
+.arch-glyph .face.top { fill: color-mix(in oklch, var(--holo) 20%, oklch(0.19 0.028 255)); }
+.arch-glyph .face.front { fill: color-mix(in oklch, var(--holo) 11%, oklch(0.17 0.026 255)); }
+.arch-glyph .face.side { fill: oklch(0.165 0.024 255); }
+.arch-glyph .wall { fill: none; stroke: var(--holo); stroke-width: 1.3; }
+
+.arch-glyph.agreed .face,
+.arch-glyph.agreed .wall { stroke-width: 1.8; }
+
+.arch-glyph.proposed .face,
+.arch-glyph.proposed .wall { stroke-dasharray: 5 4; fill: transparent; }
+
+.arch-glyph.unclassified .face,
+.arch-glyph.unclassified .wall { stroke: var(--ghost); fill: transparent; }
+
+/* No ground was drawn under it, and the dashes say why: an order exists and
+   this is not in it. In the flat view that had to be inferred from a dash; here
+   the gap under the glyph is the statement. */
+.arch-glyph.ungrounded .face,
+.arch-glyph.ungrounded .wall { stroke-dasharray: 2 4; opacity: 0.75; }
+
 .arch-glyph { cursor: pointer; }
 .arch-glyph ellipse,
 .arch-glyph rect,

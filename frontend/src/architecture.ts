@@ -43,8 +43,18 @@ const proposalList = el("arch-proposals");
 const verdicts = el("arch-verdicts");
 const runTestsButton = el<HTMLButtonElement>("arch-run-tests");
 const readingPill = el("arch-reading");
+const projectionToggle = el("arch-projection");
 
 const SVG = "http://www.w3.org/2000/svg";
+
+/**
+ * Which projection the scene is drawn in. Flat by default, and flat stays.
+ *
+ * Dialogue 15 ruled that a third axis does not replace the band diagram: it is
+ * harder to screenshot into an argument, and the flat view is what every other
+ * document here quotes. Two pictures of one placement, chosen per reader.
+ */
+let projection: "flat" | "iso" = "flat";
 
 let model: ArchitectureModel | null = null;
 let scope: string | null = null;
@@ -58,6 +68,15 @@ interface Pkg {
   layer: number;
   x: number;
   y: number;
+
+  /**
+   * Depth, and only the isometric projection reads it.
+   *
+   * The flat view is one dimension per band and needs no z. Isometry needs a
+   * ground *plane* rather than a line, or a slab has no top face to rest
+   * anything on -- which is the whole reason for the second projection.
+   */
+  z: number;
 
   /**
    * What somebody said this package is, and whether they have said it yet.
@@ -241,6 +260,7 @@ function build(current: ArchitectureModel): { packages: Pkg[]; edges: Edge[] } {
     layer: layers.get(name) ?? 0,
     x: 0,
     y: 0,
+    z: 0,
     claim: said.get(name)?.claim ?? null,
     verdict: said.get(name)?.verdict ?? null,
     grounded: true,
@@ -297,6 +317,12 @@ function layerOf(names: string[], edges: Edge[]): Map<string, number> {
 const WIDTH = 1000;
 const BOX = 116;
 
+/** How far back the ground plane reaches, in plan units. Only isometry reads it. */
+const DEPTH = 340;
+
+/** Packages per depth row before a band folds backwards. */
+const PER_ROW = 5;
+
 function place(packages: Pkg[], edges: Edge[]): void {
   const bands = new Map<number, Pkg[]>();
   for (const pkg of packages) {
@@ -344,12 +370,23 @@ function place(packages: Pkg[], edges: Edge[]): void {
   }
 }
 
-/** Even spacing across the scene, keeping the order the caller settled on. */
+/** Even spacing across the scene, keeping the order the caller settled on.
+ *
+ * A band wider than `PER_ROW` folds into a second row of depth. Flat ignores
+ * `z` entirely; isometry needs it, and folding here rather than in the
+ * projection keeps one placement for both views -- so a package cannot sit in
+ * one order flat and another in isometry, which would make the two pictures
+ * disagree about a thing neither of them decides. */
 function spread(band: Pkg[], y: number): void {
-  const span = WIDTH / (band.length + 1);
+  const rows = Math.ceil(band.length / PER_ROW) || 1;
+  const perRow = Math.ceil(band.length / rows);
   band.forEach((pkg, index) => {
-    pkg.x = span * (index + 1);
+    const row = Math.floor(index / perRow);
+    const inRow = band.slice(row * perRow, (row + 1) * perRow);
+    const span = WIDTH / (inRow.length + 1);
+    pkg.x = span * ((index % perRow) + 1);
     pkg.y = y;
+    pkg.z = rows === 1 ? DEPTH / 2 : (DEPTH / (rows - 1)) * row;
   });
 }
 
@@ -362,6 +399,208 @@ const node = (name: string, attrs: Record<string, string | number>): SVGElement 
   }
   return element;
 };
+
+// ---------------------------------------------------------------- isometry
+
+/**
+ * The second projection, accepted in dialogue 15 and built without a library.
+ *
+ * The argument for a third axis was never that 3D looks better. It was that two
+ * facts have no honest flat drawing: an import running **against** the stated
+ * order, which in a band diagram is a red line among red lines and here is an
+ * arrow visibly climbing; and a package nobody has placed, which flat can only
+ * mark with a dash and isometry can draw with *no ground under it*.
+ *
+ * `three.js` was accepted for this and is not used. A fixed 2:1 matrix over the
+ * SVG that already exists is sixty lines, and the console's dependency budget
+ * is one. If orbiting or occlusion turn out to be what makes the scene
+ * readable, that is when the engine earns its place -- not before.
+ */
+const ISO_X = 0.866; // cos 30
+const ISO_Y = 0.5; //   sin 30
+const BAND_H = 132;
+
+/** Plan coordinates and a height, to a point on screen. */
+function iso(x: number, z: number, h: number): [number, number] {
+  return [(x - z) * ISO_X, (x + z) * ISO_Y - h];
+}
+
+/** The height a band sits at. Row 0 is the top of the stated order. */
+const heightOf = (row: number, rows: number): number => (rows - 1 - row) * BAND_H;
+
+const poly = (points: [number, number][], cls: string): SVGElement =>
+  node("polygon", { points: points.map(([x, y]) => `${x},${y}`).join(" "), class: cls });
+
+function drawIso(packages: Pkg[], edges: Edge[]): void {
+  const bands = [...new Set(packages.map((p) => p.layer))].sort((a, b) => b - a);
+  const rowOf = new Map(bands.map((layer, row) => [layer, row]));
+  const height = (pkg: Pkg) => heightOf(rowOf.get(pkg.layer) ?? 0, bands.length);
+  const pointOf = (pkg: Pkg): [number, number] => iso(pkg.x, pkg.z, height(pkg));
+
+  const at = new Map(packages.map((p) => [p.name, p]));
+  const lit = (name: string) => scope === null || name === scope || name.startsWith(scope + ".");
+
+  const svg = node("svg", {
+    width: "100%",
+    height: "100%",
+    role: "img",
+    "aria-label": "package dependency scene, isometric",
+  });
+
+  // Ground planes, furthest first. A band holding nothing anybody grounded gets
+  // none: the dashes on an ungrounded glyph say an order exists and this is not
+  // in it, and painting a floor under it would contradict them.
+  for (const layer of bands) {
+    const h = heightOf(rowOf.get(layer) ?? 0, bands.length);
+    if (!packages.some((p) => p.layer === layer && p.grounded)) continue;
+    svg.appendChild(
+      poly([iso(0, 0, h), iso(WIDTH, 0, h), iso(WIDTH, DEPTH, h), iso(0, DEPTH, h)], "arch-plane"),
+    );
+  }
+
+  for (const edge of edges) {
+    const from = at.get(edge.from);
+    const to = at.get(edge.to);
+    if (!from || !to) continue;
+    const [x1, y1] = pointOf(from);
+    const [x2, y2] = pointOf(to);
+    const on = lit(edge.from) || lit(edge.to);
+    const cls = edge.crossed
+      ? "crossed"
+      : edge.againstOrder
+        ? "against"
+        : edge.deferred
+          ? "deferred"
+          : "beam";
+    // Bowed clear of the plane, or an edge between two packages on one band is
+    // a straight line lying inside the slab and invisible.
+    const lift = Math.abs(y2 - y1) < 8 ? 26 : 0;
+    svg.appendChild(
+      node("path", {
+        d: `M${x1} ${y1} Q${(x1 + x2) / 2} ${(y1 + y2) / 2 - lift - 34} ${x2} ${y2}`,
+        class: `arch-edge ${cls}${on ? "" : " dim"}`,
+        "stroke-width": Math.min(0.8 + edge.weight * 0.22, 3),
+      }),
+    );
+  }
+
+  // Painter's order: a higher band is further away, and within one band the
+  // package nearest the viewer has the largest x + z.
+  const ordered = [...packages].sort((a, b) => height(b) - height(a) || a.x + a.z - (b.x + b.z));
+
+  for (const pkg of ordered) {
+    const agreed = pkg.verdict === "agreed";
+    const shape = shapeOf(pkg.claim, pkg.verdict);
+    const group = node("g", {
+      class:
+        `arch-glyph ${shape ?? "unclassified"}` +
+        `${pkg.grounded ? "" : " ungrounded"}` +
+        `${agreed ? " agreed" : shape ? " proposed" : ""}` +
+        `${lit(pkg.name) ? "" : " dim"}`,
+      "data-package": pkg.name,
+    });
+
+    const h = height(pkg);
+    const half = Math.min(BOX, 62 + pkg.modules * 3) / 2;
+    const d = 34;
+    const [cx, cy] = pointOf(pkg);
+
+    if (shape === "layer") {
+      // A slab with its top face showing, which is the sentence the flat view
+      // could not say: things rest on this.
+      const wide = half + 16;
+      const t = 14;
+      const backLeft = iso(pkg.x - wide, pkg.z - d, h);
+      const backRight = iso(pkg.x + wide, pkg.z - d, h);
+      const frontRight = iso(pkg.x + wide, pkg.z + d, h);
+      const frontLeft = iso(pkg.x - wide, pkg.z + d, h);
+      group.appendChild(
+        poly(
+          [
+            frontLeft,
+            frontRight,
+            iso(pkg.x + wide, pkg.z + d, h - t),
+            iso(pkg.x - wide, pkg.z + d, h - t),
+          ],
+          "face front",
+        ),
+      );
+      group.appendChild(
+        poly(
+          [
+            frontRight,
+            backRight,
+            iso(pkg.x + wide, pkg.z - d, h - t),
+            iso(pkg.x + wide, pkg.z + d, h - t),
+          ],
+          "face side",
+        ),
+      );
+      group.appendChild(poly([backLeft, backRight, frontRight, frontLeft], "face top"));
+    } else if (shape === "feature") {
+      // The flat view's drum, given a height it can stand up in.
+      const tall = 34;
+      const [tx, ty] = iso(pkg.x, pkg.z, h + tall);
+      group.appendChild(
+        node("ellipse", { cx, cy, rx: half, ry: half * ISO_Y, class: "face front" }),
+      );
+      group.appendChild(
+        node("path", {
+          d: `M${tx - half} ${ty} v${tall} M${tx + half} ${ty} v${tall}`,
+          class: "wall",
+        }),
+      );
+      group.appendChild(
+        node("ellipse", { cx: tx, cy: ty, rx: half, ry: half * ISO_Y, class: "face top" }),
+      );
+    } else {
+      // Unjudged: a plate lying flat, no volume. Nothing has been said about
+      // it, so it is given no shape that stands up.
+      group.appendChild(
+        poly(
+          [
+            iso(pkg.x - half, pkg.z - d * 0.7, h),
+            iso(pkg.x + half, pkg.z - d * 0.7, h),
+            iso(pkg.x + half, pkg.z + d * 0.7, h),
+            iso(pkg.x - half, pkg.z + d * 0.7, h),
+          ],
+          "face top",
+        ),
+      );
+    }
+
+    const label = node("text", {
+      x: cx,
+      y: cy - (shape === "feature" ? 52 : 22),
+      "text-anchor": "middle",
+    });
+    label.textContent = pkg.name.split(".").pop() ?? pkg.name;
+    group.appendChild(label);
+
+    const sub = node("text", { x: cx, y: cy + 26, "text-anchor": "middle", class: "sub" });
+    sub.textContent = pkg.tables > 0 ? `${pkg.modules} · ${pkg.tables} tables` : `${pkg.modules}`;
+    group.appendChild(sub);
+
+    group.addEventListener("click", () => {
+      scope = scope === pkg.name ? null : pkg.name;
+      say(scope ? `scoped to ${scope}` : "showing everything", describe(scope));
+      render();
+    });
+    svg.appendChild(group);
+  }
+
+  // Fit the box to what was drawn. The matrix puts the origin where it puts it,
+  // and a hardcoded viewBox would clip the first repository with a wider band.
+  const points = packages.map(pointOf);
+  const pad = 120;
+  const minX = Math.min(iso(0, DEPTH, 0)[0], ...points.map(([x]) => x)) - pad;
+  const maxX = Math.max(iso(WIDTH, 0, 0)[0], ...points.map(([x]) => x)) + pad;
+  const minY = Math.min(...points.map(([, y]) => y)) - pad;
+  const maxY = Math.max(iso(WIDTH, DEPTH, 0)[1], ...points.map(([, y]) => y)) + pad;
+  svg.setAttribute("viewBox", `${minX} ${minY} ${maxX - minX} ${maxY - minY}`);
+
+  svgHost.replaceChildren(svg);
+}
 
 function draw(packages: Pkg[], edges: Edge[]): void {
   const rows = Math.max(...packages.map((p) => p.y), 200) + 130;
@@ -544,7 +783,7 @@ function card(state: string, title: string, detail: string): HTMLElement {
 function render(): void {
   if (!model) return;
   const { packages, edges } = build(model);
-  draw(packages, edges);
+  (projection === "iso" ? drawIso : draw)(packages, edges);
 
   counts.textContent =
     `${model.modules.length} modules · ${packages.length} packages · ` +
@@ -723,6 +962,16 @@ export async function refresh(): Promise<void> {
   selector.value = chosen;
   await load(chosen);
 }
+
+projectionToggle.addEventListener("click", (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-projection]");
+  if (!button) return;
+  projection = button.dataset.projection === "iso" ? "iso" : "flat";
+  for (const other of projectionToggle.querySelectorAll("button")) {
+    other.classList.toggle("on", other === button);
+  }
+  render();
+});
 
 selector.addEventListener("change", () => {
   void load(selector.value);

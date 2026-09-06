@@ -239,4 +239,16 @@ That also sharpens a line already in [§8](../../architecture/memory-graph.md): 
 
 **What is now unbuilt and specified**: `above` in `architecture/catalogue.py`, written only between packages classified `layer`, chains followed at read time, cycles broken, stranded rows reported as orphans through the machinery PR #92 already built. Everything else in this dialogue — the isometric or `three.js` scene, the arrangement table, the channel assignment — waits on that one relation, which is four statements' worth of vocabulary and the smallest piece here.
 
+**Built 2026-09-06, and not with `three.js`.** `above` shipped first as
+sequenced, and the scene that followed is a fixed 2:1 isometric matrix over the
+existing hand-rolled SVG — about sixty lines, no new dependency, offered beside
+the flat view rather than replacing it. Q3 accepted the library over a
+recommendation to refuse; this does not overturn that ruling, it defers spending
+it. The two things Q1 and Q4 said the third axis would buy are both present — an
+import against the stated order climbs, and an ungrounded package has no plane
+under it — so what remains to be learned is whether occlusion and orbiting are
+what makes the scene *readable*, which is the only question `three.js` now
+answers. If they are, the ruling is already in place and the projection is
+thrown away rather than argued about again.
+
 Related: [dialogue 10](10-a-place-to-stand.md) (substrate vs policy, and the dependency budget), [dialogue 11](11-the-name-and-the-tail.md) (tier-three vocabulary, which `layer` is), [dialogue 13](13-the-subject-changed.md) (derived subjects change under stated claims), [dialogue 14](14-the-domain-with-no-package.md) (a decision settled by the repository's own numbers).
