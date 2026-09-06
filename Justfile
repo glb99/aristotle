@@ -203,6 +203,11 @@ check-all: lint test-agent cov typing audit-ci console-check console-build
 db-up:
     docker compose up -d --wait postgres
 
+# Start Adminer at http://localhost:8080 -- server "postgres", user/password/db "bacteria"
+[group('db')]
+db-admin:
+    docker compose up -d --wait adminer
+
 # Stop Postgres, keeping its data
 [group('db')]
 db-down:

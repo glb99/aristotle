@@ -35,5 +35,17 @@ services:
       timeout: 3s
       retries: 15
 
+  # A browser onto the same Postgres, for looking at what a migration or a job
+  # actually did without reaching for `psql`. Not started by `just db-up` --
+  # that targets `postgres` by name -- so it costs nothing to anyone who
+  # doesn't ask for it: `docker compose up -d adminer`.
+  adminer:
+    image: adminer
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
 volumes:
   postgres_data:
