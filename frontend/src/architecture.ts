@@ -738,7 +738,12 @@ addButton.addEventListener("click", async () => {
   // runs it reads the project row; a route that accepted a command would be
   // remote code execution with extra steps.
   const command = window.prompt("command to run its tests (optional)") ?? "";
-  await addProject(location, "", command);
+  try {
+    await addProject(location, "", command);
+  } catch (error) {
+    counts.textContent = String(error instanceof Error ? error.message : error);
+    return;
+  }
   await refresh();
 });
 
