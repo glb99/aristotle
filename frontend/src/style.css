@@ -1027,7 +1027,27 @@ button.act.danger[data-armed="yes"] {
    bands. Colour and line weight carry exactly what they carry in the flat view;
    the only thing the third axis adds is that a surface can now have a top. */
 
-.arch-seg button { font: 400 11px var(--mono); }
+/* On the scene rather than in the deck. The deck is a 44px row that does not
+   wrap inside a container that clips, so a seventh control there is a control
+   nobody can see -- and this one belongs to the picture, not to the project. */
+.arch-seg {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  background: color-mix(in oklch, var(--void) 82%, transparent);
+  backdrop-filter: blur(3px);
+  border-color: var(--edge);
+}
+
+.arch-seg button {
+  font: 400 11px var(--mono);
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  color: var(--dim);
+}
+
+.arch-seg button.on { background: var(--deck); color: var(--holo); }
 
 /* The ground a band provides. Faint on purpose: it is scaffolding for reading
    height, not a thing anybody stated. */
