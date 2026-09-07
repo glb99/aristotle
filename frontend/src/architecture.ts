@@ -29,6 +29,7 @@ import {
   type Project,
 } from "./api";
 import { el, text } from "./dom";
+import { drawScene3d, type Scene3d } from "./scene3d";
 
 const selector = el<HTMLSelectElement>("arch-project");
 const addButton = el<HTMLButtonElement>("arch-add");
@@ -43,15 +44,28 @@ const proposalList = el("arch-proposals");
 const verdicts = el("arch-verdicts");
 const runTestsButton = el<HTMLButtonElement>("arch-run-tests");
 const readingPill = el("arch-reading");
+const projectionToggle = el("arch-projection");
 
 const SVG = "http://www.w3.org/2000/svg";
+
+/**
+ * Which projection the scene is drawn in. Flat by default, and flat stays.
+ *
+ * Dialogue 15 ruled that a third axis does not replace the band diagram: it is
+ * harder to quote into an argument, and the flat view is what every other
+ * document here shows. Two drawings of one placement, chosen per reader.
+ */
+let projection: "flat" | "layered" = "flat";
+
+/** The running scene, if there is one. Torn down before anything else draws. */
+let running: Scene3d | null = null;
 
 let model: ArchitectureModel | null = null;
 let scope: string | null = null;
 
 // ---------------------------------------------------------------- packages
 
-interface Pkg {
+export interface Pkg {
   name: string;
   modules: number;
   tables: number;
@@ -87,7 +101,7 @@ interface Pkg {
   grounded: boolean;
 }
 
-interface Edge {
+export interface Edge {
   from: string;
   to: string;
   weight: number;
@@ -544,7 +558,21 @@ function card(state: string, title: string, detail: string): HTMLElement {
 function render(): void {
   if (!model) return;
   const { packages, edges } = build(model);
-  draw(packages, edges);
+  // Torn down first, always. A three.js loop over a detached canvas keeps its
+  // WebGL context and every buffer in it, and the browser drops the *oldest*
+  // context when it runs out -- so the leak shows up as the first view going
+  // black rather than as the fourth failing to open.
+  running?.stop();
+  running = null;
+  if (projection === "layered") {
+    running = drawScene3d(svgHost, packages, edges, (name) => {
+      scope = name;
+      say(scope ? `scoped to ${scope}` : "showing everything", describe(scope));
+      render();
+    }, scope);
+  } else {
+    draw(packages, edges);
+  }
 
   counts.textContent =
     `${model.modules.length} modules · ${packages.length} packages · ` +
@@ -723,6 +751,16 @@ export async function refresh(): Promise<void> {
   selector.value = chosen;
   await load(chosen);
 }
+
+projectionToggle.addEventListener("click", (event) => {
+  const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-projection]");
+  if (!button) return;
+  projection = button.dataset.projection === "layered" ? "layered" : "flat";
+  for (const other of projectionToggle.querySelectorAll("button")) {
+    other.classList.toggle("on", other === button);
+  }
+  render();
+});
 
 selector.addEventListener("change", () => {
   void load(selector.value);
