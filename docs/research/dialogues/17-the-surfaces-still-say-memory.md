@@ -275,7 +275,81 @@ accepting a classification wants to show the five packages that repeat. If those
 cannot share a list, `REVIEW` is three surfaces wearing one name and the merge
 is cosmetic.
 
-### Q2 — open
+### Q2 — `/ontologies/{id}`, where `{id}` is the column's own value
+
+**Agreed 2026-09-09.**
+
+**The prerequisite answered itself: the `ontology` column already is the id.**
+`NULL` for personal, `architecture:<project_id>` for a checkout — and
+`decisions.ontology_of` says the prefix exists *"so that a row is legible in a
+database somebody is reading by hand."* It already carries both facts, which
+vocabulary and which instance, so the URL names exactly what the column names
+and `GET /ontologies` lists partitions. One translation at the edge: `NULL`
+cannot be a path segment, so the URL says `personal` and the repository maps it
+back. The column stays `NULL`, because rewriting it is the backfilling its own
+docstring forbids.
+
+**The uniform core is the substrate's verbs, and the evidence is a duplicate
+that already exists:**
+
+```
+POST /graph/nodes/{node_id}/rename                 personal
+POST /architecture/projects/{project_id}/renames   architecture
+```
+
+One act — *say a subject is the same thing under a new name* — two spellings,
+and `architecture/decisions.py` implements it with `SAME_AS`, the substrate's
+own relation. Not two similar features; one verb written twice.
+
+Counted against the real routes the split is eight uniform to two specific, so
+the counter — *uniformity over non-uniform domains is decoration* — does not
+hold at these numbers, and will not hold later for a reason rather than by luck:
+**the uniform verbs are the substrate's, and the substrate does not grow per
+domain.** That is [dialogue 10](10-a-place-to-stand.md) Q4 applied to routes.
+
+```
+GET  /ontologies                                 personal + one per checkout
+GET  /ontologies/{id}                            the model
+GET  /ontologies/{id}/conclusions
+POST /ontologies/{id}/assertions/{aid}/retract   · /confirm
+POST /ontologies/{id}/conclusions/{cid}/reject
+POST /ontologies/{id}/nodes/{nid}/rename
+POST /ontologies/{id}/links
+POST /ontologies/{id}/judgments
+POST /ontologies/{id}/ask
+POST /ontologies/{id}/probes/tests               architecture
+POST /ontologies/{id}/order                      architecture
+```
+
+**`/chat` splits, and memory does not follow the graph.** Sessions, turns,
+transcript and extraction are transport and become `/sessions/...` — the
+correction [dialogue 14](14-the-domain-with-no-package.md) made to the package
+and never made to the route. Memory stays with them at
+`/sessions/{sid}/memory`, because **memory is the agent's and not an
+ontology's**: it is what reaches a prompt, [ADR 0010] gave it a port precisely so
+the graph is one possible backing rather than its home, and
+`chat_user_memory_entry` is scoped to a user while `chat_memory_entry` is scoped
+to a session — so it already spans both and belongs to neither ontology.
+
+The consequence for Q1: `REVIEW` composes two sources, waiting memories from
+`/sessions/...` and live claims and proposals from `/ontologies/...`. Honest,
+because Q1 established they are different kinds of thing.
+
+**Creation stays domain-specific**, ruled by the human. `POST /ontologies` does
+not mean the same thing twice: creating an architecture ontology means
+registering a checkout and takes a filesystem path, while creating a personal one
+is meaningless because it exists when the user does. So `POST
+/architecture/projects` remains beside the uniform surface rather than being
+forced into it. It costs the tidiness of a single prefix and buys an honest
+statement that **creation is the adapter's business** — it is the one route that
+has to know what a checkout is.
+
+**What would make this wrong:** that one entry per checkout is the wrong
+granularity. If *the architecture ontology* should be a single thing with
+projects inside it, the nesting inverts and `{id}` becomes the domain rather than
+the partition.
+
+### Q3 — open
 
 *Not yet discussed.*
 
