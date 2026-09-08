@@ -167,6 +167,18 @@ class ProposalOut(BaseModel):
     held_by: list[HeldOut] = []
 
 
+class WaitingOut(ProposalOut):
+    """A suggestion, said across conversations rather than within one.
+
+    ``ProposalOut`` plus the session it came from. Inheriting rather than
+    repeating six fields keeps the two listings the same shape on the wire: a
+    client that renders one row renders both, which is the point of the review
+    surface being one place.
+    """
+
+    session_id: str
+
+
 @router.get("/sessions", response_model=list[SessionSummaryOut])
 async def list_sessions(principal: CurrentPrincipal, db: DbSession) -> list[SessionSummaryOut]:
     """Every conversation the caller owns, most recently active first.
@@ -395,6 +407,39 @@ async def delete_memory(
     repository = SqlSessionRepository(db)
     await load_owned_session(repository, principal, session_id)
     await repository.forget(session_id, key=key, scope=scope)
+
+
+@router.get("/proposals", response_model=list[WaitingOut])
+async def read_all_proposals(principal: CurrentPrincipal, db: DbSession) -> list[WaitingOut]:
+    """Everything awaiting a decision, in every conversation this caller owns.
+
+    **The route that makes a review surface possible.** Until now proposals were
+    listed one session at a time, so answering *what is waiting anywhere*
+    required already knowing every session id -- recorded as a gap in
+    `docs/status.md` and, per dialogue 17, the reason a queue can accumulate
+    unseen while the console reports a count for whichever conversation happens
+    to be open.
+
+    **No session id, so ownership is a filter rather than a check** -- the same
+    shape as ``list_sessions`` above, and the same reason: this route has no id
+    to compare, so a bug here is a missing ``WHERE`` and not a missing
+    comparison, and a missing ``WHERE`` returns other people's suggestions. The
+    filter lives in ``list_sessions``, which ``waiting_for`` walks; nothing here
+    takes a user id from the caller.
+    """
+    listing = await review.waiting_for(SqlSessionRepository(db), principal.id)
+    return [
+        WaitingOut(
+            session_id=item.session_id,
+            source=item.entry.source,
+            key=item.entry.key,
+            value=item.entry.value,
+            reason=item.entry.reason,
+            created_at=item.entry.created_at,
+            held_by=[HeldOut(scope=held.scope, value=held.value) for held in item.entry.held_by],
+        )
+        for item in listing
+    ]
 
 
 @router.get("/sessions/{session_id}/memory-proposals", response_model=list[ProposalOut])

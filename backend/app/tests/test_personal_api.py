@@ -364,6 +364,28 @@ async def test_a_model_proposal_is_visible_to_the_owner_for_review(client, token
     assert client.get(f"/chat/sessions/{session_id}/memory", headers=auth(token)).json() == []
 
 
+async def test_the_queue_can_be_read_without_knowing_a_session_id(client, token, monkeypatch):
+    """The question no route could answer, and the reason REVIEW can exist.
+
+    Proposals were listed one conversation at a time, so *what is waiting
+    anywhere* required already holding every session id. A queue that can only
+    be read per session is a queue that accumulates unseen, which is the failure
+    ADR 0017 names and `docs/status.md` records.
+
+    Two sessions, so that a listing which happens to return the newest one is
+    not mistaken for a listing that spans them.
+    """
+    monkeypatch.setitem(model_client.PROVIDERS, "fake", ProposingModelClient)
+    first, second = new_session(client, token), new_session(client, token)
+    for session_id in (first, second):
+        client.post(f"/chat/sessions/{session_id}/turns", headers=auth(token), json={"text": "hi"})
+
+    waiting = client.get("/chat/proposals", headers=auth(token)).json()
+
+    assert {row["session_id"] for row in waiting} == {first, second}
+    assert [row["key"] for row in waiting] == ["tone", "tone"]
+
+
 async def test_activating_a_proposal_makes_it_reach_the_model(client, token, monkeypatch):
     """The human act, end to end.
 

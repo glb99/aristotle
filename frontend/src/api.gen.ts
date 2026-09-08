@@ -244,6 +244,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chat/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read All Proposals
+         * @description Everything awaiting a decision, in every conversation this caller owns.
+         *
+         *     **The route that makes a review surface possible.** Until now proposals were
+         *     listed one session at a time, so answering *what is waiting anywhere*
+         *     required already knowing every session id -- recorded as a gap in
+         *     `docs/status.md` and, per dialogue 17, the reason a queue can accumulate
+         *     unseen while the console reports a count for whichever conversation happens
+         *     to be open.
+         *
+         *     **No session id, so ownership is a filter rather than a check** -- the same
+         *     shape as ``list_sessions`` above, and the same reason: this route has no id
+         *     to compare, so a bug here is a missing ``WHERE`` and not a missing
+         *     comparison, and a missing ``WHERE`` returns other people's suggestions. The
+         *     filter lives in ``list_sessions``, which ``waiting_for`` walks; nothing here
+         *     takes a user id from the caller.
+         */
+        get: operations["read_all_proposals_chat_proposals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chat/sessions": {
         parameters: {
             query?: never;
@@ -1480,6 +1514,37 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /**
+         * WaitingOut
+         * @description A suggestion, said across conversations rather than within one.
+         *
+         *     ``ProposalOut`` plus the session it came from. Inheriting rather than
+         *     repeating six fields keeps the two listings the same shape on the wire: a
+         *     client that renders one row renders both, which is the point of the review
+         *     surface being one place.
+         */
+        WaitingOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Held By
+             * @default []
+             */
+            held_by: components["schemas"]["HeldOut"][];
+            /** Key */
+            key: string;
+            /** Reason */
+            reason: string;
+            /** Session Id */
+            session_id: string;
+            /** Source */
+            source: string;
+            /** Value */
+            value: unknown;
+        };
     };
     responses: never;
     parameters: never;
@@ -1819,6 +1884,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_all_proposals_chat_proposals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitingOut"][];
+                };
             };
             /** @description Validation Error */
             422: {
