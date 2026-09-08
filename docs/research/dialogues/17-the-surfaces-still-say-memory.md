@@ -230,7 +230,54 @@ nothing in this repository measures that.
 
 ## What is agreed
 
-*Nothing yet. Opened 2026-09-09.*
+### Q1 — Domain by view, two rows, and `REVIEW` carries state
+
+**Agreed 2026-09-09.**
+
+The tabs become two axes: domain across the top with `+ add`, views beneath, and
+the same views for every domain. Two rows rather than one, because drawing two
+axes on a single line is the error this dialogue opened about.
+
+**The counter was right and stronger than it was stated, and it changes the
+answer rather than defeating it.** The two domains do not have two judgment
+models. They have three, and only two of them have a review surface:
+
+| | what it is | where it lives | the act |
+|---|---|---|---|
+| **live claim** | live the moment it is written -- `claim_extraction.py:315` calls `observe()` straight into the log | `graph_assertion` | **retract** |
+| **waiting memory** | inert; reaches no prompt until activated | `chat_memory_proposal` | **activate** |
+| **proposal** | not stored at all -- `service.py:143` recomputes `propose(derived)` per request | nowhere | **accept** |
+
+Personal's rail lists the second. Architecture's column lists the third. **The
+first has no review surface at all** -- an extracted claim is live, traversable,
+drawable and able to fire a conflict, and nothing anywhere lists *what it just
+decided about you*. `docs/status.md` records the small version of this ("review
+across sessions"); this is the large one, and it was found by asking whether one
+word covered two acts and discovering it covered three.
+
+So `REVIEW` is one surface with three visibly distinct rows, which is
+[§9](../../architecture/memory-graph.md)'s drawing rule applied one surface out:
+`architecture.ts` already refuses to let an agreed feature look like a rejected
+one, and a list that draws *live*, *waiting* and *proposed* alike makes the same
+mistake with higher stakes, because the reader is about to act on it.
+
+**Counts: `REVIEW` yes, `RULES` no.** A queue that drains is worth returning
+for; a standing condition is not. `core -> personal` has been crossed since
+[dialogue 14](14-the-domain-with-no-package.md) recorded it and deliberately left
+it standing, so a `RULES` badge would be lit on day one and every day after --
+the notification-fatigue failure [§8](../../architecture/memory-graph.md) names,
+arriving through a door this dialogue would have built for it. The count belongs
+on the page, not in the nav.
+
+**What would reopen this:** the three states needing different *layouts* rather
+than different rows. Activating a memory wants to show the prompt it would join;
+accepting a classification wants to show the five packages that repeat. If those
+cannot share a list, `REVIEW` is three surfaces wearing one name and the merge
+is cosmetic.
+
+### Q2 — open
+
+*Not yet discussed.*
 
 ---
 
