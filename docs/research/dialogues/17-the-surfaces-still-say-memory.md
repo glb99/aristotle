@@ -409,7 +409,63 @@ honest constructions beat one dishonest interface. Implementation answers this,
 not argument — write the registry against the two domains that exist before
 believing it.
 
-### Q4 — open
+### Q4 — `sessions/` is built, and the trigger that fired is not the named one
+
+**Agreed 2026-09-09.**
+
+**The named trigger has not fired.** [Dialogue 14](14-the-domain-with-no-package.md)
+set it at *a second domain wanting durable sessions*, and Q1 and Q2 do not
+reach it. The seam already exists and both domains already use it — the agent's
+`SessionRepository` protocol, with `SessionStore` in memory for architecture and
+`SqlSessionRepository` durable for personal. A uniform `POST
+/ontologies/{id}/ask` dispatches to the domain and each composes its own runtime
+against that protocol. Architecture would have to want *persistence*, and
+`conversation.py` still refuses it on purpose.
+
+**A different trigger fired, and Q2 pulled it.** Splitting `/chat` gives the
+transport its own routes — `/sessions`, turns, transcript, extraction, memory —
+and those have to live somewhere. Leaving them in `personal/views.py` puts the
+transport's routes inside a domain, which is the category error Q2 just fixed
+for `/graph`. Dialogue 14 could not have seen this: the transport had no
+separate surface then.
+
+**Why `sessions/` is legal now when it was not.** #14 refused it on the
+five-part test — *no adapter, no vocabulary, no rules, no proposer, no surface;
+tables and a repository and no domain.* Four of the five are still true and the
+fifth changed: it now has a surface. And the objection underneath was
+accumulation — *"a package beside the real domains that is nobody's domain is
+precisely what `chat/` became, which is how `build_model_client` ended up
+there."* That risk inverts here, because under Q2 the domain logic moves *into*
+`personal/`, so `sessions/` starts empty of it rather than collecting it.
+
+**The precedent is `auth/`**: a feature that is not a domain, owning its tables,
+its routes and one job. `sessions/` is that shape — the session tables, the
+transport routes, the durable `SessionRepository`. The five-part test is not the
+right test for it, any more than it is for `auth/`.
+
+**Where the seventeen modules land**, after Q2 and Q3:
+
+| | |
+|---|---|
+| `sessions/` | `models.py`, `repository.py`, `access.py`, `tasks.py`, the transport half of `views.py` |
+| `ontologies/` | `graph_views.py`, becoming the uniform surface |
+| `personal/` | `catalogue`, `claim_extraction`, `memory_extraction`, `dates`, `graph_candidates`, `graph_memory`, `memory`, `review`, `comparison`, `service` |
+
+This also clears #14's recorded wart rather than carrying it: *"`personal/` owns
+four tables whose columns name nothing personal."* In `sessions/` the column
+names stop being a wart at all. **No table is renamed** — classes move,
+`__tablename__` stays, no migration, the same discipline #14 held to.
+
+**The acceptance test, same shape as #14's:** `sessions -> personal` must be **0
+edges**. If `sessions/` ends up importing `personal/` to serve a route, it is
+the wart in a new spelling and worse for having moved.
+
+**What would make this wrong,** and it is a cost rather than an objection: this
+is now three structural moves in one dialogue — `ontologies/`, `sessions/`, and
+a shrunken `personal/`. Each is justified separately; they land together or not
+at all. Q5 is where that is weighed.
+
+### Q5 — open
 
 *Not yet discussed.*
 
