@@ -6,7 +6,7 @@ named two: a ``remember`` tool the model calls mid-turn, which exists in
 host". This is the host building it.
 
 **Nothing here writes memory.** Every fact this module derives becomes a
-:class:`~bacteria.app.personal.models.ChatMemoryProposal`, which
+:class:`~bacteria.app.sessions.models.ChatMemoryProposal`, which
 ``assemble_context`` never reads, so it reaches no model until a human activates
 it. That is not a policy this module is being careful about — it is the only
 write it has access to, because :meth:`SqlSessionRepository.propose` is the only
@@ -58,8 +58,9 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from bacteria.agent.model.protocol import SendsMessages
-from bacteria.app.personal.models import ChatMemoryExtraction, ChatTranscriptItem
-from bacteria.app.personal.repository import KnownKeys, SqlSessionRepository
+from bacteria.app.personal.backing import session_repository
+from bacteria.app.sessions.models import ChatMemoryExtraction, ChatTranscriptItem
+from bacteria.app.sessions.repository import KnownKeys
 
 logger = logging.getLogger(__name__)
 
@@ -264,7 +265,7 @@ async def extract_memories(
         await _advance(db, session_id, reached)
         return ExtractionResult(through_seq=reached)
 
-    repository = SqlSessionRepository(db)
+    repository = session_repository(db)
     facts, dropped = await _propose_from(
         client, messages, max_proposals, await repository.known_keys(session_id)
     )

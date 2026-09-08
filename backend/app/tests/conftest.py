@@ -42,7 +42,7 @@ from bacteria.app.core import settings as settings_module
 from bacteria.app.core.settings import ENV_PREFIX, Settings, get_settings
 from bacteria.app.graph import models as _graph_models  # noqa: F401
 from bacteria.app.ingestion import models as _ingestion_models  # noqa: F401
-from bacteria.app.personal import models as _chat_models  # noqa: F401
+from bacteria.app.sessions import models as _session_models  # noqa: F401
 
 LOOP_FACTORY = asyncio.SelectorEventLoop if sys.platform == "win32" else None
 """The loop class the tests run on, or ``None`` to accept the default.

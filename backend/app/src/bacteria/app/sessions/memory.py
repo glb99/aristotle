@@ -38,7 +38,7 @@ from bacteria.agent.session.store import (
     MemoryEntry,
     MemoryScope,
 )
-from bacteria.app.personal.models import (
+from bacteria.app.sessions.models import (
     ChatMemoryEntry,
     ChatMemoryProposal,
     ChatUserMemoryEntry,

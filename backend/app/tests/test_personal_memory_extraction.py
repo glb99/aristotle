@@ -26,8 +26,8 @@ from bacteria.app.personal.memory_extraction import (
     PROMPT_VERSION,
     extract_memories,
 )
-from bacteria.app.personal.models import ChatMemoryEntry, ChatMemoryExtraction, ChatMemoryProposal
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.models import ChatMemoryEntry, ChatMemoryExtraction, ChatMemoryProposal
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 
 class _FakeClient:

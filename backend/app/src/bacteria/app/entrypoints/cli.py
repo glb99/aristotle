@@ -44,11 +44,12 @@ from bacteria.app.graph.catalogue import PROMOTION_THRESHOLD, promotable
 from bacteria.app.graph.repository import SqlGraphRepository, tally_relations
 from bacteria.app.graph.service import expire_tail
 from bacteria.app.personal import review
+from bacteria.app.personal.backing import session_repository
 from bacteria.app.personal.catalogue import VOCABULARY
 from bacteria.app.personal.comparison import compare
-from bacteria.app.personal.models import ChatSession
-from bacteria.app.personal.repository import SqlSessionRepository
 from bacteria.app.personal.service import run_turn
+from bacteria.app.sessions.models import ChatSession
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 
 async def _issue(principal_id: str, label: str) -> int:
@@ -173,7 +174,7 @@ async def _chat(principal_id: str, session_id: str | None) -> int:
     """Hold a conversation against the real database, from a terminal.
 
     Composition only, like everything here: it opens a session, builds the same
-    :class:`~bacteria.app.personal.repository.SqlSessionRepository` the API builds,
+    :class:`~bacteria.app.sessions.repository.SqlSessionRepository` the API builds,
     and calls the same :func:`~bacteria.app.personal.service.run_turn`. There is no
     second turn implementation and there must not be — the reply, the
     transcript rows, and the extraction trigger are whatever the HTTP path
@@ -210,7 +211,7 @@ async def _chat(principal_id: str, session_id: str | None) -> int:
     # working in one configuration and failing in the other at the worst moment.
     queue = register_tasks()
     async with queue.open_async(), AsyncSession(get_engine()) as db:
-        repository = SqlSessionRepository(db)
+        repository = session_repository(db)
 
         # Before either branch, so it guards resuming as well as creating: the
         # principal reaches `run_turn` and the turn's span either way.
@@ -543,7 +544,7 @@ async def _one_shot(handler, *args) -> int:
     one of them learns something.
     """
     async with AsyncSession(get_engine()) as db:
-        return await handler(SqlSessionRepository(db), *args)
+        return await handler(session_repository(db), *args)
 
 
 async def _memory_diff(session_id: str) -> int:

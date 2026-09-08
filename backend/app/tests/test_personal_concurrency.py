@@ -16,8 +16,8 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from bacteria.agent.session.store import TranscriptItem
-from bacteria.app.personal.models import ChatTranscriptItem
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.models import ChatTranscriptItem
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 
 def message(text: str) -> TranscriptItem:

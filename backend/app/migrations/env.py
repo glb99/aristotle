@@ -36,7 +36,7 @@ from bacteria.app.core.db import include_name
 from bacteria.app.core.settings import get_settings
 from bacteria.app.graph import models as _graph_models  # noqa: F401
 from bacteria.app.ingestion import models as _ingestion_models  # noqa: F401
-from bacteria.app.personal import models as _personal_models  # noqa: F401
+from bacteria.app.sessions import models as _session_models  # noqa: F401
 
 config = context.config
 

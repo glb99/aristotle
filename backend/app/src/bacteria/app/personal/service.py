@@ -35,8 +35,8 @@ from bacteria.app.core import observability
 from bacteria.app.core.jobs import get_app
 from bacteria.app.core.model_client import build_model_client
 from bacteria.app.core.settings import get_settings
-from bacteria.app.personal.repository import KnownKeys, SqlSessionRepository
 from bacteria.app.personal.tasks import extract_assertions_task, extract_memories_task
+from bacteria.app.sessions.repository import KnownKeys, SqlSessionRepository
 
 
 def _candidate_supplier(

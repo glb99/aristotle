@@ -17,7 +17,7 @@ from bacteria.app.core import model_client
 from bacteria.app.core.db import session_scope
 from bacteria.app.core.settings import get_settings
 from bacteria.app.personal import service
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.repository import SqlSessionRepository
 from bacteria.app.views import create_app
 
 

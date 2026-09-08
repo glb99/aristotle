@@ -14,7 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from bacteria.agent.session.store import SESSION_SCOPE, USER_SCOPE
 from bacteria.app.personal import review
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 
 @pytest.fixture(name="repo")
