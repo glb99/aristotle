@@ -349,7 +349,67 @@ granularity. If *the architecture ontology* should be a single thing with
 projects inside it, the nesting inverts and `{id}` becomes the domain rather than
 the partition.
 
-### Q3 — open
+### Q3 — A registry, above the domains rather than beside them
+
+**Agreed 2026-09-09.**
+
+**The counter does not hold, and the reason is specific rather than a
+judgement call.** [Dialogue 14](14-the-domain-with-no-package.md) refused
+`sessions/` for *building a shared home for a thing with one user* — but that
+proposal *moved* one implementation into a shared home. A registry moves
+nothing; it declares what already exists twice. And it has a job the moment Q2
+lands: **a uniform route has to resolve `{id}` to a vocabulary.**
+`personal/graph_views.py` hardcodes `VOCABULARY` and `architecture/views.py`
+hardcodes `ontology_of(project)`; `GET /ontologies/{id}` can hardcode neither.
+So the registry is not built for a hypothetical third domain — it is built
+because Q2's routes need a lookup that does not exist. The third domain is the
+payoff, not the justification.
+
+**What it holds, and only this:**
+
+```python
+@dataclass(frozen=True)
+class Domain:
+    name: str                    # "personal", "architecture"
+    label: str                   # the UI's domain row
+    vocabulary: Vocabulary       # SqlGraphRepository(vocabulary=...)
+    owns: Callable[[str], bool]  # does this ontology id belong to me
+    model: Callable[..., Model]  # nodes · assertions · conclusions · proposals · rules
+```
+
+`model()` is where a plug-in seam usually goes fake, so: **the response has a
+common core and the production differs.** Personal's model is a projection of
+the log; architecture's is a fresh parse plus stored judgments. Each fills what
+it has and omits what it does not — fields absent, rather than routes
+conditioned. That is already the shape of `architecture.Model`.
+
+**Where it lives is the structural point.** Not `core/`, where
+`_core_names_a_domain_concept` would fire and be right — a registry naming
+domains is domain concepts. Not `graph/`, which is substrate and imports no
+domain. So a new top-level `ontologies/` package holding the registry and the
+uniform routes, importing both domains: **a composition root for domains**, the
+role `entrypoints/` plays for processes.
+
+That is what distinguishes it from `sessions/`. Dialogue 14's rule governs
+things trying to sit *beside* domains; this sits *above* them, a position with
+precedent in this tree. None of the seven boundaries forbids a package importing
+two features, so it is legal as well as principled.
+
+**The acceptance test, checkable by this codebase's own tool** the way #14's
+0-edge test was — `derive` produces the import graph, and a rule over it can say
+whether a third domain was added without editing the first two:
+
+> Adding a third domain touches no file outside its own package and the registry.
+
+**What would make this wrong:** `model()` needing a different signature per
+domain. Architecture's takes a `Project` and touches a filesystem; personal's
+takes a principal and touches only the log. If unifying that means a union type
+and a branch at every call site, the seam is a wrapper around an `if`, and two
+honest constructions beat one dishonest interface. Implementation answers this,
+not argument — write the registry against the two domains that exist before
+believing it.
+
+### Q4 — open
 
 *Not yet discussed.*
 
