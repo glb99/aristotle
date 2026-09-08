@@ -465,9 +465,94 @@ is now three structural moves in one dialogue — `ontologies/`, `sessions/`, an
 a shrunken `personal/`. Each is justified separately; they land together or not
 at all. Q5 is where that is weighed.
 
-### Q5 — open
+### Q5 — The evidence is that it builds the instrument the kill criterion needs
 
-*Not yet discussed.*
+**Agreed 2026-09-09.**
+
+**The cost, stated plainly.** Three structural moves landing together, every
+route renamed, the generated client regenerated, the console rewritten, the e2e
+specs rewritten. Behaviour-neutral except for one addition — `REVIEW`, which
+surfaces the live claims that have no review surface at all today.
+
+Q3 and Q4 each supplied a structural test. Both prove the import graph is clean
+and neither proves the interface is better, which was the worry this question
+opened with and it stands.
+
+**But the project's own kill criterion is currently unmeasurable, and that is
+the argument.** [Dialogue 13](13-the-subject-changed.md) retired
+[§14](../../architecture/memory-graph.md)'s bet and replaced it, because *a
+retired kill criterion must be replaced or the project stops being able to be
+wrong*:
+
+> **If the human accepts essentially everything the agent proposes, there is no
+> negotiation.** The surface is a rubber stamp, the "shared" model is the
+> agent's model with a signature on it, and the thesis is wrong. Measured as the
+> proportion of proposed classifications and rules **rejected or edited** rather
+> than waved through, with **both tails failing**.
+
+Nothing measures it. `architecture.ts` counts verdicts for the open project,
+personal counts nothing, and nothing counts across domains or over time. **Q1's
+`REVIEW` is the instrument that criterion needs, and it does not exist.**
+
+**And the one reading available already fails.** The architecture deck, in a
+screenshot taken while answering this dialogue:
+
+```
+PROPOSED   9 agreed · 0 disagreed · 5 open
+```
+
+Nine accepted, none rejected — the failure tail dialogue 13 named, and
+[§8](../../architecture/memory-graph.md) says why it matters: *"a review
+everyone clicks through is worse than no review, because everyone believes it
+was checked."*
+
+The caveat sharpens it rather than excusing it: **an agent made those nine
+judgments, not the human.** An agent proposed classifications, an agent accepted
+all nine, they were written with `origin="stated"` and `trust="user"`, and
+nothing anywhere flagged it. That is the rubber stamp literally, and it is
+invisible precisely because no surface reports a rejection rate.
+
+So the evidence that this refactor is worth its churn is not that the code is
+tidier. **It is that it builds the instrument the project's falsifiability
+depends on**, and the one reading available says the criterion is failing now.
+
+**This adds a requirement to Q1**: `REVIEW` must record *who judged* and report
+the rate. `stated_by` and `trust` are already on the row and nothing reads them
+for this. Without it the refactor is the same blind spot with a better layout.
+
+**What it still does not prove.** Nothing here measures whether the console is
+nicer to use, and this dialogue does not pretend otherwise. The weak substitute
+is a task test, binary and currently failing: *can a person answer "what is
+waiting anywhere?"* Today no, and `docs/status.md` records it. After Q1, yes by
+construction. One question is not a usability programme; it beats asserting an
+improvement nobody can check.
+
+---
+
+## Closing note
+
+Every answer here was decided by something already in the repository rather than
+by preference. Q1 by three storage states the code already distinguishes and one
+word did not. Q2 by a column whose docstring had already chosen the identifier,
+and by a verb spelled twice. Q3 by a lookup Q2 requires and neither domain can
+provide. Q4 by a trigger [dialogue 14](14-the-domain-with-no-package.md) named
+narrowly, which did *not* fire — a different one did, which #14 could not have
+seen. Q5 by a criterion dialogue 13 installed and nothing implemented.
+
+The pattern [dialogue 14](14-the-domain-with-no-package.md) named holds an
+eighth time: **the repository was the more reliable witness.** What this
+dialogue adds is that it was also the witness against the *project*, not only
+against a design — the rubber-stamp reading in Q5 is the first time an answer
+here has been evidence that the thesis might be wrong rather than that a
+structure is untidy.
+
+**What is now unbuilt and specified:** the two-row nav with four views and a
+three-state `REVIEW` that reports who judged; `/ontologies/{id}` over the
+substrate's eight verbs with creation left to the adapter; `/sessions` for the
+transport; an `ontologies/` registry above the domains; `sessions/` beside
+`auth/` as a feature that is not a domain; and two acceptance tests —
+`sessions -> personal` at 0 edges, and a third domain touching no file outside
+its own package and the registry.
 
 ---
 
