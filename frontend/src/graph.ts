@@ -360,10 +360,10 @@ function renderClaims(
       // pointless, which is worse for the one act that fills the graph than for
       // any of the ones that empty it.
       if (assertion.origin !== "stated") {
-        item.append(action("confirm", "quiet", () => confirmAssertion(assertion.assertion_id)));
+        item.append(action("confirm", "quiet", () => confirmAssertion("personal", assertion.assertion_id)));
       }
       item.append(
-        confirmable("retract", () => retractAssertion(assertion.assertion_id)),
+        confirmable("retract", () => retractAssertion("personal", assertion.assertion_id)),
       );
       list.append(item);
     }
@@ -436,7 +436,7 @@ function renderNodes(nodes: GraphNode[]): HTMLElement[] {
         // fifty for an act nobody performs twice on the same node.
         const label = window.prompt(`What should “${node.label}” be called?`, node.label);
         if (label === null || label.trim() === "" || label === node.label) return;
-        await renameNode(node.node_id, label.trim());
+        await renameNode("personal", node.node_id, label.trim());
       }),
     );
 
@@ -467,7 +467,7 @@ function linkButton(node: GraphNode, arming: boolean, eligible: boolean): HTMLBu
       return;
     }
     try {
-      await linkNodes(pendingLink, node.node_id);
+      await linkNodes("personal", pendingLink, node.node_id);
       pendingLink = null;
       linkError = null;
     } catch (failure) {
@@ -540,7 +540,7 @@ function renderConclusions(conclusions: GraphConclusion[]): HTMLElement[] {
     // be recomputed and the log keeps everything it rested on -- so it asks
     // once, not twice. A retracted one is gone from this list and stays gone.
     if (conclusion.status === "active") {
-      item.append(action("reject", "quiet", () => rejectConclusion(conclusion.conclusion_id)));
+      item.append(action("reject", "quiet", () => rejectConclusion("personal", conclusion.conclusion_id)));
     }
     list.append(item);
   }
@@ -597,7 +597,7 @@ export async function refresh(_sessionId: string | null): Promise<void> {
   // The session id is ignored, and the parameter stays because the shell hands
   // it to every tab. A graph belongs to a person and outlives the conversation
   // it was learned in, so switching sessions does not change what is drawn.
-  const [graph, conclusions] = await Promise.all([readGraph(), readConclusions()]);
+  const [graph, conclusions] = await Promise.all([readGraph("personal"), readConclusions("personal")]);
 
   const nodes = labelsOf(graph.nodes);
   // Every state, not only the provable one. Filtering to `conflict` meant a

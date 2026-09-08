@@ -109,9 +109,9 @@ export const readMemory = (sessionId: string) =>
  * here: a graph belongs to a person and outlives every conversation it was
  * learned in, so there is no id to pass and therefore no id to get wrong.
  */
-export const readGraph = () => unwrap(api.GET("/graph"));
+export const readGraph = (ontology: string) => unwrap(api.GET("/ontologies/{ontology}", { params: { path: { ontology } } }));
 
-export const readConclusions = () => unwrap(api.GET("/graph/conclusions"));
+export const readConclusions = (ontology: string) => unwrap(api.GET("/ontologies/{ontology}/conclusions", { params: { path: { ontology } } }));
 
 export const readProposals = (sessionId: string) =>
   unwrap(
@@ -175,10 +175,10 @@ export const closeSession = () => api.DELETE("/auth/session");
  * carries what changed, so a caller redraws from it rather than re-fetching the
  * graph to discover that it should.
  */
-export const retractAssertion = (assertionId: string) =>
+export const retractAssertion = (ontology: string, assertionId: string) =>
   unwrap(
-    api.POST("/graph/assertions/{assertion_id}/retract", {
-      params: { path: { assertion_id: assertionId } },
+    api.POST("/ontologies/{ontology}/assertions/{assertion_id}/retract", {
+      params: { path: { ontology, assertion_id: assertionId } },
     }),
   );
 
@@ -189,30 +189,30 @@ export const retractAssertion = (assertionId: string) =>
  * console could be complete-looking and still leave the graph unable to say
  * anything to the model it belongs to.
  */
-export const confirmAssertion = (assertionId: string) =>
+export const confirmAssertion = (ontology: string, assertionId: string) =>
   unwrap(
-    api.POST("/graph/assertions/{assertion_id}/confirm", {
-      params: { path: { assertion_id: assertionId } },
+    api.POST("/ontologies/{ontology}/assertions/{assertion_id}/confirm", {
+      params: { path: { ontology, assertion_id: assertionId } },
     }),
   );
 
-export const rejectConclusion = (conclusionId: string) =>
+export const rejectConclusion = (ontology: string, conclusionId: string) =>
   unwrap(
-    api.POST("/graph/conclusions/{conclusion_id}/reject", {
-      params: { path: { conclusion_id: conclusionId } },
+    api.POST("/ontologies/{ontology}/conclusions/{conclusion_id}/reject", {
+      params: { path: { ontology, conclusion_id: conclusionId } },
     }),
   );
 
-export const renameNode = (nodeId: string, label: string) =>
+export const renameNode = (ontology: string, nodeId: string, label: string) =>
   unwrap(
-    api.POST("/graph/nodes/{node_id}/rename", {
-      params: { path: { node_id: nodeId } },
+    api.POST("/ontologies/{ontology}/nodes/{node_id}/rename", {
+      params: { path: { ontology, node_id: nodeId } },
       body: { label },
     }),
   );
 
-export const linkNodes = (left: string, right: string) =>
-  unwrap(api.POST("/graph/links", { body: { left, right } }));
+export const linkNodes = (ontology: string, left: string, right: string) =>
+  unwrap(api.POST("/ontologies/{ontology}/links", { params: { path: { ontology } }, body: { left, right } }));
 
 export const listProjects = () => unwrap(api.GET("/architecture/projects"));
 

@@ -38,9 +38,14 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
+from bacteria.app.architecture.decisions import ontology_of
+from bacteria.app.architecture.repository import SqlProjectRepository
 from bacteria.app.auth.dependencies import CurrentPrincipal
+from bacteria.app.auth.principal import Principal
 from bacteria.app.core.dependencies import DbSession
+from bacteria.app.graph.catalogue import Vocabulary
 from bacteria.app.graph.conclusions import Conclusion
 from bacteria.app.graph.constraints import conflicts_for
 from bacteria.app.graph.log import Assertion
@@ -61,9 +66,53 @@ from bacteria.app.graph.service import (
     retract,
 )
 from bacteria.app.graph.temporal import OPEN_ENDED
-from bacteria.app.personal.catalogue import VOCABULARY
+from bacteria.app.ontologies.registry import (
+    UnknownOntology,
+    domain_for,
+    listing,
+    partition,
+)
 
-router = APIRouter(prefix="/graph", tags=["graph"])
+router = APIRouter(prefix="/ontologies", tags=["ontologies"])
+
+
+async def _for(
+    ontology: str, principal: Principal, db: AsyncSession
+) -> tuple[Optional[str], Vocabulary]:
+    """The partition to narrow on and the vocabulary to read against.
+
+    Both come from the id, which is the point of ADR 0013 §4: the URL names what
+    the column names, so a route needs no state to know which model it is
+    looking at.
+
+    **And ownership is checked here, which it was not at first.** The routes
+    this replaces each named a resource the caller had to own -- a session id, a
+    project id -- and `architecture/views.py` looked it up through
+    `repository.owned`. Parameterising by ontology dropped that: any
+    well-formed `architecture:<uuid>` resolved on its prefix alone and read an
+    empty partition, so the check moved from "somebody else's project is a 404"
+    to "somebody else's project is an empty graph". Nothing leaked, because the
+    partition really was empty -- but the rule had quietly stopped being
+    enforced, which is the state it fails from next time.
+
+    A 404 for both unknown and not-yours, deliberately. `personal/access.py`
+    gives the reason for sessions and it holds here: a 403 would confirm the
+    ontology exists, which turns a guessable path segment into an oracle for
+    enumerating somebody's checkouts.
+    """
+    try:
+        domain = domain_for(ontology)
+    except UnknownOntology:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail=f"no such ontology: {ontology}"
+        ) from None
+
+    if domain.prefix is not None:
+        project_id = ontology.removeprefix(domain.prefix)
+        if await SqlProjectRepository(db).owned(principal.id, project_id) is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"no such ontology: {ontology}")
+
+    return partition(ontology), domain.vocabulary
 
 
 class NodeOut(BaseModel):
@@ -158,8 +207,34 @@ class ConclusionOut(BaseModel):
     evidence: list[str]
 
 
-@router.get("", response_model=GraphOut)
-async def read_graph(principal: CurrentPrincipal, db: DbSession) -> GraphOut:
+class OntologyOut(BaseModel):
+    """One model this caller has, and which domain governs it."""
+
+    ontology: str
+    domain: str
+    label: str
+
+
+@router.get("", response_model=list[OntologyOut])
+async def list_ontologies(principal: CurrentPrincipal, db: DbSession) -> list[OntologyOut]:
+    """Every model this caller can open, personal first.
+
+    **The route a domain switcher needs and nothing could answer.** Which
+    ontologies exist was implicit in which packages happened to have a
+    catalogue, and the console hardcoded two tabs against that.
+
+    Personal is always present because it exists when the principal does --
+    which is [ADR 0013](../../../../../../docs/adr/0013-the-console-is-domain-by-view-and-the-api-is-ontologies.md)
+    §6's reason creation stays domain-specific: there is nothing to create.
+    Architecture's are one per checkout, and reading them is a query against
+    that domain's own table, so it is asked rather than assumed.
+    """
+    projects = await SqlProjectRepository(db).owned_by(principal.id)
+    return [OntologyOut(**entry) for entry in listing([(ontology_of(p), p.name) for p in projects])]
+
+
+@router.get("/{ontology}", response_model=GraphOut)
+async def read_graph(ontology: str, principal: CurrentPrincipal, db: DbSession) -> GraphOut:
     """The caller's own graph as it currently stands.
 
     "Currently" means believed now — ``recorded_until IS NULL`` — not everything
@@ -172,7 +247,8 @@ async def read_graph(principal: CurrentPrincipal, db: DbSession) -> GraphOut:
     that goes stale the moment either changes — and the thing it would be
     caching is a comparison over a set small enough to walk.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     believed = _one_row_per_claim(await repository.current(principal.id))
     conclusions = await repository.depending_on(principal.id, [a.assertion_id for a in believed])
 
@@ -184,7 +260,7 @@ async def read_graph(principal: CurrentPrincipal, db: DbSession) -> GraphOut:
             right=conflict.right,
             state=conflict.state,
         )
-        for relation in VOCABULARY.functional()
+        for relation in vocabulary.functional()
         for conflict in conflicts_for(relation, believed, conclusions=conclusions)
     ]
 
@@ -209,7 +285,7 @@ async def read_graph(principal: CurrentPrincipal, db: DbSession) -> GraphOut:
                 starts=a.valid.start,
                 trust=a.trust,
                 origin=a.origin,
-                canonical=VOCABULARY.is_canonical(a.rel),
+                canonical=vocabulary.is_canonical(a.rel),
                 recorded_at=a.recorded_at,
                 reason=(a.attrs or {}).get("reason"),
             )
@@ -219,8 +295,10 @@ async def read_graph(principal: CurrentPrincipal, db: DbSession) -> GraphOut:
     )
 
 
-@router.get("/conclusions", response_model=list[ConclusionOut])
-async def read_conclusions(principal: CurrentPrincipal, db: DbSession) -> list[ConclusionOut]:
+@router.get("/{ontology}/conclusions", response_model=list[ConclusionOut])
+async def read_conclusions(
+    ontology: str, principal: CurrentPrincipal, db: DbSession
+) -> list[ConclusionOut]:
     """Beliefs the system drew, including the ones that have gone stale.
 
     Stale ones are returned rather than filtered, because "this rested on
@@ -228,7 +306,8 @@ async def read_conclusions(principal: CurrentPrincipal, db: DbSession) -> list[C
     tell a person, and hiding it would leave them looking at a shorter list with
     no indication anything had been withdrawn.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     believed = await repository.current(principal.id)
     conclusions = await repository.depending_on(principal.id, [a.assertion_id for a in believed])
     return [_conclusion_out(c) for c in conclusions]
@@ -315,9 +394,9 @@ class RenameIn(BaseModel):
     label: str
 
 
-@router.post("/assertions/{assertion_id}/retract", response_model=OutcomeOut)
+@router.post("/{ontology}/assertions/{assertion_id}/retract", response_model=OutcomeOut)
 async def retract_assertion(
-    assertion_id: str, principal: CurrentPrincipal, db: DbSession
+    ontology: str, assertion_id: str, principal: CurrentPrincipal, db: DbSession
 ) -> OutcomeOut:
     """Stop believing a claim.
 
@@ -326,7 +405,8 @@ async def retract_assertion(
     reconstructs what was believed before. `DELETE` would name the wrong act, and
     a route's shape is the first thing anyone reads about what it does.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     try:
         claim = await repository.assertion(principal.id, assertion_id)
     except UnknownAssertionError:
@@ -337,9 +417,9 @@ async def retract_assertion(
     return _rendered(outcome)
 
 
-@router.post("/assertions/{assertion_id}/confirm", response_model=OutcomeOut)
+@router.post("/{ontology}/assertions/{assertion_id}/confirm", response_model=OutcomeOut)
 async def confirm_assertion(
-    assertion_id: str, principal: CurrentPrincipal, db: DbSession
+    ontology: str, assertion_id: str, principal: CurrentPrincipal, db: DbSession
 ) -> OutcomeOut:
     """Endorse a claim the extractor proposed, so a prompt may be told it.
 
@@ -351,7 +431,8 @@ async def confirm_assertion(
     ``origin``, so the log records the endorsement as its own event — and
     confirming twice writes nothing, because saying yes twice is one yes.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     try:
         claim = await repository.assertion(principal.id, assertion_id)
     except UnknownAssertionError:
@@ -367,9 +448,9 @@ async def confirm_assertion(
     return _rendered(outcome)
 
 
-@router.post("/conclusions/{conclusion_id}/reject", response_model=OutcomeOut)
+@router.post("/{ontology}/conclusions/{conclusion_id}/reject", response_model=OutcomeOut)
 async def reject_conclusion(
-    conclusion_id: str, principal: CurrentPrincipal, db: DbSession
+    ontology: str, conclusion_id: str, principal: CurrentPrincipal, db: DbSession
 ) -> OutcomeOut:
     """Withdraw an inferred belief the owner disagrees with.
 
@@ -377,7 +458,8 @@ async def reject_conclusion(
     state it held before anyone assumed anything — and it will not be explained
     the same way again.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     try:
         outcome = await reject(
             repository, principal.id, conclusion_id, now=datetime.now(timezone.utc)
@@ -389,9 +471,9 @@ async def reject_conclusion(
     return _rendered(outcome)
 
 
-@router.post("/nodes/{node_id}/rename", response_model=NodeOut)
+@router.post("/{ontology}/nodes/{node_id}/rename", response_model=NodeOut)
 async def rename_node(
-    node_id: str, body: RenameIn, principal: CurrentPrincipal, db: DbSession
+    ontology: str, node_id: str, body: RenameIn, principal: CurrentPrincipal, db: DbSession
 ) -> NodeOut:
     """Correct what a node is called.
 
@@ -399,7 +481,8 @@ async def rename_node(
     should share a name are two nodes to link, so the refusal is an invitation
     rather than a wall.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     try:
         node = await rename(
             repository, principal.id, node_id, body.label, now=datetime.now(timezone.utc)
@@ -422,15 +505,18 @@ async def rename_node(
     )
 
 
-@router.post("/links", response_model=OutcomeOut, status_code=201)
-async def link_nodes(body: LinkIn, principal: CurrentPrincipal, db: DbSession) -> OutcomeOut:
+@router.post("/{ontology}/links", response_model=OutcomeOut, status_code=201)
+async def link_nodes(
+    ontology: str, body: LinkIn, principal: CurrentPrincipal, db: DbSession
+) -> OutcomeOut:
     """Say two nodes are the same thing.
 
     201, because this creates an assertion — the link is a claim like any other
     and can be retracted through the route above, which is the whole argument for
     linking rather than merging.
     """
-    repository = SqlGraphRepository(db, vocabulary=VOCABULARY)
+    scope, vocabulary = await _for(ontology, principal, db)
+    repository = SqlGraphRepository(db, ontology=scope, vocabulary=vocabulary)
     try:
         outcome = await link(
             repository,

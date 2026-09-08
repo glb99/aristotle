@@ -113,7 +113,7 @@ function personalRows(graphAssertions: GraphAssertion[], waiting: Waiting[]): Ro
       {
         label: "retract",
         danger: true,
-        run: () => retractAssertion(assertion.assertion_id),
+        run: () => retractAssertion("personal", assertion.assertion_id),
       },
     ],
   }));
@@ -255,7 +255,7 @@ export async function refresh(): Promise<void> {
   const rows =
     domain === "personal"
       ? personalRows(
-          (await readGraph()).assertions.filter((a: GraphAssertion) => a.origin !== "stated"),
+          (await readGraph("personal")).assertions.filter((a: GraphAssertion) => a.origin !== "stated"),
           await readAllProposals(),
         )
       : architectureModel
