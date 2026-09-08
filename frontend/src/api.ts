@@ -22,6 +22,7 @@ export type SessionSummary = components["schemas"]["SessionSummaryOut"];
 export type TranscriptEntry = components["schemas"]["TranscriptEntry"];
 export type MemoryEntry = components["schemas"]["MemoryEntryOut"];
 export type Proposal = components["schemas"]["ProposalOut"];
+export type Waiting = components["schemas"]["WaitingOut"];
 export type Held = components["schemas"]["HeldOut"];
 export type ExtractionProgress = components["schemas"]["ExtractionProgressOut"];
 export type Graph = components["schemas"]["GraphOut"];
@@ -118,6 +119,15 @@ export const readProposals = (sessionId: string) =>
       params: { path: { session_id: sessionId } },
     }),
   );
+
+/**
+ * Everything awaiting a decision, in every conversation the caller owns.
+ *
+ * The listing `readProposals` cannot give: that one needs a session id, so
+ * *what is waiting anywhere* required already holding them all. Dialogue 17's
+ * REVIEW is one surface across conversations and this is what feeds it.
+ */
+export const readAllProposals = () => unwrap(api.GET("/chat/proposals"));
 
 export const readExtraction = (sessionId: string) =>
   unwrap(
