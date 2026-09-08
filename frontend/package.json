@@ -12,10 +12,12 @@
     "e2e": "playwright test"
   },
   "dependencies": {
-    "openapi-fetch": "^0.14.1"
+    "openapi-fetch": "^0.14.1",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@types/three": "^0.185.4",
     "openapi-typescript": "^7.9.1",
     "typescript": "^5.9.3",
     "vite": "^7.1.14"
