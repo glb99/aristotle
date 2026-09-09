@@ -15,7 +15,7 @@ a startup race into a step that has to work inside a CI job with none of them.
 import json
 import sys
 
-from bacteria.app.views import create_app
+from aristotle.app.views import create_app
 
 
 def main() -> int:

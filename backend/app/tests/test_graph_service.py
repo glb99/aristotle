@@ -16,10 +16,10 @@ from datetime import datetime, timezone
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.graph.conclusions import Conclusion
-from bacteria.app.graph.log import Assertion, supersede
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.graph.service import (
+from aristotle.app.graph.conclusions import Conclusion
+from aristotle.app.graph.log import Assertion, supersede
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.graph.service import (
     LabelTakenError,
     MismatchedKindsError,
     claims_for,
@@ -35,8 +35,8 @@ from bacteria.app.graph.service import (
     retract,
     revise,
 )
-from bacteria.app.graph.temporal import OPEN_ENDED, Interval
-from bacteria.app.personal.catalogue import VOCABULARY
+from aristotle.app.graph.temporal import OPEN_ENDED, Interval
+from aristotle.app.personal.catalogue import VOCABULARY
 
 W1 = datetime(2026, 5, 4, tzinfo=timezone.utc)
 W3 = datetime(2026, 5, 18, tzinfo=timezone.utc)

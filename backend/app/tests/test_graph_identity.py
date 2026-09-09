@@ -17,10 +17,10 @@ from datetime import datetime, timezone
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.graph.identity import normalize
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.graph.service import refer_to
-from bacteria.app.personal.catalogue import VOCABULARY
+from aristotle.app.graph.identity import normalize
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.graph.service import refer_to
+from aristotle.app.personal.catalogue import VOCABULARY
 
 NOW = datetime(2026, 5, 4, tzinfo=timezone.utc)
 LATER = datetime(2026, 5, 25, tzinfo=timezone.utc)
@@ -143,7 +143,7 @@ async def test_the_owner_node_id_is_derived_rather_than_allocated(repo):
     recording that they are one person. Derived from the user id, that race has
     nowhere to happen.
     """
-    from bacteria.app.graph.identity import owner_node_id
+    from aristotle.app.graph.identity import owner_node_id
 
     node = await refer_to(repo, "u1", "person", "self", now=NOW)
 
@@ -166,7 +166,7 @@ async def test_a_person_actually_called_self_gets_an_ordinary_node(repo):
     the owner is reserved for `kind="person"` alone. A person genuinely called
     that is the case this cannot serve, and is rare enough to accept.
     """
-    from bacteria.app.graph.identity import owner_node_id
+    from aristotle.app.graph.identity import owner_node_id
 
     org = await refer_to(repo, "u1", "organization", "Self", now=NOW)
 

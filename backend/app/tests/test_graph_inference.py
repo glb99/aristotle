@@ -10,10 +10,10 @@ Pure — no database, no fixtures.
 
 from datetime import datetime, timezone
 
-from bacteria.app.graph.catalogue import Relation
-from bacteria.app.graph.inference import infer_succession
-from bacteria.app.graph.log import Assertion
-from bacteria.app.graph.temporal import OPEN_ENDED, Interval
+from aristotle.app.graph.catalogue import Relation
+from aristotle.app.graph.inference import infer_succession
+from aristotle.app.graph.log import Assertion
+from aristotle.app.graph.temporal import OPEN_ENDED, Interval
 
 NOW = datetime(2026, 5, 25, tzinfo=timezone.utc)
 JAN = datetime(2026, 1, 15, tzinfo=timezone.utc)

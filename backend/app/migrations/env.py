@@ -2,7 +2,7 @@
 
 Three things here are deliberate and easy to get wrong when copying a template.
 
-The database URL comes from :mod:`bacteria.app.core.settings`, not from
+The database URL comes from :mod:`aristotle.app.core.settings`, not from
 ``alembic.ini``. A URL in the ini file is a second place the database can be
 named, and the failure that produces — migrating one database while the
 application talks to another — is quiet and confusing.
@@ -14,7 +14,7 @@ psycopg's async mode cannot run on the default event loop. Migrations are a
 short-lived administrative task with no concurrency to gain from, so the driver
 prefix is stripped and a normal engine is used.
 
-``include_name`` comes from :mod:`bacteria.app.core.db` rather than being defined
+``include_name`` comes from :mod:`aristotle.app.core.db` rather than being defined
 here, because this module calls into Alembic's context at import and so cannot
 be imported by anything else — including the drift test, which needs the same
 filter to compare like with like.
@@ -29,14 +29,14 @@ from sqlmodel import SQLModel
 # Imported for the side effect of registering tables on SQLModel.metadata.
 # Without every model module imported here, autogenerate sees a table it does
 # not know about and cheerfully writes a migration to drop it.
-from bacteria.app import models as _root_models  # noqa: F401
-from bacteria.app.architecture import models as _architecture_models  # noqa: F401
-from bacteria.app.auth import models as _auth_models  # noqa: F401
-from bacteria.app.core.db import include_name
-from bacteria.app.core.settings import get_settings
-from bacteria.app.graph import models as _graph_models  # noqa: F401
-from bacteria.app.ingestion import models as _ingestion_models  # noqa: F401
-from bacteria.app.sessions import models as _session_models  # noqa: F401
+from aristotle.app import models as _root_models  # noqa: F401
+from aristotle.app.architecture import models as _architecture_models  # noqa: F401
+from aristotle.app.auth import models as _auth_models  # noqa: F401
+from aristotle.app.core.db import include_name
+from aristotle.app.core.settings import get_settings
+from aristotle.app.graph import models as _graph_models  # noqa: F401
+from aristotle.app.ingestion import models as _ingestion_models  # noqa: F401
+from aristotle.app.sessions import models as _session_models  # noqa: F401
 
 config = context.config
 
@@ -44,7 +44,7 @@ if config.config_file_name is not None:
     # `disable_existing_loggers=False`, and it is not a preference. `fileConfig`
     # defaults it to True, which switches off every logger that already exists
     # rather than merely reconfiguring the ones named in `alembic.ini` -- so
-    # every `bacteria.*` logger created before this import goes permanently
+    # every `aristotle.*` logger created before this import goes permanently
     # silent, having logged nothing wrong and reported nothing about it.
     #
     # Alembic's generated template ships the defaulted call and it is harmless

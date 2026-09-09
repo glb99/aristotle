@@ -12,10 +12,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.architecture.layout import source_roots
-from bacteria.app.auth.service import issue_key
-from bacteria.app.core.db import session_scope
-from bacteria.app.views import create_app
+from aristotle.app.architecture.layout import source_roots
+from aristotle.app.auth.service import issue_key
+from aristotle.app.core.db import session_scope
+from aristotle.app.views import create_app
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -70,11 +70,11 @@ class TestLayout:
         """A PEP 420 directory between ``src`` and the package is kept.
 
         This is the real failure it was written for: this workspace's
-        ``src/bacteria/`` has no ``__init__.py``, so climbing stopped at
-        ``src/bacteria`` and 232 of 234 imports stopped resolving. The graph came
+        ``src/aristotle/`` has no ``__init__.py``, so climbing stopped at
+        ``src/aristotle`` and 232 of 234 imports stopped resolving. The graph came
         back small and tidy rather than obviously broken.
         """
-        _package(tmp_path, "src.bacteria.app")
+        _package(tmp_path, "src.aristotle.app")
 
         assert {p.name for p in source_roots(tmp_path)} == {"src"}
 
@@ -116,7 +116,7 @@ class TestProjects:
         created = client.post(
             "/architecture/projects",
             headers=auth(token),
-            json={"location": str(REPO), "name": "bacteria"},
+            json={"location": str(REPO), "name": "aristotle"},
         )
         assert created.status_code == 201
         project_id = created.json()["project_id"]
@@ -127,7 +127,7 @@ class TestProjects:
         body = model.json()
         assert sorted(body["roots"]) == ["backend/agent/src", "backend/app/src"]
         assert len(body["modules"]) > 50
-        assert any(m["name"] == "bacteria.app.graph.service" for m in body["modules"])
+        assert any(m["name"] == "aristotle.app.graph.service" for m in body["modules"])
         assert "graph_assertion" in body["tables"]
 
     async def test_every_boundary_is_reported_including_the_undecidable(

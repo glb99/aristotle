@@ -22,7 +22,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import text
 
-from bacteria.app.graph.models import ALWAYS, OPEN_ENDED
+from aristotle.app.graph.models import ALWAYS, OPEN_ENDED
 
 
 def test_the_open_bound_is_not_postgres_infinity():

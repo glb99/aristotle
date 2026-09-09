@@ -9,8 +9,8 @@ rather than given some.
 
 from pathlib import Path
 
-from bacteria.app.architecture.classify import propose, roles, sentence
-from bacteria.app.architecture.derive import Derived, Import, Module
+from aristotle.app.architecture.classify import propose, roles, sentence
+from aristotle.app.architecture.derive import Derived, Import, Module
 
 
 def _repo(*modules: str, imports: tuple[tuple[str, str], ...] = ()) -> Derived:
@@ -136,8 +136,8 @@ class TestProposals:
     def test_a_package_of_one_module_is_not_classified(self) -> None:
         """Namespace roots and leaf directories say nothing about the design.
 
-        They were most of the noise in the first version: ``bacteria``,
-        ``bacteria.agent`` and ``app.alembic.versions`` all arrived as claims.
+        They were most of the noise in the first version: ``aristotle``,
+        ``aristotle.agent`` and ``app.alembic.versions`` all arrived as claims.
         """
         derived = _repo(
             "app.a.service",
@@ -179,8 +179,8 @@ class TestAgainstThisRepository:
         classifier that missed them would be wrong in a way no synthetic fixture
         would reveal.
         """
-        from bacteria.app.architecture.derive import derive
-        from bacteria.app.architecture.layout import source_roots
+        from aristotle.app.architecture.derive import derive
+        from aristotle.app.architecture.layout import source_roots
 
         repo = Path(__file__).resolve().parents[3]
         derived = derive(source_roots(repo))
@@ -189,11 +189,11 @@ class TestAgainstThisRepository:
         assert {"models", "repository", "service", "views"} <= found
 
         features = {p.subject for p in propose(derived) if p.claim == "feature"}
-        assert "bacteria.app.personal" in features
-        assert "bacteria.app.graph" in features
+        assert "aristotle.app.personal" in features
+        assert "aristotle.app.graph" in features
 
         layers = {p.subject for p in propose(derived) if p.claim == "layer"}
-        assert "bacteria.app.core" in layers
+        assert "aristotle.app.core" in layers
 
     def test_the_transport_imports_no_domain(self) -> None:
         """`sessions -> personal` is zero edges, and this is why the package exists.
@@ -214,8 +214,8 @@ class TestAgainstThisRepository:
         it, and the edge this guards against is one nobody would write on
         purpose.
         """
-        from bacteria.app.architecture.derive import derive
-        from bacteria.app.architecture.layout import source_roots
+        from aristotle.app.architecture.derive import derive
+        from aristotle.app.architecture.layout import source_roots
 
         repo = Path(__file__).resolve().parents[3]
         derived = derive(source_roots(repo))
@@ -224,11 +224,11 @@ class TestAgainstThisRepository:
         reached = {
             package(edge.dst)
             for edge in derived.imports
-            if package(edge.src) == "bacteria.app.sessions"
+            if package(edge.src) == "aristotle.app.sessions"
         }
 
-        assert "bacteria.app.personal" not in reached
-        assert "bacteria.app.architecture" not in reached
+        assert "aristotle.app.personal" not in reached
+        assert "aristotle.app.architecture" not in reached
         # Not vacuous: the package does import things, so an empty result would
         # mean the parse found nothing rather than that the rule holds.
-        assert "bacteria.agent.session" in reached
+        assert "aristotle.agent.session" in reached

@@ -6,8 +6,8 @@ import os
 import pytest
 from pydantic import ValidationError
 
-from bacteria.app.core import settings as settings_module
-from bacteria.app.core.settings import Settings, load_env_file
+from aristotle.app.core import settings as settings_module
+from aristotle.app.core.settings import Settings, load_env_file
 
 
 @pytest.fixture(name="dotenv_is_read")
@@ -28,7 +28,7 @@ def _dotenv_is_read(monkeypatch):
 
 
 def test_settings_read_the_prefixed_environment(monkeypatch):
-    monkeypatch.setenv("BACTERIA_LOG_LEVEL", "DEBUG")
+    monkeypatch.setenv("ARISTOTLE_LOG_LEVEL", "DEBUG")
 
     assert Settings(_env_file=None).log_level == "DEBUG"
 
@@ -36,19 +36,19 @@ def test_settings_read_the_prefixed_environment(monkeypatch):
 def test_an_unknown_setting_fails_at_startup_rather_than_being_ignored(monkeypatch):
     """A typo in a deployment's environment must not be silently discarded.
 
-    Ignoring extras means `BACTERIA_DATABSE_URL` leaves the real setting at its
+    Ignoring extras means `ARISTOTLE_DATABSE_URL` leaves the real setting at its
     default — a local SQLite file — and the service starts, serves, and writes
     to the wrong place with nothing in the logs to say so.
     """
-    monkeypatch.setenv("BACTERIA_DATABSE_URL", "postgresql://typo")
+    monkeypatch.setenv("ARISTOTLE_DATABSE_URL", "postgresql://typo")
 
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
 
 
 def test_unset_settings_fall_back_to_defaults(monkeypatch):
-    monkeypatch.delenv("BACTERIA_LOG_LEVEL", raising=False)
-    monkeypatch.delenv("BACTERIA_DATABASE_URL", raising=False)
+    monkeypatch.delenv("ARISTOTLE_LOG_LEVEL", raising=False)
+    monkeypatch.delenv("ARISTOTLE_DATABASE_URL", raising=False)
 
     settings = Settings(_env_file=None)
 
@@ -69,7 +69,7 @@ def test_provider_credentials_in_the_env_file_do_not_break_settings(tmp_path, mo
     """
     env = tmp_path / ".env"
     env.write_text(
-        "GEMINI_API_KEY=secret-value\nMODEL_PROVIDER=gemini\nBACTERIA_LOG_LEVEL=DEBUG\n",
+        "GEMINI_API_KEY=secret-value\nMODEL_PROVIDER=gemini\nARISTOTLE_LOG_LEVEL=DEBUG\n",
         encoding="utf-8",
     )
     monkeypatch.chdir(tmp_path)
@@ -89,11 +89,11 @@ def test_provider_credentials_in_the_env_file_do_not_break_settings(tmp_path, mo
 def test_a_typo_in_a_prefixed_variable_is_still_rejected(monkeypatch):
     """Relaxing `extra` must not relax the guard that actually guards.
 
-    `BACTERIA_DATABSE_URL` leaves `database_url` at its default and the service
+    `ARISTOTLE_DATABSE_URL` leaves `database_url` at its default and the service
     starts happily against the wrong database. That is the mistake people make,
     and it is caught by the hand-written validator rather than by pydantic.
     """
-    monkeypatch.setenv("BACTERIA_DATABSE_URL", "postgresql+psycopg://x/y")
+    monkeypatch.setenv("ARISTOTLE_DATABSE_URL", "postgresql+psycopg://x/y")
 
     with pytest.raises(ValidationError, match="DATABSE"):
         Settings()
@@ -109,7 +109,7 @@ def test_load_env_file_puts_unprefixed_keys_where_the_sdks_look(
     reading that file into its own fields puts nothing into `os.environ`, and
     `ANTHROPIC_API_KEY` is read from the real environment by the SDK under that
     exact name. So the service could not reach a model locally while
-    `uv run bacteria-agent` could — the agent's composition root called `load_dotenv`
+    `uv run aristotle-agent` could — the agent's composition root called `load_dotenv`
     and no entrypoint here did.
     """
     (tmp_path / ".env").write_text("ANTHROPIC_API_KEY=from-the-file\n", encoding="utf-8")
@@ -144,7 +144,7 @@ def test_a_setting_without_the_prefix_is_reported(monkeypatch, caplog):
     """The other half of the typo problem, and the one that stays silent.
 
     `_reject_unknown_prefixed_variables` only inspects names that already start
-    with `BACTERIA_`, so it catches a misspelled prefix and cannot see a missing
+    with `ARISTOTLE_`, so it catches a misspelled prefix and cannot see a missing
     one. `RUN_WORKER_IN_API=true` is then never collected, the field keeps its
     `False` default, and the deployment converses perfectly while no job is ever
     consumed — which reads as a broken feature rather than a missing variable.
@@ -157,7 +157,7 @@ def test_a_setting_without_the_prefix_is_reported(monkeypatch, caplog):
 
     assert settings.run_worker_in_api is False, "the unprefixed name must still not be read"
     assert "RUN_WORKER_IN_API" in caplog.text
-    assert "BACTERIA_RUN_WORKER_IN_API" in caplog.text
+    assert "ARISTOTLE_RUN_WORKER_IN_API" in caplog.text
 
 
 def test_the_platforms_own_database_url_is_not_complained_about(monkeypatch, caplog):

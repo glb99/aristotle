@@ -8,8 +8,8 @@ catalogue rather than about a row, or promoting a relation becomes a migration.
 Pure — no database, no fixtures.
 """
 
-from bacteria.app.graph.catalogue import promotable
-from bacteria.app.personal.catalogue import CATALOGUE, VOCABULARY
+from aristotle.app.graph.catalogue import promotable
+from aristotle.app.personal.catalogue import CATALOGUE, VOCABULARY
 
 
 def test_a_converse_alias_reports_that_the_ends_must_swap():

@@ -7,7 +7,7 @@ these tests exercise the first without the second.
 
 import contextlib
 
-from bacteria.app.ingestion.pipeline import Batch, build_pipeline
+from aristotle.app.ingestion.pipeline import Batch, build_pipeline
 
 
 async def run(records, persist=None) -> Batch:

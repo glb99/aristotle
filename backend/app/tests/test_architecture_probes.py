@@ -12,12 +12,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.architecture.models import Project
-from bacteria.app.architecture.probes import describe, run_tests
-from bacteria.app.auth.service import issue_key
-from bacteria.app.core.db import session_scope
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.views import create_app
+from aristotle.app.architecture.models import Project
+from aristotle.app.architecture.probes import describe, run_tests
+from aristotle.app.auth.service import issue_key
+from aristotle.app.core.db import session_scope
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.views import create_app
 
 REPO = Path(__file__).resolve().parents[3]
 

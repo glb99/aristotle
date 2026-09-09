@@ -10,7 +10,7 @@ is exactly where it would be lost.
 
 Nullable on all three, which is both honest and safe. Rows written before this
 have no version to backfill, and the ``remember`` tool has none to supply at all
-— its schema is built in ``bacteria.agent``. Nullable is also what makes this
+— its schema is built in ``aristotle.agent``. Nullable is also what makes this
 applicable to tables that already have rows, which is the failure this repository
 keeps a note about: autogenerate will happily write ``ADD COLUMN ... NOT NULL``
 with no default, and that fails outright against real data while passing on an

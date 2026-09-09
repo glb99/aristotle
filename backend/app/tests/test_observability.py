@@ -1,13 +1,13 @@
 """What decides whether a process prints spans to its own stdout.
 
-Exercises :func:`~bacteria.app.core.observability._should_print_spans` directly
-rather than through :func:`~bacteria.app.core.observability.configure`, and that
+Exercises :func:`~aristotle.app.core.observability._should_print_spans` directly
+rather than through :func:`~aristotle.app.core.observability.configure`, and that
 is the reason the rule was extracted at all: `conftest` patches `configure` out
 for the whole session, so a test reaching it would either observe the patch or
 acquire a real exporter to watch. The decision is separable, so it is separate.
 """
 
-from bacteria.app.core.observability import _should_print_spans
+from aristotle.app.core.observability import _should_print_spans
 
 
 def test_a_process_with_nowhere_to_export_prints_spans():
@@ -54,8 +54,8 @@ def test_printing_can_be_silenced_with_no_exporter_at_all():
 def test_a_surface_that_opted_out_cannot_be_overridden_by_configuration():
     """`console=False` is about what the stream *is*, so no variable may undo it.
 
-    `bacteria-admin`'s stdout is where a person reads what a model said. If
-    `BACTERIA_LOGFIRE_CONSOLE=true` could reach it, setting that variable for the
+    `aristotle-admin`'s stdout is where a person reads what a model said. If
+    `ARISTOTLE_LOGFIRE_CONSOLE=true` could reach it, setting that variable for the
     API would break every conversation held from the same shell — twenty-three
     query spans between a question and its answer, which is what the `console`
     flag was added to stop.

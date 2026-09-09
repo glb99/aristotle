@@ -12,12 +12,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.architecture.decisions import decide, ontology_of
-from bacteria.app.architecture.models import Project
-from bacteria.app.auth.service import issue_key
-from bacteria.app.core.db import session_scope
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.views import create_app
+from aristotle.app.architecture.decisions import decide, ontology_of
+from aristotle.app.architecture.models import Project
+from aristotle.app.auth.service import issue_key
+from aristotle.app.core.db import session_scope
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.views import create_app
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -95,7 +95,7 @@ class TestJudging:
         this* first, and a row written without an author can never be given one
         — inventing one afterwards is the false history the log forbids.
         """
-        response = judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
+        response = judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
 
         assert response.status_code == 200
         assert response.json()["verdict"] == "agreed"
@@ -110,20 +110,20 @@ class TestJudging:
         and the queue becomes something people stop reading. It is also the
         number this surface exists to produce.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "disagreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "disagreed")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
-        chat = next(p for p in body["proposals"] if p["subject"] == "bacteria.app.personal")
+        chat = next(p for p in body["proposals"] if p["subject"] == "aristotle.app.personal")
 
         assert chat["verdict"] == "disagreed"
 
     async def test_a_judged_proposal_still_appears(self, client, token, project) -> None:
         """Hiding what was rejected would hide that anything was ever rejected."""
-        judge(client, token, project, "bacteria.app.personal", "feature", "disagreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "disagreed")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
 
-        assert any(p["subject"] == "bacteria.app.personal" for p in body["proposals"])
+        assert any(p["subject"] == "aristotle.app.personal" for p in body["proposals"])
 
     async def test_an_unjudged_proposal_has_no_verdict(self, client, token, project) -> None:
         """*Not yet judged* and *judged no* must never be the same state.
@@ -141,11 +141,11 @@ class TestJudging:
         March* stays answerable — which is the entire reason these live in a
         bi-temporal log rather than a settings table.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
-        judge(client, token, project, "bacteria.app.personal", "feature", "disagreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "disagreed")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
-        chat = next(p for p in body["proposals"] if p["subject"] == "bacteria.app.personal")
+        chat = next(p for p in body["proposals"] if p["subject"] == "aristotle.app.personal")
 
         assert chat["verdict"] == "disagreed"
 
@@ -170,11 +170,11 @@ class TestIsolation:
         """The property the whole ontology column exists for.
 
         These rows sit in the same table as a person's memory, keyed by the same
-        principal. If the partition leaked, *"bacteria.app.personal is a feature"*
+        principal. If the partition leaked, *"aristotle.app.personal is a feature"*
         would show up in somebody's personal graph — and, worse, could be
         surfaced to a model as something they said about their life.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
 
         async with AsyncSession(engine) as db:
             memory = SqlGraphRepository(db)
@@ -192,7 +192,7 @@ class TestIsolation:
         Without this the test above passes for the wrong reason — a write that
         silently did nothing would also leave the memory graph clean.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
 
         async with AsyncSession(engine) as db:
             arch = SqlGraphRepository(db, ontology=f"architecture:{project}")
@@ -210,7 +210,7 @@ class TestIsolation:
         async with AsyncSession(engine) as session:
             other = await issue_key(session, principal_id="stranger", label="tests")
 
-        response = judge(client, other, project, "bacteria.app.personal", "feature", "agreed")
+        response = judge(client, other, project, "aristotle.app.personal", "feature", "agreed")
 
         assert response.status_code == 404
 
@@ -237,8 +237,8 @@ class TestWhatSurvivesAReversal:
         packages in the author's own database ended up simultaneously agreed and
         disagreed.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
-        judge(client, token, project, "bacteria.app.personal", "feature", "disagreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "disagreed")
 
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
@@ -257,12 +257,12 @@ class TestWhatSurvivesAReversal:
         is not the same act as withdrawing one and saying nothing — and only
         that field records which happened.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
         made_at = standing[0].recorded_at
 
-        judge(client, token, project, "bacteria.app.personal", "feature", "disagreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "disagreed")
 
         async with AsyncSession(engine) as session:
             then = await architecture_log(session, project).believed_at("tester", made_at)
@@ -279,11 +279,11 @@ class TestWhatSurvivesAReversal:
         reopening it would move the date the judgment was actually made, which
         is the one fact the row exists to carry.
         """
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
         async with AsyncSession(engine) as session:
             first = await architecture_log(session, project).current("tester")
 
-        judge(client, token, project, "bacteria.app.personal", "feature", "agreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "agreed")
 
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
@@ -350,11 +350,11 @@ class TestARenamedPackage:
         could be in: a person cannot act on a record they cannot see, and the
         graph must not forget it on their behalf.
         """
-        await judged_long_ago(engine, project, "bacteria.app.chat", "tester")
+        await judged_long_ago(engine, project, "aristotle.app.chat", "tester")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
 
-        assert [o["subject"] for o in body["orphans"]] == ["bacteria.app.chat"]
+        assert [o["subject"] for o in body["orphans"]] == ["aristotle.app.chat"]
         assert body["orphans"][0]["verdict"] == "agreed"
 
     async def test_stating_the_rename_moves_the_judgment_and_empties_the_orphans(
@@ -362,7 +362,7 @@ class TestARenamedPackage:
     ) -> None:
         """The whole loop, and the reason it is not an ``UPDATE``.
 
-        ``bacteria.app.chat`` was judged on a day that package existed.
+        ``aristotle.app.chat`` was judged on a day that package existed.
         Rewriting the row to say ``personal`` would claim somebody judged a
         package that did not yet exist -- the manufactured history the log
         refuses -- so the row keeps its subject and the *read* resolves it.
@@ -370,13 +370,13 @@ class TestARenamedPackage:
         The author travels, which is the difference between this and asking the
         person to judge the same package again under its new name.
         """
-        await judged_long_ago(engine, project, "bacteria.app.chat", "somebody-else")
+        await judged_long_ago(engine, project, "aristotle.app.chat", "somebody-else")
 
-        stated = rename(client, token, project, "bacteria.app.chat", "bacteria.app.personal")
+        stated = rename(client, token, project, "aristotle.app.chat", "aristotle.app.personal")
 
         assert stated.status_code == 200
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
-        personal = next(p for p in body["proposals"] if p["subject"] == "bacteria.app.personal")
+        personal = next(p for p in body["proposals"] if p["subject"] == "aristotle.app.personal")
 
         assert body["orphans"] == []
         assert personal["verdict"] == "agreed"
@@ -390,14 +390,14 @@ class TestARenamedPackage:
         produce the same screen, and only the rows say whether a date and an
         author were preserved or invented.
         """
-        await judged_long_ago(engine, project, "bacteria.app.chat", "somebody-else")
-        rename(client, token, project, "bacteria.app.chat", "bacteria.app.personal")
+        await judged_long_ago(engine, project, "aristotle.app.chat", "somebody-else")
+        rename(client, token, project, "aristotle.app.chat", "aristotle.app.personal")
 
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
 
         judgments = [c for c in standing if c.rel in ("is_a", "is_not_a")]
-        assert [c.attrs["subject"] for c in judgments] == ["bacteria.app.chat"]
+        assert [c.attrs["subject"] for c in judgments] == ["aristotle.app.chat"]
 
     async def test_renaming_to_a_package_that_is_not_here_is_refused(
         self, client, token, project
@@ -408,7 +408,7 @@ class TestARenamedPackage:
         the decision leaves a name a person recognises and arrives at one that
         appears nowhere at all.
         """
-        response = rename(client, token, project, "bacteria.app.chat", "not.a.package")
+        response = rename(client, token, project, "aristotle.app.chat", "not.a.package")
 
         assert response.status_code == 409
         assert "no package called" in response.json()["detail"]
@@ -420,7 +420,7 @@ class TestARenamedPackage:
         order -- and it would carry judgments backwards into a subject the parse
         still produces.
         """
-        response = rename(client, token, project, "bacteria.app.graph", "bacteria.app.architecture")
+        response = rename(client, token, project, "aristotle.app.graph", "aristotle.app.architecture")
 
         assert response.status_code == 409
         assert "still here" in response.json()["detail"]
@@ -434,13 +434,13 @@ class TestARenamedPackage:
         one made about the current name was made with the package in front of
         them.
         """
-        await judged_long_ago(engine, project, "bacteria.app.chat", "somebody-else")
-        rename(client, token, project, "bacteria.app.chat", "bacteria.app.personal")
+        await judged_long_ago(engine, project, "aristotle.app.chat", "somebody-else")
+        rename(client, token, project, "aristotle.app.chat", "aristotle.app.personal")
 
-        judge(client, token, project, "bacteria.app.personal", "feature", "disagreed")
+        judge(client, token, project, "aristotle.app.personal", "feature", "disagreed")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
-        personal = next(p for p in body["proposals"] if p["subject"] == "bacteria.app.personal")
+        personal = next(p for p in body["proposals"] if p["subject"] == "aristotle.app.personal")
 
         # Asserted together, because the verdict alone passes for the wrong
         # reason: with the rename unresolved the carried judgment never reaches
@@ -460,8 +460,8 @@ class TestARenamedPackage:
         the tree, so re-stating must not move it -- the same rule ``decide``
         applies to a restated judgment, in the same file, for the same reason.
         """
-        rename(client, token, project, "bacteria.app.chat", "bacteria.app.personal")
-        rename(client, token, project, "bacteria.app.chat", "bacteria.app.personal")
+        rename(client, token, project, "aristotle.app.chat", "aristotle.app.personal")
+        rename(client, token, project, "aristotle.app.chat", "aristotle.app.personal")
 
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
@@ -505,14 +505,14 @@ class TestTheStatedOrder:
         assert body["order"] == []
 
     async def test_a_stated_order_is_reported_floor_first(self, client, token, project) -> None:
-        a_layer(client, token, project, "bacteria.app.core")
-        a_layer(client, token, project, "bacteria.agent.model")
+        a_layer(client, token, project, "aristotle.app.core")
+        a_layer(client, token, project, "aristotle.agent.model")
 
-        stated = state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
+        stated = state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
         assert stated.status_code == 200
-        assert body["order"] == ["bacteria.app.core", "bacteria.agent.model"]
+        assert body["order"] == ["aristotle.app.core", "aristotle.agent.model"]
 
     async def test_the_chain_is_followed(self, client, token, project) -> None:
         """Two statements order three layers.
@@ -521,17 +521,17 @@ class TestTheStatedOrder:
         a field on each package: the third rank is derived from the pair, so a
         person states adjacency and never a number they would have to renumber.
         """
-        for package in ("bacteria.app.core", "bacteria.agent.model", "bacteria.agent.session"):
+        for package in ("aristotle.app.core", "aristotle.agent.model", "aristotle.agent.session"):
             a_layer(client, token, project, package)
-        state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
-        state_order(client, token, project, "bacteria.agent.session", "bacteria.agent.model")
+        state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
+        state_order(client, token, project, "aristotle.agent.session", "aristotle.agent.model")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
 
         assert body["order"] == [
-            "bacteria.app.core",
-            "bacteria.agent.model",
-            "bacteria.agent.session",
+            "aristotle.app.core",
+            "aristotle.agent.model",
+            "aristotle.agent.session",
         ]
 
     async def test_a_layer_nobody_ordered_sits_at_the_floor(self, client, token, project) -> None:
@@ -541,12 +541,12 @@ class TestTheStatedOrder:
         unclassified package, and those are different states: one has a
         classification nobody has placed, the other has neither.
         """
-        a_layer(client, token, project, "bacteria.app.core")
-        a_layer(client, token, project, "bacteria.agent.tools")
+        a_layer(client, token, project, "aristotle.app.core")
+        a_layer(client, token, project, "aristotle.agent.tools")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
 
-        assert sorted(body["order"]) == ["bacteria.agent.tools", "bacteria.app.core"]
+        assert sorted(body["order"]) == ["aristotle.agent.tools", "aristotle.app.core"]
 
     async def test_ordering_something_nobody_called_a_layer_is_refused(
         self, client, token, project
@@ -557,9 +557,9 @@ class TestTheStatedOrder:
         imports, so its height is derived -- and an unclassified package would
         get a height while nothing at all has been said about it.
         """
-        a_layer(client, token, project, "bacteria.app.core")
+        a_layer(client, token, project, "aristotle.app.core")
 
-        refused = state_order(client, token, project, "bacteria.app.personal", "bacteria.app.core")
+        refused = state_order(client, token, project, "aristotle.app.personal", "aristotle.app.core")
 
         assert refused.status_code == 409
         assert "not agreed to be a layer" in refused.json()["detail"]
@@ -573,10 +573,10 @@ class TestTheStatedOrder:
         is the rule `decide` and `rename` both apply, in this file, for this
         reason.
         """
-        a_layer(client, token, project, "bacteria.app.core")
-        a_layer(client, token, project, "bacteria.agent.model")
-        state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
-        state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
+        a_layer(client, token, project, "aristotle.app.core")
+        a_layer(client, token, project, "aristotle.agent.model")
+        state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
+        state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
 
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
@@ -590,14 +590,14 @@ class TestTheStatedOrder:
         model until they do would take the whole surface down over one bad row,
         which is the ruling `renames` already made for a rename cycle.
         """
-        a_layer(client, token, project, "bacteria.app.core")
-        a_layer(client, token, project, "bacteria.agent.model")
-        state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
-        state_order(client, token, project, "bacteria.app.core", "bacteria.agent.model")
+        a_layer(client, token, project, "aristotle.app.core")
+        a_layer(client, token, project, "aristotle.agent.model")
+        state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
+        state_order(client, token, project, "aristotle.app.core", "aristotle.agent.model")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
 
-        assert sorted(body["order"]) == ["bacteria.agent.model", "bacteria.app.core"]
+        assert sorted(body["order"]) == ["aristotle.agent.model", "aristotle.app.core"]
 
 
 class TestARetractedLayer:
@@ -612,17 +612,17 @@ class TestARetractedLayer:
         unattached, which is a different thing and the one the log can
         represent. So it stands, and the model says so.
         """
-        a_layer(client, token, project, "bacteria.app.core")
-        a_layer(client, token, project, "bacteria.agent.model")
-        state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
+        a_layer(client, token, project, "aristotle.app.core")
+        a_layer(client, token, project, "aristotle.agent.model")
+        state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
 
-        judge(client, token, project, "bacteria.agent.model", "layer", "disagreed")
+        judge(client, token, project, "aristotle.agent.model", "layer", "disagreed")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
         above = [o for o in body["orphans"] if o["relation"] == "above"]
 
         assert [(o["subject"], o["claim"]) for o in above] == [
-            ("bacteria.agent.model", "bacteria.app.core")
+            ("aristotle.agent.model", "aristotle.app.core")
         ]
         async with AsyncSession(engine) as session:
             standing = await architecture_log(session, project).current("tester")
@@ -634,12 +634,12 @@ class TestARetractedLayer:
         A stranded ordering that still ranked things would put a package above
         another on the strength of a classification that has been withdrawn.
         """
-        a_layer(client, token, project, "bacteria.app.core")
-        a_layer(client, token, project, "bacteria.agent.model")
-        state_order(client, token, project, "bacteria.agent.model", "bacteria.app.core")
+        a_layer(client, token, project, "aristotle.app.core")
+        a_layer(client, token, project, "aristotle.agent.model")
+        state_order(client, token, project, "aristotle.agent.model", "aristotle.app.core")
 
-        judge(client, token, project, "bacteria.agent.model", "layer", "disagreed")
+        judge(client, token, project, "aristotle.agent.model", "layer", "disagreed")
 
         body = client.get(f"/architecture/projects/{project}/model", headers=auth(token)).json()
 
-        assert body["order"] == ["bacteria.app.core"]
+        assert body["order"] == ["aristotle.app.core"]

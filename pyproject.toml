@@ -1,5 +1,5 @@
 [project]
-name = "bacteria-workspace"
+name = "aristotle-workspace"
 version = "0"
 requires-python = ">=3.13"
 # The deployed application, named here so that a bare `uv sync` at this root
@@ -8,26 +8,26 @@ requires-python = ">=3.13"
 # deployable, and the root is what gets deployed.
 #
 # Every command in this repository names the package it wants: the Dockerfile
-# runs `uv sync --package bacteria-app`, the deploy workflow runs
+# runs `uv sync --package aristotle-app`, the deploy workflow runs
 # `uv sync --all-packages`, and the Justfile does the same. FastAPI Cloud's
 # builder does not. It runs a plain `uv sync`, which installs a virtual root's
 # `dependencies` and its groups and nothing else -- so with this list empty the
-# image built cleanly, contained the whole toolchain, and had no `bacteria` in
-# it. The failure arrives at import time as `No module named 'bacteria'`, long
+# image built cleanly, contained the whole toolchain, and had no `aristotle` in
+# it. The failure arrives at import time as `No module named 'aristotle'`, long
 # after the part that looked like it could fail.
 #
-# `bacteria-agent` is deliberately absent: it comes in transitively through the
+# `aristotle-agent` is deliberately absent: it comes in transitively through the
 # application, which is the direction the dependency already runs.
-dependencies = ["bacteria-app"]
+dependencies = ["aristotle-app"]
 
 [tool.uv.sources]
 # The workspace copy rather than an index release, matching what
-# `backend/app/pyproject.toml` says about `bacteria-agent` and for the same
+# `backend/app/pyproject.toml` says about `aristotle-agent` and for the same
 # reason: these are developed here, not consumed as releases.
-bacteria-app = { workspace = true }
+aristotle-app = { workspace = true }
 
 [tool.uv]
-# The root is not itself a package -- nothing imports `bacteria-workspace` and
+# The root is not itself a package -- nothing imports `aristotle-workspace` and
 # nothing should build it. It exists to declare the workspace, to hold the
 # toolchain both members are developed with, and to be the directory a deploy
 # is rooted at. A virtual project still installs its `dependencies`, which is
@@ -43,19 +43,19 @@ members = ["backend/*"]
 [tool.fastapi]
 # Here at the workspace root rather than in `backend/app`, where the application
 # it names actually lives. `fastapi deploy` builds from the directory holding
-# this file, and `bacteria-app` cannot be built on its own: it declares
-# `bacteria-agent = { workspace = true }`, which resolves only when the root
+# this file, and `aristotle-app` cannot be built on its own: it declares
+# `aristotle-agent = { workspace = true }`, which resolves only when the root
 # declaring `members = ["backend/*"]` is in the build context.
 #
 # It was in `backend/app/pyproject.toml`, with the FastAPI Cloud Application
 # Directory set to `backend/app` to match. That deploy failed three ways at once
 # and none of the messages named the cause: uv refused the dependency
-# ("`bacteria-agent` references a workspace ... but is not a workspace member"),
+# ("`aristotle-agent` references a workspace ... but is not a workspace member"),
 # it resolved CPython 3.14 because no `.python-version` sits in that directory,
 # and the build script could not `cd backend/app` from a root that already was
 # it. The Dockerfile had the right shape all along -- it copies `backend/`,
-# `pyproject.toml` and `uv.lock`, then runs `uv sync --package bacteria-app`.
-entrypoint = "bacteria.app.entrypoints.asgi:app"
+# `pyproject.toml` and `uv.lock`, then runs `uv sync --package aristotle-app`.
+entrypoint = "aristotle.app.entrypoints.asgi:app"
 
 [dependency-groups]
 # The toolchain is a dependency of the workspace, not a string in the Justfile.
@@ -90,7 +90,7 @@ dev = [
 # keeping, or carry a permanently red gate. Excluding it is the third.
 exclude = ["docs/research"]
 line-length = 100
-# The workspace floor, not the application's. `bacteria` supports 3.11 and is
+# The workspace floor, not the application's. `aristotle` supports 3.11 and is
 # meant to be vendorable into projects that do too; linting it as 3.13 would let
 # a 3.13-only idiom through and break that promise silently.
 target-version = "py311"
@@ -116,25 +116,25 @@ select = ["E4", "E7", "E9", "F", "I", "B", "SIM", "RUF"]
 [tool.ruff.lint.isort]
 # Stated, not inferred. Both packages live under `backend/*/src`, which is not a
 # layout ruff recognizes as first-party on its own -- so without this it sorts
-# `bacteria.agent` in among `anthropic` and `sqlmodel`, and every import block in
+# `aristotle.agent` in among `anthropic` and `sqlmodel`, and every import block in
 # the repository ends up grouped as though the project's own code were a vendor
 # dependency. It became visible the moment the two packages started sharing a
-# namespace; before that the app imported `bacteria` and genuinely was a consumer.
-known-first-party = ["bacteria"]
+# namespace; before that the app imported `aristotle` and genuinely was a consumer.
+known-first-party = ["aristotle"]
 
 [tool.coverage.run]
 branch = true
 parallel = true
-# `bacteria` is deliberately absent. Its suite is architectural fitness
+# `aristotle` is deliberately absent. Its suite is architectural fitness
 # functions, not line coverage, and its unevenness is the stated intent
 # (backend/agent/docs/adr/0013). Pointing a coverage report at it produces a
 # number whose only use is tempting someone to write the tests that record
 # exists to decline. The application gets measured; the agent does not.
 #
-# `bacteria.app` and not `bacteria`: the namespace covers both packages, so
+# `aristotle.app` and not `aristotle`: the namespace covers both packages, so
 # naming the namespace would measure the agent too and silently reverse that
 # decision.
-source = ["bacteria.app"]
+source = ["aristotle.app"]
 
 [tool.coverage.report]
 show_missing = true

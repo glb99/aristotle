@@ -28,13 +28,13 @@ from sqlmodel import SQLModel
 
 # Imported for the side effect of registering every table on SQLModel.metadata,
 # which is the thing being compared against.
-from bacteria.app import models as _root_models  # noqa: F401
-from bacteria.app.auth import models as _auth_models  # noqa: F401
-from bacteria.app.core.db import include_name
-from bacteria.app.core.settings import get_settings
-from bacteria.app.graph import models as _graph_models  # noqa: F401
-from bacteria.app.ingestion import models as _ingestion_models  # noqa: F401
-from bacteria.app.sessions import models as _session_models  # noqa: F401
+from aristotle.app import models as _root_models  # noqa: F401
+from aristotle.app.auth import models as _auth_models  # noqa: F401
+from aristotle.app.core.db import include_name
+from aristotle.app.core.settings import get_settings
+from aristotle.app.graph import models as _graph_models  # noqa: F401
+from aristotle.app.ingestion import models as _ingestion_models  # noqa: F401
+from aristotle.app.sessions import models as _session_models  # noqa: F401
 
 ALEMBIC_INI = pathlib.Path(__file__).parent.parent / "alembic.ini"
 
@@ -60,7 +60,7 @@ def _migrated_db(monkeypatch, require_postgres):
     """
     settings_url = get_settings().database_url
     admin_url = _sync_url(settings_url.rsplit("/", 1)[0] + "/postgres")
-    name = f"bacteria_migtest_{uuid.uuid4().hex[:12]}"
+    name = f"aristotle_migtest_{uuid.uuid4().hex[:12]}"
 
     # An explicit connect_timeout, because the default is no timeout at all:
     # with nothing listening on 5432 this blocks for minutes rather than being
@@ -76,7 +76,7 @@ def _migrated_db(monkeypatch, require_postgres):
         require_postgres("Postgres unreachable; run `just db-up`")
 
     target = settings_url.rsplit("/", 1)[0] + "/" + name
-    monkeypatch.setenv("BACTERIA_DATABASE_URL", target)
+    monkeypatch.setenv("ARISTOTLE_DATABASE_URL", target)
     # env.py reads the URL through get_settings, which is cached per process.
     get_settings.cache_clear()
 
@@ -160,7 +160,7 @@ def test_every_memory_table_carries_the_same_content_columns():
     Compares content columns only. The keys are *supposed* to differ; that
     difference is what ADR 0021 and ADR 0017 are about.
     """
-    from bacteria.app.sessions.models import (
+    from aristotle.app.sessions.models import (
         ChatMemoryEntry,
         ChatMemoryProposal,
         ChatUserMemoryEntry,

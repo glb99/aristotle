@@ -1,6 +1,6 @@
 """Invariant tests for the approval gate: what counts as consent."""
 
-from bacteria.agent.tools.approval import cli_approve, describe_tool_call
+from aristotle.agent.tools.approval import cli_approve, describe_tool_call
 
 
 def test_describe_tool_call_names_the_action_and_its_arguments():

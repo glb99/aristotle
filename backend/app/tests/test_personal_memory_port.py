@@ -13,9 +13,9 @@ from typing import Any, Optional
 
 import pytest
 
-from bacteria.agent.session.store import OWNER, SESSION_SCOPE, MemoryEntry, MemoryScope
-from bacteria.app.sessions.memory import MemoryView
-from bacteria.app.sessions.repository import SqlSessionRepository
+from aristotle.agent.session.store import OWNER, SESSION_SCOPE, MemoryEntry, MemoryScope
+from aristotle.app.sessions.memory import MemoryView
+from aristotle.app.sessions.repository import SqlSessionRepository
 
 
 class RecordingStore:
@@ -136,7 +136,7 @@ async def test_an_unknown_session_never_reaches_the_store(engine):
     the second place that decision is made."""
     from sqlmodel.ext.asyncio.session import AsyncSession
 
-    from bacteria.agent.session.store import UnknownSessionError
+    from aristotle.agent.session.store import UnknownSessionError
 
     store = RecordingStore()
     async with AsyncSession(engine) as db:

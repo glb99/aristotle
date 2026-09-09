@@ -11,7 +11,7 @@ import re
 import pytest
 from fastapi.testclient import TestClient
 
-from bacteria.app.views import CONSOLE_DIR, create_app
+from aristotle.app.views import CONSOLE_DIR, create_app
 
 
 @pytest.fixture(name="console")

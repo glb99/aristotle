@@ -6,8 +6,8 @@ readable without reading the adapter, and that the adapter cannot drift from it.
 
 from typing import Optional
 
-from bacteria.app.architecture import decisions, derive
-from bacteria.app.architecture.catalogue import (
+from aristotle.app.architecture import decisions, derive
+from aristotle.app.architecture.catalogue import (
     CATALOGUE,
     CLASSIFICATIONS,
     DERIVED,
@@ -18,9 +18,9 @@ from bacteria.app.architecture.catalogue import (
     reads,
     relation,
 )
-from bacteria.app.architecture.classify import propose
-from bacteria.app.architecture.derive import Derived, Import, Module
-from bacteria.app.architecture.views import (
+from aristotle.app.architecture.classify import propose
+from aristotle.app.architecture.derive import Derived, Import, Module
+from aristotle.app.architecture.views import (
     ClassificationOut,
     ImportOut,
     ModelOut,

@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass, field
 
-from bacteria.app.core.adapters import FunctionalProcessor
-from bacteria.app.core.handlers import StepHandler
+from aristotle.app.core.adapters import FunctionalProcessor
+from aristotle.app.core.handlers import StepHandler
 
 
 @dataclass

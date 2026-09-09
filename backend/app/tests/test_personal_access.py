@@ -12,12 +12,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.agent.model.protocol import ModelResponse
-from bacteria.app.auth import keys
-from bacteria.app.auth.service import issue_key, revoke_key
-from bacteria.app.core import model_client
-from bacteria.app.core.db import session_scope
-from bacteria.app.views import create_app
+from aristotle.agent.model.protocol import ModelResponse
+from aristotle.app.auth import keys
+from aristotle.app.auth.service import issue_key, revoke_key
+from aristotle.app.core import model_client
+from aristotle.app.core.db import session_scope
+from aristotle.app.views import create_app
 
 
 class FakeModelClient:
@@ -62,7 +62,7 @@ def _client(engine, monkeypatch, backend_options):
             yield session
 
     monkeypatch.setitem(model_client.PROVIDERS, "fake", FakeModelClient)
-    monkeypatch.setenv("BACTERIA_MODEL_PROVIDER", "fake")
+    monkeypatch.setenv("ARISTOTLE_MODEL_PROVIDER", "fake")
 
     # No lifespan: conftest builds the schema once per run, which is the same
     # position a deployment is in after `alembic upgrade head`.

@@ -7,8 +7,8 @@ testing something other than what the feature does.
 
 from pathlib import Path
 
-from bacteria.app.architecture.catalogue import IMPORTS
-from bacteria.app.architecture.checks import (
+from aristotle.app.architecture.catalogue import IMPORTS
+from aristotle.app.architecture.checks import (
     BOUNDARIES,
     Boundary,
     Cited,
@@ -18,8 +18,8 @@ from bacteria.app.architecture.checks import (
     _core_names_a_domain_concept,
     evaluate,
 )
-from bacteria.app.architecture.derive import Derived, Import, Module, derive
-from bacteria.app.architecture.layout import python_files
+from aristotle.app.architecture.derive import Derived, Import, Module, derive
+from aristotle.app.architecture.layout import python_files
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -243,14 +243,14 @@ class TestBoundariesCanFail:
         vendorable only while it names nothing above it.
         """
         offending = Import(
-            src="bacteria.agent.session.store",
-            dst="bacteria.app.core.db",
+            src="aristotle.agent.session.store",
+            dst="aristotle.app.core.db",
             deferred=False,
             line=4,
         )
         clean = Import(
-            src="bacteria.app.personal.service",
-            dst="bacteria.agent.session.store",
+            src="aristotle.app.personal.service",
+            dst="aristotle.agent.session.store",
             deferred=False,
             line=9,
         )
@@ -260,13 +260,13 @@ class TestBoundariesCanFail:
     def test_the_application_may_not_import_the_agents_own_root(self) -> None:
         """Two composition roots stay two.
 
-        ``bacteria.agent.interfaces`` composes the agent's own process; the
+        ``aristotle.agent.interfaces`` composes the agent's own process; the
         application composing itself out of it would make one root wearing two
         names.
         """
         offending = Import(
-            src="bacteria.app.entrypoints.cli",
-            dst="bacteria.agent.interfaces.cli",
+            src="aristotle.app.entrypoints.cli",
+            dst="aristotle.agent.interfaces.cli",
             deferred=False,
             line=12,
         )
@@ -280,20 +280,20 @@ class TestBoundariesCanFail:
         reports six violations on an intact boundary.
         """
         offending = Import(
-            src="bacteria.app.core.db",
-            dst="bacteria.app.sessions.models",
+            src="aristotle.app.core.db",
+            dst="aristotle.app.sessions.models",
             deferred=False,
             line=7,
         )
         deferred = Import(
-            src="bacteria.app.core.jobs",
-            dst="bacteria.app.personal.tasks",
+            src="aristotle.app.core.jobs",
+            dst="aristotle.app.personal.tasks",
             deferred=True,
             line=117,
         )
         inward = Import(
-            src="bacteria.app.personal.service",
-            dst="bacteria.app.core.db",
+            src="aristotle.app.personal.service",
+            dst="aristotle.app.core.db",
             deferred=False,
             line=3,
         )
@@ -310,16 +310,16 @@ class TestBoundariesCanFail:
         """
         derived = Derived(
             modules={
-                "bacteria.app.core.db": Module(
-                    name="bacteria.app.core.db",
+                "aristotle.app.core.db": Module(
+                    name="aristotle.app.core.db",
                     path="core/db.py",
-                    package="bacteria.app.core",
+                    package="aristotle.app.core",
                     tables=("chat_session",),
                 ),
-                "bacteria.app.sessions.models": Module(
-                    name="bacteria.app.sessions.models",
+                "aristotle.app.sessions.models": Module(
+                    name="aristotle.app.sessions.models",
                     path="chat/models.py",
-                    package="bacteria.app.personal",
+                    package="aristotle.app.personal",
                     tables=("chat_transcript_item",),
                 ),
             },
@@ -332,7 +332,7 @@ class TestBoundariesCanFail:
         # import, so nothing downstream could tell a misplaced table from a
         # dependency.
         assert [(c.src, c.rel, c.dst) for c in found] == [
-            ("bacteria.app.core.db", "owns_table", "chat_session")
+            ("aristotle.app.core.db", "owns_table", "chat_session")
         ]
 
 
@@ -359,8 +359,8 @@ class TestVerdict:
     def test_a_crossing_makes_the_verdict_unclean(self) -> None:
         """One crossing is enough to fail, which is what makes this a gate."""
         offending = Import(
-            src="bacteria.agent.tools.memory",
-            dst="bacteria.app.sessions.models",
+            src="aristotle.agent.tools.memory",
+            dst="aristotle.app.sessions.models",
             deferred=False,
             line=2,
         )
@@ -455,7 +455,7 @@ class Item(Base, table=True):
             name="agent-knows-nothing",
             sentence="The agent knows nothing about the application.",
             decides=_agent_reaches_into_the_app,
-            about=("bacteria.agent", "bacteria.app"),
+            about=("aristotle.agent", "aristotle.app"),
         )
         stranger = _graph(modules=("someone_else.main",))
 
@@ -470,9 +470,9 @@ class Item(Base, table=True):
             name="agent-knows-nothing",
             sentence="The agent knows nothing about the application.",
             decides=_agent_reaches_into_the_app,
-            about=("bacteria.agent", "bacteria.app"),
+            about=("aristotle.agent", "aristotle.app"),
         )
-        here = _graph(modules=("bacteria.agent.session.store", "bacteria.app.core.db"))
+        here = _graph(modules=("aristotle.agent.session.store", "aristotle.app.core.db"))
 
         verdict = evaluate(here, [rule])
 

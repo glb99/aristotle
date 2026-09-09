@@ -10,8 +10,8 @@ from the template — which is why it takes a session rather than the async
 `engine` everything else uses.
 """
 
-from bacteria.app.models import UserCreate
-from bacteria.app.repositories import UserRepository
+from aristotle.app.models import UserCreate
+from aristotle.app.repositories import UserRepository
 
 
 def test_create_assigns_an_identity_the_caller_did_not_supply(sync_session):

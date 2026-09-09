@@ -5,7 +5,7 @@ and no logic. That makes a plain import the only check they get, and it is worth
 having: a bad import here is a process that will not start, and nothing else in
 the suite would notice.
 
-This used to live in the Justfile as `coverage run -m bacteria.app.entrypoints.asgi`,
+This used to live in the Justfile as `coverage run -m aristotle.app.entrypoints.asgi`,
 which stopped being an import check the moment `asgi.py` grew a `__main__`
 block — `-m` runs the module, so the command started a server and hung instead
 of failing. A test is the right home for it.
@@ -14,14 +14,14 @@ of failing. A test is the right home for it.
 import asyncio
 import importlib
 
-from bacteria.app.auth import keys
-from bacteria.app.core.settings import get_settings
-from bacteria.app.entrypoints import cli
+from aristotle.app.auth import keys
+from aristotle.app.core.settings import get_settings
+from aristotle.app.entrypoints import cli
 
 
 def test_the_asgi_entrypoint_imports_and_exposes_an_app():
     """`app` is what a deployment's ASGI server looks for by name."""
-    asgi = importlib.import_module("bacteria.app.entrypoints.asgi")
+    asgi = importlib.import_module("aristotle.app.entrypoints.asgi")
 
     assert asgi.app.routes
     assert callable(asgi.main)
@@ -29,7 +29,7 @@ def test_the_asgi_entrypoint_imports_and_exposes_an_app():
 
 def test_the_admin_and_worker_entrypoints_import():
     """Both are console scripts, so a broken import is only found on first run."""
-    for name in ("bacteria.app.entrypoints.cli", "bacteria.app.entrypoints.queue_worker"):
+    for name in ("aristotle.app.entrypoints.cli", "aristotle.app.entrypoints.queue_worker"):
         assert importlib.import_module(name) is not None
 
 
@@ -54,9 +54,9 @@ async def test_the_in_api_worker_is_awaited_on_shutdown_not_abandoned(engine, mo
     finish on its own. Both shapes ended with a finished task; only one of them
     stopped it deliberately, before the pool went away.
     """
-    monkeypatch.setenv("BACTERIA_RUN_WORKER_IN_API", "true")
+    monkeypatch.setenv("ARISTOTLE_RUN_WORKER_IN_API", "true")
     get_settings.cache_clear()
-    asgi = importlib.import_module("bacteria.app.entrypoints.asgi")
+    asgi = importlib.import_module("aristotle.app.entrypoints.asgi")
 
     async with asgi.lifespan(asgi.app):
         running = [t for t in asyncio.all_tasks() if t.get_name() == "in-api-procrastinate-worker"]
@@ -78,12 +78,12 @@ async def test_no_worker_runs_in_the_api_by_default(engine, monkeypatch):
     Two processes is the design (`queue_worker.py` says why); one process is the
     concession a single-process platform forces. A default that quietly ran the
     worker in-process would spread that concession to every deployment, including
-    the ones already running `bacteria-worker` -- which would then have two
+    the ones already running `aristotle-worker` -- which would then have two
     workers competing for the same queue and no indication anywhere.
     """
-    monkeypatch.delenv("BACTERIA_RUN_WORKER_IN_API", raising=False)
+    monkeypatch.delenv("ARISTOTLE_RUN_WORKER_IN_API", raising=False)
     get_settings.cache_clear()
-    asgi = importlib.import_module("bacteria.app.entrypoints.asgi")
+    asgi = importlib.import_module("aristotle.app.entrypoints.asgi")
 
     async with asgi.lifespan(asgi.app):
         assert not [t for t in asyncio.all_tasks() if t.get_name() == "in-api-procrastinate-worker"]
@@ -131,20 +131,20 @@ async def test_a_whole_key_is_refused_with_the_field_it_wanted(engine, capsys):
 
 
 def test_the_workspace_root_installs_the_application():
-    """A bare `uv sync` at the root must install `bacteria`, or a deploy has no app.
+    """A bare `uv sync` at the root must install `aristotle`, or a deploy has no app.
 
     Every command in this repository names the package it wants --
-    `uv sync --package bacteria-app` in the Dockerfile, `--all-packages` in the
+    `uv sync --package aristotle-app` in the Dockerfile, `--all-packages` in the
     deploy workflow and the Justfile -- so all of them keep working if this
     dependency is deleted. FastAPI Cloud's builder does not name one. It runs a
     plain `uv sync`, which installs a virtual root's `dependencies` and nothing
     else, and the image then builds cleanly, carries the whole toolchain, and
-    contains no `bacteria` at all.
+    contains no `aristotle` at all.
 
     That is why this is a test rather than a comment: the line it guards reads
     like a redundancy at a root that builds nothing, every local check stays
     green when it is removed, and the only thing that notices is a deployment
-    failing at import with `No module named 'bacteria'`.
+    failing at import with `No module named 'aristotle'`.
     """
     import tomllib
     from pathlib import Path
@@ -152,7 +152,7 @@ def test_the_workspace_root_installs_the_application():
     root = Path(__file__).resolve().parents[3] / "pyproject.toml"
     manifest = tomllib.loads(root.read_text(encoding="utf-8"))
 
-    assert "bacteria-app" in manifest["project"]["dependencies"], (
-        f"{root} must depend on bacteria-app; a plain `uv sync` installs nothing else"
+    assert "aristotle-app" in manifest["project"]["dependencies"], (
+        f"{root} must depend on aristotle-app; a plain `uv sync` installs nothing else"
     )
-    assert manifest["tool"]["uv"]["sources"]["bacteria-app"] == {"workspace": True}
+    assert manifest["tool"]["uv"]["sources"]["aristotle-app"] == {"workspace": True}

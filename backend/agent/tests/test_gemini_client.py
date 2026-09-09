@@ -13,11 +13,11 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from google.genai import errors as genai_errors
 
-from bacteria.agent.model.errors import AssetError, ContractError, CredentialsError, ServingError
-from bacteria.agent.model.gemini_client import GeminiClient
-from bacteria.agent.model.protocol import SendsMessages
-from bacteria.agent.runtime.runtime import Runtime
-from bacteria.agent.session.store import SessionStore
+from aristotle.agent.model.errors import AssetError, ContractError, CredentialsError, ServingError
+from aristotle.agent.model.gemini_client import GeminiClient
+from aristotle.agent.model.protocol import SendsMessages
+from aristotle.agent.runtime.runtime import Runtime
+from aristotle.agent.session.store import SessionStore
 
 
 def make_client(**overrides) -> GeminiClient:

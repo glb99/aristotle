@@ -1,8 +1,8 @@
 [project]
-# Distribution `bacteria-app`, imported as `bacteria.app`. See the note on the
+# Distribution `aristotle-app`, imported as `aristotle.app`. See the note on the
 # namespace in `backend/agent/pyproject.toml`.
-name = "bacteria-app"
-# Deliberately unversioned, where `bacteria-agent` is not. Nothing consumes this
+name = "aristotle-app"
+# Deliberately unversioned, where `aristotle-agent` is not. Nothing consumes this
 # package -- it is a deployed application, and its releases are commits. Giving
 # it a semver would invite the question "compatible with what?", which has no
 # answer.
@@ -14,7 +14,7 @@ requires-python = ">=3.13"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 dependencies = [
-    "bacteria-agent",
+    "aristotle-agent",
     "fastapi[standard]",
     "granian",
     "sqlmodel",
@@ -22,12 +22,12 @@ dependencies = [
     "psycopg[binary,pool]",
     "alembic",
     "pydantic-settings",
-    # Declared even though `bacteria-agent` depends on it too. This package imports
+    # Declared even though `aristotle-agent` depends on it too. This package imports
     # `dotenv` directly, and leaning on a transitive dependency means that the
     # day the agent stops needing it, this breaks in a way that points at the
     # wrong package.
     "python-dotenv",
-    # Declared by *this* package and never by `bacteria-agent`, which is the whole
+    # Declared by *this* package and never by `aristotle-agent`, which is the whole
     # point rather than an oversight -- see ADR 0003. The agent is vendorable and
     # must not carry a host's observability vendor into a host that never chose
     # one. The extras are the two instrumentations this application actually
@@ -36,16 +36,16 @@ dependencies = [
 ]
 
 [project.scripts]
-bacteria-admin = "bacteria.app.entrypoints.cli:main"
-bacteria-serve = "bacteria.app.entrypoints.asgi:main"
-bacteria-worker = "bacteria.app.entrypoints.queue_worker:main"
+aristotle-admin = "aristotle.app.entrypoints.cli:main"
+aristotle-serve = "aristotle.app.entrypoints.asgi:main"
+aristotle-worker = "aristotle.app.entrypoints.queue_worker:main"
 
 # No `[tool.fastapi]` here, and that is deliberate rather than an omission.
 #
 # It lived here once, with the FastAPI Cloud Application Directory set to
 # `backend/app` to match, which reads as the obvious arrangement: the deployed
 # application is this package. It cannot work. This package declares
-# `bacteria-agent = { workspace = true }` a few lines above, and a workspace
+# `aristotle-agent = { workspace = true }` a few lines above, and a workspace
 # member does not build without the root that declares it -- so a build rooted
 # here fails on the dependency before it reaches any code.
 #
@@ -56,7 +56,7 @@ bacteria-worker = "bacteria.app.entrypoints.queue_worker:main"
 [tool.uv.sources]
 # Resolved from backend/agent rather than an index. The agent is developed
 # alongside this application, not consumed as a release.
-bacteria-agent = { workspace = true }
+aristotle-agent = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
@@ -64,8 +64,8 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 # Same namespace as the agent, and for the same reason -- neither package may
-# own `bacteria/` outright. See `backend/agent/pyproject.toml`.
-module-name = "bacteria.app"
+# own `aristotle/` outright. See `backend/agent/pyproject.toml`.
+module-name = "aristotle.app"
 namespace = true
 
 [tool.pytest.ini_options]

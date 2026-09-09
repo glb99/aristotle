@@ -11,10 +11,10 @@ Real Postgres, like everything that touches storage here.
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.agent.session.store import USER_SCOPE
-from bacteria.app.personal.catalogue import VOCABULARY
-from bacteria.app.personal.graph_memory import GraphMemoryStore, UnknownPreferenceError
-from bacteria.app.sessions.repository import SqlSessionRepository
+from aristotle.agent.session.store import USER_SCOPE
+from aristotle.app.personal.catalogue import VOCABULARY
+from aristotle.app.personal.graph_memory import GraphMemoryStore, UnknownPreferenceError
+from aristotle.app.sessions.repository import SqlSessionRepository
 
 USER = "graph-memory"
 
@@ -140,10 +140,10 @@ async def test_what_the_extractor_heard_arrives_as_a_proposal(engine):
     """
     from datetime import datetime, timezone
 
-    from bacteria.app.graph.log import Assertion
-    from bacteria.app.graph.repository import SqlGraphRepository
-    from bacteria.app.graph.service import owner, refer_to
-    from bacteria.app.graph.temporal import OPEN_ENDED, Interval
+    from aristotle.app.graph.log import Assertion
+    from aristotle.app.graph.repository import SqlGraphRepository
+    from aristotle.app.graph.service import owner, refer_to
+    from aristotle.app.graph.temporal import OPEN_ENDED, Interval
 
     now = datetime.now(timezone.utc)
     async with AsyncSession(engine) as db:
