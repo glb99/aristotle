@@ -44,7 +44,7 @@ So the code version would work beautifully and **exercise almost nothing this pr
 
 **Which makes them a sequence rather than a choice.** The code one is the rehearsal: the only version where you can tell whether the rendering is *correct*, because the truth is computable. Learn the visual grammar where mistakes are detectable, then apply it where they are not.
 
-It also has a deliverable sitting in `bacteria` already: `diagram.excalidraw`, hand-maintained and drifting. A hand-drawn architecture diagram that disagrees with the code is exactly the cognitive debt the proposal is aimed at, and deriving it is worth doing whatever happens to the rest.
+It also has a deliverable sitting in `aristotle` already: `diagram.excalidraw`, hand-maintained and drifting. A hand-drawn architecture diagram that disagrees with the code is exactly the cognitive debt the proposal is aimed at, and deriving it is worth doing whatever happens to the rest.
 
 ## The line this must not cross by accident
 
@@ -125,7 +125,7 @@ Nothing in either proposal so far addresses two viewers who disagree. Seeing the
 
 **Held to one test**: if it gets built and the question *does a diagram beat a list* is still open, it was decoration. Time-boxed, because this is the tractable problem sitting next to the hard one, which is the classic shape of displacement.
 
-**In `bacteria`, not here.** This repository's deliverable is the mental model; a code visualizer is not that.
+**In `aristotle`, not here.** This repository's deliverable is the mental model; a code visualizer is not that.
 
 ### Q3 — Human and agent, and the founding document overclaims
 

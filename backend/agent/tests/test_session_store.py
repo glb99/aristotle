@@ -6,8 +6,8 @@ would cause a real bug — not every method, and not every branch.
 
 import pytest
 
-from bacteria.agent.session.protocol import SessionRepository
-from bacteria.agent.session.store import SessionStore, TranscriptItem, UnknownSessionError
+from aristotle.agent.session.protocol import SessionRepository
+from aristotle.agent.session.store import SessionStore, TranscriptItem, UnknownSessionError
 
 
 async def test_get_state_returns_a_copy_not_the_authoritative_record():

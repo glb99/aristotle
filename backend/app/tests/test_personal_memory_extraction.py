@@ -19,15 +19,15 @@ from typing import Any
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.agent.model.protocol import ModelResponse
-from bacteria.agent.session.store import TranscriptItem
-from bacteria.app.personal.memory_extraction import (
+from aristotle.agent.model.protocol import ModelResponse
+from aristotle.agent.session.store import TranscriptItem
+from aristotle.app.personal.memory_extraction import (
     EXTRACTOR_SOURCE,
     PROMPT_VERSION,
     extract_memories,
 )
-from bacteria.app.sessions.models import ChatMemoryEntry, ChatMemoryExtraction, ChatMemoryProposal
-from bacteria.app.sessions.repository import SqlSessionRepository
+from aristotle.app.sessions.models import ChatMemoryEntry, ChatMemoryExtraction, ChatMemoryProposal
+from aristotle.app.sessions.repository import SqlSessionRepository
 
 
 class _FakeClient:

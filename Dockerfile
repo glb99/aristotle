@@ -1,5 +1,5 @@
-# One image, three processes. `bacteria-serve`, `bacteria-worker`, and
-# `bacteria-admin` are console scripts on the same install, so the API, the queue
+# One image, three processes. `aristotle-serve`, `aristotle-worker`, and
+# `aristotle-admin` are console scripts on the same install, so the API, the queue
 # worker, and the operator CLI cannot drift onto different code -- which is the
 # failure a separate worker image invites, and it shows up as a job failing to
 # deserialize rather than as anything obviously version-shaped.
@@ -10,7 +10,7 @@
 
 # The console is built here rather than copied in, and that is a correctness fix
 # rather than a convenience. `.dockerignore` used to let `COPY backend/` pick up
-# `backend/app/src/bacteria/app/console/` -- gitignored build output -- so the
+# `backend/app/src/aristotle/app/console/` -- gitignored build output -- so the
 # image contained whatever the developer had last built, a stale bundle, or on a
 # fresh clone nothing at all. The same class of bug as the deploy workflow's
 # `rignore` problem, with the same symptom: `/` answers 404 and every API route
@@ -27,7 +27,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 COPY frontend/ ./
-# `vite.config.ts` writes to `../backend/app/src/bacteria/app/console`, which
+# `vite.config.ts` writes to `../backend/app/src/aristotle/app/console`, which
 # lands at /backend/... in this stage. Not overridden here: the path is where the
 # Python package looks, and a second definition of it is a second thing to keep
 # in step.
@@ -73,38 +73,38 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=backend/agent/pyproject.toml,target=backend/agent/pyproject.toml \
     --mount=type=bind,source=backend/app/pyproject.toml,target=backend/app/pyproject.toml \
-    uv sync --locked --no-install-workspace --no-dev --package bacteria-app
+    uv sync --locked --no-install-workspace --no-dev --package aristotle-app
 
 COPY backend/ /app/backend/
 COPY pyproject.toml uv.lock /app/
 COPY scripts/ /app/scripts/
 
-# Now the members themselves. `--package bacteria-app` rather than a bare `uv sync`,
+# Now the members themselves. `--package aristotle-app` rather than a bare `uv sync`,
 # and that is not a refinement -- the workspace root sets `package = false`, so a
 # bare sync installs the root's own dependencies (there are none) and no member
-# at all. The image built, started, and had no `bacteria.app` module in it. It pulls
-# `bacteria-agent` in as a workspace dependency, so naming one member is enough.
+# at all. The image built, started, and had no `aristotle.app` module in it. It pulls
+# `aristotle-agent` in as a workspace dependency, so naming one member is enough.
 #
 # `--locked` fails rather than silently re-resolving if uv.lock disagrees with
 # the pyprojects, which is the point of building from a lockfile: a build that
 # quietly picks different versions than the ones tested is worse than one that
 # stops.
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-dev --package bacteria-app
+    uv sync --locked --no-dev --package aristotle-app
 
 # After the sync, so a frontend edit does not invalidate the dependency layers.
 #
 # Into the source tree because `uv sync` installs workspace members editable, so
-# this is the directory the installed `bacteria.app` imports from. That is an
+# this is the directory the installed `aristotle.app` imports from. That is an
 # assumption about uv rather than something this file controls, which is why the
 # next step checks it instead of trusting it.
 # Emptied first, because `COPY backend/` above brings in whatever the developer
 # last built. Doing it here rather than in `.dockerignore` is deliberate and the
 # comment there says why: that file is uploaded to FastAPI Cloud and read by its
 # builder, so excluding the console there took it out of the *deployed* image.
-RUN rm -rf /app/backend/app/src/bacteria/app/console
+RUN rm -rf /app/backend/app/src/aristotle/app/console
 
-COPY --from=console /backend/app/src/bacteria/app/console/                     /app/backend/app/src/bacteria/app/console/
+COPY --from=console /backend/app/src/aristotle/app/console/                     /app/backend/app/src/aristotle/app/console/
 
 # Asked of the *installed* package, not of the filesystem. `views.py` mounts
 # nothing when `index.html` is absent -- deliberately, because an unbuilt
@@ -112,13 +112,13 @@ COPY --from=console /backend/app/src/bacteria/app/console/                     /
 # wrong directory produces an image that starts cleanly, serves every API route,
 # and 404s at `/`. That is precisely the failure that shipped six times from the
 # other packaging path. Here it is a build error.
-RUN python -c "from bacteria.app.views import CONSOLE_DIR; index = CONSOLE_DIR / 'index.html'; assert index.is_file(), f'no console at {CONSOLE_DIR}; the COPY above missed where the package imports from'; print(f'console present: {CONSOLE_DIR}')"
+RUN python -c "from aristotle.app.views import CONSOLE_DIR; index = CONSOLE_DIR / 'index.html'; assert index.is_file(), f'no console at {CONSOLE_DIR}; the COPY above missed where the package imports from'; print(f'console present: {CONSOLE_DIR}')"
 
 # Non-root, and created before the switch so the venv stays owned by root and
 # read-only to the process using it. A compromised worker cannot rewrite the code
 # it is running.
-RUN useradd --create-home --uid 10001 bacteria
-USER bacteria
+RUN useradd --create-home --uid 10001 aristotle
+USER aristotle
 
 # Alembic is invoked from the package directory, matching alembic.ini's own
 # relative paths, and matching how `just migrate` runs it.

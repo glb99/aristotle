@@ -13,7 +13,7 @@ suggest a fact mid-turn; a deferred job reads the transcript afterwards and
 suggests more, reading forward from a watermark so its cost tracks new turns
 rather than conversation length. Neither writes memory — both write proposals,
 which reach no model until a person activates one, at a scope that person
-chooses. Extraction is off by default (`BACTERIA_MEMORY_EXTRACTION_ENABLED`); it
+chooses. Extraction is off by default (`ARISTOTLE_MEMORY_EXTRACTION_ENABLED`); it
 is a second model call on every turn. See
 [ADR 0002](adr/0002-the-memory-graph-is-postgres-tables.md), whose first
 phase this is.
@@ -25,7 +25,7 @@ rather than only here:
 |---|---|
 | Tools over HTTP | Approval has nobody to ask until a run can pause and resume. Passing no tool registry is the only option that neither silently approves everything nor pretends to gate. |
 | A way to ask how a deferred job went | The job id is real and queryable by hand, but no route reports it, so `:defer` is fire-and-forget today. |
-| Which memories a turn actually carried | `run_meta` records *how many* reached the prompt, not which. Recording the keys is a change inside `bacteria.agent`, against a decision `_run_meta` states on purpose, so it needs a record of its own rather than a route. |
+| Which memories a turn actually carried | `run_meta` records *how many* reached the prompt, not which. Recording the keys is a change inside `aristotle.agent`, against a decision `_run_meta` states on purpose, so it needs a record of its own rather than a route. |
 | Retries on ingestion jobs | Ingestion is not idempotent — duplicates are only caught within a batch — so a retried job would store everything twice. Needs the cross-batch decision first. |
 | Key scopes | Every key grants identity and therefore everything; there is no read-only key to hand a script. Browser sessions expire, keys still do not — [ADR 0005](adr/0005-a-browser-holds-a-session-not-a-key.md) explains why the asymmetry is deliberate. |
 | Ending every session for a principal | Revoking a key does not close the sessions it opened, which outlive it by up to twelve hours. `revoke-sessions <principal>` is the missing verb. |

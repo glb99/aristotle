@@ -16,15 +16,15 @@ from typing import Any, Optional
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.graph.temporal import OPEN_ENDED
-from bacteria.app.personal.catalogue import VOCABULARY
-from bacteria.app.personal.claim_extraction import (
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.graph.temporal import OPEN_ENDED
+from aristotle.app.personal.catalogue import VOCABULARY
+from aristotle.app.personal.claim_extraction import (
     PROMPT_VERSION,
     UnknownSessionError,
     extract_assertions,
 )
-from bacteria.app.sessions.models import ChatSession, ChatTranscriptItem
+from aristotle.app.sessions.models import ChatSession, ChatTranscriptItem
 
 NOW = datetime(2026, 5, 4, tzinfo=timezone.utc)
 LATER = datetime(2026, 5, 11, tzinfo=timezone.utc)
@@ -199,7 +199,7 @@ async def test_re_reading_the_same_slice_does_not_duplicate_claims(db):
     await extract_assertions(db, first, SESSION, max_assertions=5, now=NOW)
 
     # Rewind the watermark by hand: the crash this simulates leaves it unmoved.
-    from bacteria.app.graph.models import GraphExtraction
+    from aristotle.app.graph.models import GraphExtraction
 
     row = await db.get(GraphExtraction, SESSION)
     assert row is not None

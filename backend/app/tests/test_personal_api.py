@@ -11,14 +11,14 @@ from fastapi.testclient import TestClient
 from procrastinate.exceptions import AppNotOpen
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.agent.model.protocol import ModelResponse
-from bacteria.app.auth.service import issue_key
-from bacteria.app.core import model_client
-from bacteria.app.core.db import session_scope
-from bacteria.app.core.settings import get_settings
-from bacteria.app.personal import service
-from bacteria.app.sessions.repository import SqlSessionRepository
-from bacteria.app.views import create_app
+from aristotle.agent.model.protocol import ModelResponse
+from aristotle.app.auth.service import issue_key
+from aristotle.app.core import model_client
+from aristotle.app.core.db import session_scope
+from aristotle.app.core.settings import get_settings
+from aristotle.app.personal import service
+from aristotle.app.sessions.repository import SqlSessionRepository
+from aristotle.app.views import create_app
 
 
 class FakeModelClient:
@@ -50,7 +50,7 @@ def _client(engine, monkeypatch, backend_options):
             yield session
 
     monkeypatch.setitem(model_client.PROVIDERS, "fake", FakeModelClient)
-    monkeypatch.setenv("BACTERIA_MODEL_PROVIDER", "fake")
+    monkeypatch.setenv("ARISTOTLE_MODEL_PROVIDER", "fake")
 
     # No lifespan: conftest builds the schema once per run, which is the same
     # position a deployment is in after `alembic upgrade head`.
@@ -560,7 +560,7 @@ def _capture_deferrals(monkeypatch, enabled: bool) -> list[dict]:
 
     monkeypatch.setattr(service, "_require_open_queue", lambda: None)
     monkeypatch.setattr(service.extract_memories_task, "defer_async", _record)
-    monkeypatch.setenv("BACTERIA_MEMORY_EXTRACTION_ENABLED", "true" if enabled else "false")
+    monkeypatch.setenv("ARISTOTLE_MEMORY_EXTRACTION_ENABLED", "true" if enabled else "false")
     # Settings are cached for the process and the client fixture has already
     # built them, so the variable above reaches nothing without this.
     get_settings.cache_clear()
@@ -644,7 +644,7 @@ async def test_a_turn_refuses_before_the_model_when_it_cannot_enqueue(engine, mo
 
     ``AppNotOpen`` used to arrive at the deferral, which happens after the model
     has answered and the transcript has been written — so the turn was paid for,
-    stored, and lost, and every retry paid again. `bacteria-admin chat` shipped
+    stored, and lost, and every retry paid again. `aristotle-admin chat` shipped
     with exactly that bug. The assertion that matters is not that it raises but
     that the client was never called.
     """

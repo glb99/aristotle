@@ -13,12 +13,12 @@ from datetime import datetime, timezone
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.graph.log import Assertion
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.graph.service import confirm, observe
-from bacteria.app.graph.temporal import OPEN_ENDED, Interval
-from bacteria.app.personal.catalogue import VOCABULARY
-from bacteria.app.personal.graph_candidates import GraphCandidateSupplier
+from aristotle.app.graph.log import Assertion
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.graph.service import confirm, observe
+from aristotle.app.graph.temporal import OPEN_ENDED, Interval
+from aristotle.app.personal.catalogue import VOCABULARY
+from aristotle.app.personal.graph_candidates import GraphCandidateSupplier
 
 USER = "candidates"
 NOW = datetime(2026, 5, 4, tzinfo=timezone.utc)

@@ -1,6 +1,6 @@
 """What this package is allowed to import, and where it may read configuration.
 
-The rule these protect is the one that makes `bacteria.agent` a library rather than a
+The rule these protect is the one that makes `aristotle.agent` a library rather than a
 layer: it depends on nothing from whatever hosts it, and on nothing it has not
 declared, and it learns how it is configured from its caller rather than from the
 environment. Break any of that and the agent stops being vendorable — which is the
@@ -8,7 +8,7 @@ entire premise of the layering.
 
 Static analysis, not an import attempt, and that distinction is the reason this
 file exists. In the workspace this package currently lives in, the application
-is installed in the same virtualenv, so `import bacteria.app` inside `bacteria/`
+is installed in the same virtualenv, so `import aristotle.app` inside `aristotle/`
 would succeed — in development, in CI, in every test run. Nothing would go red.
 The failure would surface only when someone vendored this package somewhere
 else, which is the furthest possible point from the mistake and the worst place
@@ -41,14 +41,14 @@ Only the exceptions. Anything absent is assumed to import under its own name,
 which is true of the rest and stays true for most things added later.
 """
 
-SELF = "bacteria.agent"
+SELF = "aristotle.agent"
 
-NAMESPACE = "bacteria"
+NAMESPACE = "aristotle"
 """The namespace both halves of this project share.
 
 Comparing top-level roots alone stopped being enough when they started sharing
-it. `bacteria.app` and `bacteria.agent` have the same first component, so a
-check that allowed the root `bacteria` would have allowed the agent to import
+it. `aristotle.app` and `aristotle.agent` have the same first component, so a
+check that allowed the root `aristotle` would have allowed the agent to import
 the application -- the one import these tests exist to forbid -- while still
 passing. That is precisely how this guard was defeated by a rename, and why
 :func:`_import_key` compares two components inside the namespace and one
@@ -60,7 +60,7 @@ def _import_key(dotted: str) -> str:
     """Reduce a dotted module path to the unit the allow-list is written in.
 
     Two components inside the shared namespace, one everywhere else:
-    ``bacteria.app.core.db`` -> ``bacteria.app``, and ``anthropic.types`` ->
+    ``aristotle.app.core.db`` -> ``aristotle.app``, and ``anthropic.types`` ->
     ``anthropic``.
     """
     parts = dotted.split(".")
@@ -167,7 +167,7 @@ def _configuration_reads_below_the_composition_root() -> dict[str, set[str]]:
 def test_only_the_composition_root_reads_configuration():
     """Nothing below `interfaces/` learns anything from the environment.
 
-    The property that lets a host compose this agent at all. `bacteria.app`
+    The property that lets a host compose this agent at all. `aristotle.app`
     builds its clients from its own `Settings`, so a module below the
     composition root reading `MODEL_PROVIDER` for itself would ignore the
     host's configuration entirely -- and do it silently, since the variable is
@@ -189,7 +189,7 @@ def test_only_the_composition_root_reads_configuration():
 
 
 def test_the_source_imports_only_what_this_package_declares():
-    """Nothing enters `bacteria.agent` that its own metadata does not promise.
+    """Nothing enters `aristotle.agent` that its own metadata does not promise.
 
     Catches two failures with one assertion. A sibling package from whatever
     workspace this happens to sit in — the one that would make the agent
@@ -205,7 +205,7 @@ def test_the_source_imports_only_what_this_package_declares():
     }
 
     assert offenders == {}, (
-        "bacteria/agent/src imports modules it does not declare in pyproject.toml.\n"
+        "aristotle/agent/src imports modules it does not declare in pyproject.toml.\n"
         "Either declare the dependency, or -- if it belongs to the host -- "
         "invert it behind a protocol the host implements.\n"
         f"{offenders}"
@@ -227,5 +227,5 @@ def test_the_tests_import_only_what_this_package_declares():
     }
 
     assert offenders == {}, (
-        f"bacteria/agent tests import modules the package does not declare.\n{offenders}"
+        f"aristotle/agent tests import modules the package does not declare.\n{offenders}"
     )

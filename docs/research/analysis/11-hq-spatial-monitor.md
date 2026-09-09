@@ -25,7 +25,7 @@ Seven rules, each stated as a dated log entry:
 **The convergence is the finding, and it is not about Mars.** Four of HQ's rules are decisions this project already made, arrived at from a different direction:
 
 - *One volume, one real thing* is [§2](../../architecture/memory-graph.md)'s **an assumed value never enters the log**, stated as a rendering discipline instead of a storage one.
-- *A vocabulary written down before it was built, with unplaced pieces documented as unplaced* is the **relation catalogue** of [dialogue 07](../dialogues/07-relation-vocabulary.md) — seeded top-down before the data, admitting an entry only when something can back it — together with bacteria's `Not built:` convention, which is the same honesty about absence.
+- *A vocabulary written down before it was built, with unplaced pieces documented as unplaced* is the **relation catalogue** of [dialogue 07](../dialogues/07-relation-vocabulary.md) — seeded top-down before the data, admitting an entry only when something can back it — together with aristotle's `Not built:` convention, which is the same honesty about absence.
 - *A world that lies once stops being worth looking at* is why `run_id` is left null rather than guessed and why `past` and `unknown` both collapse to unknown. Under-claiming is the recoverable direction, in pixels as in rows.
 - *Matte rust never states a fact* is a **reserved channel that carries no claim** — structurally the two-surfaces split of [§8](../../architecture/memory-graph.md), where one channel may write and another may not.
 

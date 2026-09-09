@@ -1,4 +1,4 @@
-# bacteria-agent — working in this package
+# aristotle-agent — working in this package
 
 ## What this is
 
@@ -8,7 +8,7 @@ deliberately minimal so the boundaries stay visible.
 
 Read first, in order:
 
-1. `src/bacteria/agent/__init__.py` — the layer map and the distinctions that matter.
+1. `src/aristotle/agent/__init__.py` — the layer map and the distinctions that matter.
 2. `docs/ARCHITECTURE.md` — request path, ownership, invariants, gaps.
 3. `docs/adr/` — why any particular thing is the way it is.
 
@@ -17,7 +17,7 @@ Read first, in order:
 ```bash
 uv sync --extra dev      # install
 uv run pytest            # test
-uv run bacteria-agent    # interactive CLI (needs a key in .env)
+uv run aristotle-agent    # interactive CLI (needs a key in .env)
 ```
 
 Provider selection is `MODEL_PROVIDER` (`anthropic` by default, or `gemini`),

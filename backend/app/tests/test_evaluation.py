@@ -19,12 +19,12 @@ import inspect
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.agent.session.store import TranscriptItem
-from bacteria.app.evaluation import checks as checks_module
-from bacteria.app.evaluation.checks import CHECKS, Policy, evaluate
-from bacteria.app.evaluation.fixtures import FIXTURE_MODEL, FIXTURE_TOOL, seed
-from bacteria.app.evaluation.runs import RecordedRun, load_runs
-from bacteria.app.sessions.repository import SqlSessionRepository
+from aristotle.agent.session.store import TranscriptItem
+from aristotle.app.evaluation import checks as checks_module
+from aristotle.app.evaluation.checks import CHECKS, Policy, evaluate
+from aristotle.app.evaluation.fixtures import FIXTURE_MODEL, FIXTURE_TOOL, seed
+from aristotle.app.evaluation.runs import RecordedRun, load_runs
+from aristotle.app.sessions.repository import SqlSessionRepository
 
 POLICY = Policy(
     expected_models=frozenset({FIXTURE_MODEL}),

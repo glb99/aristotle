@@ -24,12 +24,12 @@ Pure: no database, no fixtures, no model.
 
 from datetime import datetime, timezone
 
-from bacteria.app.graph.catalogue import Relation
-from bacteria.app.graph.conclusions import Conclusion, stale_after
-from bacteria.app.graph.constraints import conflicts_for
-from bacteria.app.graph.inference import infer_succession
-from bacteria.app.graph.log import Assertion, state_at, supersede
-from bacteria.app.graph.temporal import OPEN_ENDED, Interval
+from aristotle.app.graph.catalogue import Relation
+from aristotle.app.graph.conclusions import Conclusion, stale_after
+from aristotle.app.graph.constraints import conflicts_for
+from aristotle.app.graph.inference import infer_succession
+from aristotle.app.graph.log import Assertion, state_at, supersede
+from aristotle.app.graph.temporal import OPEN_ENDED, Interval
 
 W1 = datetime(2026, 5, 4, tzinfo=timezone.utc)
 W2 = datetime(2026, 5, 11, tzinfo=timezone.utc)

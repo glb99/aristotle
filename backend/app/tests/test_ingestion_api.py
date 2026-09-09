@@ -11,10 +11,10 @@ from fastapi.testclient import TestClient
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.auth.service import issue_key
-from bacteria.app.core.db import session_scope
-from bacteria.app.ingestion.models import IngestedRecord, IngestionBatch, RejectedRecord
-from bacteria.app.views import create_app
+from aristotle.app.auth.service import issue_key
+from aristotle.app.core.db import session_scope
+from aristotle.app.ingestion.models import IngestedRecord, IngestionBatch, RejectedRecord
+from aristotle.app.views import create_app
 
 
 def auth(token: str) -> dict[str, str]:

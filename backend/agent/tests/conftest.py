@@ -36,7 +36,7 @@ are documentation as much as verification, so keep them that way.
 
 import pytest
 
-from bacteria.agent.model.protocol import ModelResponse
+from aristotle.agent.model.protocol import ModelResponse
 
 
 class FakeModelClient:

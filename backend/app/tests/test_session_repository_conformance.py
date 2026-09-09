@@ -16,9 +16,9 @@ protocol exists to prevent.
 import pytest
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.agent.session.protocol import SessionRepository
-from bacteria.agent.session.store import SessionStore, TranscriptItem, UnknownSessionError
-from bacteria.app.sessions.repository import SqlSessionRepository
+from aristotle.agent.session.protocol import SessionRepository
+from aristotle.agent.session.store import SessionStore, TranscriptItem, UnknownSessionError
+from aristotle.app.sessions.repository import SqlSessionRepository
 
 
 @pytest.fixture(params=["in_memory", "sql"], name="repo")

@@ -1,6 +1,6 @@
 # Dialogue 13 — The subject changed
 
-> Opened 2026-08-28 by the human, after an afternoon spent building an ontology of the `bacteria` codebase and finding that it went onto the substrate without a single change:
+> Opened 2026-08-28 by the human, after an afternoon spent building an ontology of the `aristotle` codebase and finding that it went onto the substrate without a single change:
 >
 > *"I think the useful part of the project is for things like architectures designing, business management, research… While the personal assistant was the way of validating the most basic substrate (nodes, relationships creation with things like I have a dog)."*
 >
@@ -12,7 +12,7 @@
 
 > Every substrate concept below already exists in open source (semantica proves it). What nobody has built is the **negotiation surface**. […] The substrate is known technology; **the interface is the novel work**.
 
-Memory was the first instance of that thesis, not the thesis. Reading back, the word "memory" carries no weight in §1 at all — it arrived from `idea.md`'s framing of the bacteria agent and was never re-examined.
+Memory was the first instance of that thesis, not the thesis. Reading back, the word "memory" carries no weight in §1 at all — it arrived from `idea.md`'s framing of the aristotle agent and was never re-examined.
 
 ## What building the second instance produced
 
@@ -40,11 +40,11 @@ That is true of tiers one and two and **false of the tier that matters**:
 | framework | the stack | `table`, `route`, `task` | no — transcribe, per stack |
 | **practice** | **this codebase's own conventions** | **`feature`, `layer`, `role`** | **yes — the rule of three** |
 
-Tier three is the only one that is *about bacteria* rather than about Python, and it is derivable from regularity: `models`, `repository`, `service`, `views` appear together in four packages and in none of `core`, `entrypoints`, `evaluation`. A **feature** is a package carrying that role set; everything else is a layer or a library.
+Tier three is the only one that is *about aristotle* rather than about Python, and it is derivable from regularity: `models`, `repository`, `service`, `views` appear together in four packages and in none of `core`, `entrypoints`, `evaluation`. A **feature** is a package carrying that role set; everything else is a layer or a library.
 
 We shipped tiers one and two. In Palantir's terms that is the **Kitchen Sink** anti-pattern by name — a 1:1 mirror of the source system, here the parser, standing in for a model of the domain. The domain is the architecture; files are the source system.
 
-**And tier three is already in the code, in the wrong form.** `checks.py` holds `CORE = "bacteria.app.core"` and computes *is this a feature* as prefix arithmetic inside each predicate. The concepts are load-bearing in every rule and exist nowhere as types — a vocabulary being used without being named.
+**And tier three is already in the code, in the wrong form.** `checks.py` holds `CORE = "aristotle.app.core"` and computes *is this a feature* as prefix arithmetic inside each predicate. The concepts are load-bearing in every rule and exist nowhere as types — a vocabulary being used without being named.
 
 Moving them into the graph as claims (`package:chat —is_a→ feature`, never as a node *kind*, which would split one node into two on [dialogue 11 Q2](11-the-name-and-the-tail.md)'s identity argument) does three things: the rules stop containing this repo's package names and become portable, a misfire becomes contestable at the right level — you can disagree with *"chat is a feature"* separately from *"layers do not import features"* — and, most importantly, **classification is the first thing in this domain that is genuinely uncertain.** An import is exact; a classification is a judgment from a regularity. Which is where `origin == "stated"` finally has something to gate, in a domain this dialogue had already concluded made the confirmation machinery inert.
 
@@ -149,7 +149,7 @@ Measured as the proportion of proposed classifications and boundaries that are *
 
 **So the criterion dictates the contents.** A rejection rate is undefined unless something *uncertain* is proposed, which settles what must be in:
 
-- **Tier-three classification** — `chat is a feature`, `core is a layer`, `service.py has role service` — proposed from regularity, `origin: inferred`, ratifiable. **Non-negotiable**: it is the only uncertain thing in this domain, so without it there is nothing to reject and the prototype cannot evaluate itself. It is also the only part that makes this an ontology of *bacteria* rather than of Python.
+- **Tier-three classification** — `chat is a feature`, `core is a layer`, `service.py has role service` — proposed from regularity, `origin: inferred`, ratifiable. **Non-negotiable**: it is the only uncertain thing in this domain, so without it there is nothing to reject and the prototype cannot evaluate itself. It is also the only part that makes this an ontology of *aristotle* rather than of Python.
 - **The boundary lifecycle in the log** — stated, crossed, accepted with a reason, retired with a date. The loop, not merely the check.
 - **Certainty legible in the scene.** A computed violation and a proposed classification must not look alike, or the second is trusted like the first — [analysis 11](../analysis/11-hq-spatial-monitor.md)'s warning arriving as a design constraint.
 - **Regeneration and staleness.** Delete a module and the boundaries governing it are orphaned. Unique to derived domains, and unhandled anywhere in the design today.

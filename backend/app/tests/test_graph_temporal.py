@@ -10,7 +10,7 @@ Pure — no database, no fixtures.
 
 from datetime import datetime, timezone
 
-from bacteria.app.graph.temporal import ALWAYS, OPEN_ENDED, Interval, overlaps
+from aristotle.app.graph.temporal import ALWAYS, OPEN_ENDED, Interval, overlaps
 
 JAN = datetime(2026, 1, 1, tzinfo=timezone.utc)
 FEB = datetime(2026, 2, 1, tzinfo=timezone.utc)

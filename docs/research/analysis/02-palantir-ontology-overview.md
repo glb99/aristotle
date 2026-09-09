@@ -17,9 +17,9 @@ Palantir's 5-minute canonical pitch for the ontology as the core of **decision-c
 
 ## Relevance to the project
 
-- The **data / logic / actions triad** is the strongest structural template so far for bacteria's memory: not just entities+relations (data), but attached reasoning procedures (logic) and executable operations (actions). A memory that only stores facts is one-third of an ontology in this sense.
+- The **data / logic / actions triad** is the strongest structural template so far for aristotle's memory: not just entities+relations (data), but attached reasoning procedures (logic) and executable operations (actions). A memory that only stores facts is one-third of an ontology in this sense.
 - "**Context, not just data**" is precisely the memory-system argument: the agent's LLM lacks the user's world model; the ontology is the vehicle for supplying it. This matches idea.md's shared-mental-model motivation almost word for word.
-- The **ontology SDK** idea suggests bacteria's memory should have a programmatic, typed interface — the graph is not just visualized, it is *the API* other components (including the conclusion engine, the UI, other agents) build against.
+- The **ontology SDK** idea suggests aristotle's memory should have a programmatic, typed interface — the graph is not just visualized, it is *the API* other components (including the conclusion engine, the UI, other agents) build against.
 - "Model how the business actually operates, not how the systems need it" → for personal/agent memory: model the user's reality, not the storage format (no schema leaking chat-log structure into the ontology).
 
 ## Connections to other sources
@@ -30,9 +30,9 @@ Palantir's 5-minute canonical pitch for the ontology as the core of **decision-c
 
 ## Open questions for the human
 
-1. Should bacteria's memory include **actions** as first-class objects (things the agent can do, modeled in the graph with their allowed parameters/effects), or is v1 scope data+relations only?
+1. Should aristotle's memory include **actions** as first-class objects (things the agent can do, modeled in the graph with their allowed parameters/effects), or is v1 scope data+relations only?
 2. "Logic sources" for a personal agent — what would they concretely be? User-defined rules? Saved prompts? Small functions? Is this the seam where your "conclusions-taking engine" plugs in?
-3. Do you buy the "SDK of your ontology" idea — i.e., the memory graph should expose a typed API that the rest of bacteria consumes, rather than the memory being an internal detail of the agent loop?
+3. Do you buy the "SDK of your ontology" idea — i.e., the memory graph should expose a typed API that the rest of aristotle consumes, rather than the memory being an internal detail of the agent loop?
 
 ## Provisional conclusions
 

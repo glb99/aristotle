@@ -17,10 +17,10 @@ A from-first-principles walk through variance and generics, motivated by real mo
 
 More abstract than the others, but it supplies the *type-theoretic laws* behind "plug-and-play ontology":
 
-- **Substitutability is the contract of abstraction.** When bacteria's memory has capability interfaces (Schedulable, Inspectable — [04](04-palantir-advanced-ontology.md)) and workflows/tools typed against them, variance rules say exactly which substitutions are safe: things *produced* by a tool can be narrowed (covariant), things *consumed* must be widened (contravariant). Same rule Palantir states as "producer extends, consumer super."
+- **Substitutability is the contract of abstraction.** When aristotle's memory has capability interfaces (Schedulable, Inspectable — [04](04-palantir-advanced-ontology.md)) and workflows/tools typed against them, variance rules say exactly which substitutions are safe: things *produced* by a tool can be narrowed (covariant), things *consumed* must be widened (contravariant). Same rule Palantir states as "producer extends, consumer super."
 - **Mutability breaks covariance** — a deep design signal for the memory substrate: immutable facts/observations (append-only, event-sourced — [05](05-ddd-article.md)) compose and substitute more safely than a mutable current-state store. Three sources now push toward append-only.
 - **Generics without subtyping** offers a modeling option the ontology discussion hasn't had yet: some "types" in the memory shouldn't form an is-a hierarchy at all, but be *parameterized templates* (e.g. `Observation[T]`, `Conclusion[Evidence]`) — structure sharing without claiming substitutability. That's a candidate answer to when *not* to use interfaces.
-- The Kraken engines/contexts pattern is a concrete architecture for **per-domain variation over shared machinery** — analogous to bacteria having one memory engine parameterized by per-context (bounded-context, [05](05-ddd-article.md)) schemas.
+- The Kraken engines/contexts pattern is a concrete architecture for **per-domain variation over shared machinery** — analogous to aristotle having one memory engine parameterized by per-context (bounded-context, [05](05-ddd-article.md)) schemas.
 
 ## Connections to other sources
 
@@ -31,7 +31,7 @@ More abstract than the others, but it supplies the *type-theoretic laws* behind 
 
 ## Open questions for the human
 
-1. How formal do you want the memory's type system to be? Options span: (a) untyped property graph, (b) typed with interfaces + informal rules, (c) typed with checked variance (tools declare what they produce/consume and the system validates substitutions like mypy does). Where on that spectrum is bacteria v1?
+1. How formal do you want the memory's type system to be? Options span: (a) untyped property graph, (b) typed with interfaces + informal rules, (c) typed with checked variance (tools declare what they produce/consume and the system validates substitutions like mypy does). Where on that spectrum is aristotle v1?
 2. Do you see the "conclusions-taking engine" as a *consumer* typed over interfaces (contravariant — accepts anything implementing X) so it stays plug-and-play as the ontology grows?
 
 ## Provisional conclusions

@@ -12,8 +12,8 @@ from unittest.mock import AsyncMock, MagicMock
 import anthropic
 import pytest
 
-from bacteria.agent.model.client import ModelClient
-from bacteria.agent.model.errors import AssetError, ContractError, CredentialsError, ServingError
+from aristotle.agent.model.client import ModelClient
+from aristotle.agent.model.errors import AssetError, ContractError, CredentialsError, ServingError
 
 
 def make_client(**overrides) -> ModelClient:

@@ -63,7 +63,7 @@ where the API URL comes from at build time. It is ruled out by the cookie:
 `SameSite=Strict` the CSRF answer, and that holds only while the console and the
 API share an origin. So the mount and the auth decision are one decision.
 
-The build lands in **`backend/app/src/bacteria/app/console/`**, inside the
+The build lands in **`backend/app/src/aristotle/app/console/`**, inside the
 package rather than beside the repository, and `create_app` serves it at `/` when
 an `index.html` is there. Package data because the alternatives resolve
 differently in development and production: a setting cannot be read at that
@@ -72,7 +72,7 @@ directory means one thing for `just serve` at the repository root and another
 for a container started elsewhere.
 
 Verified rather than assumed: a wheel built with a file in that directory
-contains `bacteria/app/console/index.html`, so `uv_build`'s defaults ship it with
+contains `aristotle/app/console/index.html`, so `uv_build`'s defaults ship it with
 no extra configuration.
 
 The coupling this accepts is the one that shape always had — the backend

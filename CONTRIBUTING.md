@@ -112,15 +112,15 @@ memory-proposals    tests-on-postgres    transcript-ordering
 | Workflows | Kebab-case, verb-first: `test.yml`, `pre-commit.yml`. |
 | Compose files | `compose.yml` is shared; anything else is explicitly combined with `-f`. |
 | Migrations | Alembic's generated slug, kept descriptive: `unique_transcript_position_per_session`. |
-| Env vars | `BACTERIA_*` for this application's settings, unprefixed for provider SDK credentials. The two are read by different things — see [`.env.example`](.env.example) and [`core/settings.py`](backend/app/src/bacteria/app/core/settings.py). |
+| Env vars | `ARISTOTLE_*` for this application's settings, unprefixed for provider SDK credentials. The two are read by different things — see [`.env.example`](.env.example) and [`core/settings.py`](backend/app/src/aristotle/app/core/settings.py). |
 
 ### Versions
 
-`bacteria-agent` carries real semver: it is the vendorable half, declaring protocols
+`aristotle-agent` carries real semver: it is the vendorable half, declaring protocols
 other code implements, so a consumer needs to know which shape it was written
 against. Pre-1.0, breaking changes to an implementor go in the minor.
 
-`bacteria-app` stays at `"0"`. Nothing consumes it — it is a deployed application and
+`aristotle-app` stays at `"0"`. Nothing consumes it — it is a deployed application and
 its releases are commits.
 
 ### Comments and docstrings

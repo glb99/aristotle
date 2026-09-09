@@ -6,12 +6,12 @@ they assert that a turn *delegates* correctly, not that any one layer works.
 
 import pytest
 
-from bacteria.agent.context.retrieval import Candidates
-from bacteria.agent.model.protocol import ModelResponse
-from bacteria.agent.runtime.runtime import Runtime, StepAlreadyExecutedError, StepTracker
-from bacteria.agent.session.store import MemoryEntry, SessionStore
-from bacteria.agent.tools.execution import ToolExecutionError
-from bacteria.agent.tools.registry import ToolDefinition, ToolRegistry
+from aristotle.agent.context.retrieval import Candidates
+from aristotle.agent.model.protocol import ModelResponse
+from aristotle.agent.runtime.runtime import Runtime, StepAlreadyExecutedError, StepTracker
+from aristotle.agent.session.store import MemoryEntry, SessionStore
+from aristotle.agent.tools.execution import ToolExecutionError
+from aristotle.agent.tools.registry import ToolDefinition, ToolRegistry
 
 
 async def test_step_cannot_silently_run_twice():

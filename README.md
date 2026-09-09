@@ -88,7 +88,7 @@ Issue yourself a credential. It is an operator command rather than an endpoint,
 and the key is printed once, because only a hash is stored:
 
 ```bash
-uv run bacteria-admin issue-key acme-corp --label "local dev"
+uv run aristotle-admin issue-key acme-corp --label "local dev"
 ```
 
 Then run it. The worker is a second process, and deferred work only happens if
@@ -104,16 +104,16 @@ without a browser:
 
 ```bash
 curl -sX POST localhost:8000/chat/sessions \
-     -H "Authorization: Bearer $BACTERIA_KEY"
+     -H "Authorization: Bearer $ARISTOTLE_KEY"
 
 curl -sX POST localhost:8000/chat/sessions/$SESSION/turns \
-     -H "Authorization: Bearer $BACTERIA_KEY" \
+     -H "Authorization: Bearer $ARISTOTLE_KEY" \
      -H "Content-Type: application/json" \
      -d '{"text": "hello"}'
 ```
 
 Or hold the same conversation with no server at all, against the same database
-and the same code path: `uv run bacteria-admin chat acme-corp`.
+and the same code path: `uv run aristotle-admin chat acme-corp`.
 
 `just --list` is the full set of commands.
 
@@ -124,17 +124,17 @@ than by discipline.
 
 | Package | Imported as | What it is |
 |---|---|---|
-| [`backend/agent`](backend/agent) | `bacteria.agent` | The agent. Layered by ownership boundary, self-contained, independently runnable and testable. No database, no web framework, no configuration of its own. |
-| [`backend/app`](backend/app) | `bacteria.app` | The service that hosts it — HTTP API, persistence, credentials, and the ontology features. |
+| [`backend/agent`](backend/agent) | `aristotle.agent` | The agent. Layered by ownership boundary, self-contained, independently runnable and testable. No database, no web framework, no configuration of its own. |
+| [`backend/app`](backend/app) | `aristotle.app` | The service that hosts it — HTTP API, persistence, credentials, and the ontology features. |
 
 The application depends on the agent; the agent does not know the application
 exists. What connects them is a protocol the agent declares and the application
 implements, which is what lets the agent be lifted into a different host.
 
-Both live under the `bacteria`
+Both live under the `aristotle`
 [PEP 420 namespace package](https://peps.python.org/pep-0420/) and are released
-separately: `bacteria-agent` carries real semver because things implement its
-protocols, `bacteria-app` stays at `0` because nothing consumes it.
+separately: `aristotle-agent` carries real semver because things implement its
+protocols, `aristotle-app` stays at `0` because nothing consumes it.
 
 ## Documentation
 
@@ -155,7 +155,7 @@ and is deliberately a different document from this one.
 
 ## Prior art
 
-bacteria is an implementation of other people's ideas, and it is worth saying
+aristotle is an implementation of other people's ideas, and it is worth saying
 whose.
 
 - **Neurosymbolic agents** — Frank Coyle,

@@ -1,6 +1,6 @@
 # Dialogue 05 — What building it taught the model
 
-> Opened 2026-08-24, after ADR 0006's phase one shipped in `bacteria` and started writing rows from real conversations. Seven merged PRs: schema, engine, repository, service, identity, extraction, the deferred job, and a read-only HTTP surface.
+> Opened 2026-08-24, after ADR 0006's phase one shipped in `aristotle` and started writing rows from real conversations. Seven merged PRs: schema, engine, repository, service, identity, extraction, the deferred job, and a read-only HTTP surface.
 >
 > Dialogues 01 and 03 were reasoning. Dialogue 04 was a prototype. This is the first pass where the model met a database, a driver, a live model provider and a real transcript — and **six of these were found by something failing, not by anyone thinking harder.**
 >
@@ -90,7 +90,7 @@ R2 said a bad extractor run is fixed by retracting everything carrying one promp
 
 ### B4 — Do we adopt the article's vocabulary, and record explicit-vs-inferred?
 
-[Analysis 10](../analysis/10-agent-stack-memory.md) maps our layers onto the taxonomy in the reference bacteria's agent package was designed against. Three things came out of it.
+[Analysis 10](../analysis/10-agent-stack-memory.md) maps our layers onto the taxonomy in the reference aristotle's agent package was designed against. Three things came out of it.
 
 **The names are better than ours** — session history, prompt context, retrieval, memory — and ours already match them. But calling the graph "memory" inside a codebase that uses *memory* for keyed entries is a collision we have tripped over twice in conversation alone.
 

@@ -1,13 +1,13 @@
 [project]
-# Distribution `bacteria-agent`, imported as `bacteria.agent`. The two halves of
-# this project share the `bacteria` namespace rather than owning two unrelated
+# Distribution `aristotle-agent`, imported as `aristotle.agent`. The two halves of
+# this project share the `aristotle` namespace rather than owning two unrelated
 # top-level names, which is what lets them be released separately without
 # `agent` -- a name nothing should claim on PyPI -- ending up on sys.path.
-name = "bacteria-agent"
+name = "aristotle-agent"
 # Real semver, unlike the application that hosts it. This package is the
 # vendorable half -- it declares protocols other code implements, so a consumer
 # needs to be able to say which shape of `SessionRepository` it was written
-# against. `bacteria-app` stays at "0" because nothing consumes it.
+# against. `aristotle-app` stays at "0" because nothing consumes it.
 #
 # 0.2.0 rather than 0.1.1: since 0.1.0 the package went async throughout
 # (ADR 0014), grew `session/protocol.py`, and added three methods to the store
@@ -46,23 +46,23 @@ dev = [
 ]
 
 [project.scripts]
-# Named for the distribution rather than the project, because `bacteria` alone
-# now means the whole repository -- and a bare `bacteria` command sitting beside
-# `bacteria-serve` and `bacteria-worker` would read as the umbrella entry point
+# Named for the distribution rather than the project, because `aristotle` alone
+# now means the whole repository -- and a bare `aristotle` command sitting beside
+# `aristotle-serve` and `aristotle-worker` would read as the umbrella entry point
 # rather than as the agent's standalone CLI, which is all it is.
-bacteria-agent = "bacteria.agent.interfaces.cli:main"
+aristotle-agent = "aristotle.agent.interfaces.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-# A PEP 420 namespace package: there is no `src/bacteria/__init__.py`, and there
-# must not be. Both distributions install into `site-packages/bacteria/`, so an
+# A PEP 420 namespace package: there is no `src/aristotle/__init__.py`, and there
+# must not be. Both distributions install into `site-packages/aristotle/`, so an
 # `__init__.py` in either would make that directory a regular package and hide
 # the other's subpackage entirely. The layer map that used to live in that file
-# is now in `bacteria/agent/__init__.py`, which is the module it describes.
-module-name = "bacteria.agent"
+# is now in `aristotle/agent/__init__.py`, which is the module it describes.
+module-name = "aristotle.agent"
 namespace = true
 
 [tool.pytest.ini_options]

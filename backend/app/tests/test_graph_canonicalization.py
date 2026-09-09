@@ -7,7 +7,7 @@ relation the live graph actually contains.
 Pure — no database, no model, no fixtures.
 """
 
-from bacteria.app.personal.claim_extraction import _clean
+from aristotle.app.personal.claim_extraction import _clean
 
 PERSON = {"label": "Diane", "kind": "person"}
 ACME = {"label": "Acme", "kind": "organization"}

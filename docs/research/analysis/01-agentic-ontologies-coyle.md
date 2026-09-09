@@ -21,7 +21,7 @@ Key points, in talk order:
 - Gives us the **canonical definition** to anchor GLOSSARY: ontology = formal specification of a shared conceptualization. Note how close "shared conceptualization" is to idea.md's "shared mental model between human and agent" — the definitions almost coincide.
 - Positions the memory-as-ontology not just as *storage* but as an **active guardrail component in the agentic loop** — the memory system can validate agent actions, not only inform them. This is a concrete mechanism for idea.md's "conclusions-taking engine could work on this substrate".
 - The **bottom-up construction** path maps directly to how an agent's memory actually grows: entities/relations harvested from conversations and actions, incrementally attached to the graph — with optional top-down schema from the user.
-- The **side-layer idea** (RDFS/OWL-like rules sitting beside the graph) suggests bacteria's memory could have two strata: the entity/relationship graph, plus a rules/constraints layer that enables inference and validation. The idea.md notion of "hierarchies, clusters… more metadata for modeling reality" may live in this same side layer.
+- The **side-layer idea** (RDFS/OWL-like rules sitting beside the graph) suggests aristotle's memory could have two strata: the entity/relationship graph, plus a rules/constraints layer that enables inference and validation. The idea.md notion of "hierarchies, clusters… more metadata for modeling reality" may live in this same side layer.
 
 ## Connections to other sources
 
@@ -32,9 +32,9 @@ Key points, in talk order:
 
 ## Open questions for the human
 
-1. Should bacteria's memory validate/veto agent actions (Coyle's guardrail role), or only inform them (pure context/recall role)? This is an architectural fork: memory as *police* vs memory as *map*.
+1. Should aristotle's memory validate/veto agent actions (Coyle's guardrail role), or only inform them (pure context/recall role)? This is an architectural fork: memory as *police* vs memory as *map*.
 2. Do we want a formal constraint language (RDFS/OWL-like, machine-checkable) in v1, or start with a plain property graph and add the rules layer later?
-3. Bottom-up growth (agent harvests entities from interactions) vs top-down (user defines the schema first) — which is the primary flow for bacteria? Both?
+3. Bottom-up growth (agent harvests entities from interactions) vs top-down (user defines the schema first) — which is the primary flow for aristotle? Both?
 
 ## Provisional conclusions
 

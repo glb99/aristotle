@@ -2,14 +2,14 @@
 
 from datetime import datetime, timezone
 
-from bacteria.agent.context.assembly import assemble_context
-from bacteria.agent.context.retrieval import (
+from aristotle.agent.context.assembly import assemble_context
+from aristotle.agent.context.retrieval import (
     Candidates,
     RecentMemory,
     RetrievesMemory,
     Selection,
 )
-from bacteria.agent.session.store import MemoryEntry, SessionStore, TranscriptItem
+from aristotle.agent.session.store import MemoryEntry, SessionStore, TranscriptItem
 
 
 async def make_state_with_messages(count: int):

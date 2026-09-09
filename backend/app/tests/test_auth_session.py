@@ -12,12 +12,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.auth import keys
-from bacteria.app.auth.dependencies import COOKIE_NAME
-from bacteria.app.auth.models import BrowserSession
-from bacteria.app.auth.service import issue_key, revoke_key
-from bacteria.app.core.db import session_scope
-from bacteria.app.views import create_app
+from aristotle.app.auth import keys
+from aristotle.app.auth.dependencies import COOKIE_NAME
+from aristotle.app.auth.models import BrowserSession
+from aristotle.app.auth.service import issue_key, revoke_key
+from aristotle.app.core.db import session_scope
+from aristotle.app.views import create_app
 
 
 @pytest.fixture(name="client")

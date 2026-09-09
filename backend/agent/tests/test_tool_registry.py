@@ -2,7 +2,7 @@
 
 import pytest
 
-from bacteria.agent.tools.registry import ToolDefinition, ToolRegistry, UnknownToolError
+from aristotle.agent.tools.registry import ToolDefinition, ToolRegistry, UnknownToolError
 
 
 def make_tool(name="echo") -> ToolDefinition:

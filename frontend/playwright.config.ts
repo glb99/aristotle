@@ -16,7 +16,7 @@ export default defineConfig({
   // "#workspace is hidden" -- a rendering bug that was a timeout.
   expect: { timeout: 15_000 },
   use: {
-    baseURL: process.env["BACTERIA_URL"] ?? "http://127.0.0.1:8000",
+    baseURL: process.env["ARISTOTLE_URL"] ?? "http://127.0.0.1:8000",
     // On by default: the failures here are visual and sequential, and a trace is
     // the difference between "the click did nothing" and knowing which listener
     // ran.

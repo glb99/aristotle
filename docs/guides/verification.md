@@ -27,7 +27,7 @@ Two narrower modes exist alongside it, and both cover something the plain run
 cannot:
 
 - `just smoke --in-process-worker` runs the topology a deployment actually uses
-  — one process, worker inside the API behind `BACTERIA_RUN_WORKER_IN_API`
+  — one process, worker inside the API behind `ARISTOTLE_RUN_WORKER_IN_API`
   (ADR 0001). Everything else here runs the two-process shape, so that flag was
   load-bearing in production and exercised nowhere. It failed exactly that way
   once: the variable never reached the process, the service conversed normally,

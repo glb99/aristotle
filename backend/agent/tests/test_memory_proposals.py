@@ -7,9 +7,9 @@ that property usable rather than merely true.
 
 import pytest
 
-from bacteria.agent.context.assembly import assemble_context
-from bacteria.agent.session.store import OWNER, MemoryRefused, SessionStore, UnknownSessionError
-from bacteria.agent.tools.memory import MODEL_SOURCE, build_remember_tool
+from aristotle.agent.context.assembly import assemble_context
+from aristotle.agent.session.store import OWNER, MemoryRefused, SessionStore, UnknownSessionError
+from aristotle.agent.tools.memory import MODEL_SOURCE, build_remember_tool
 
 
 async def a_session():

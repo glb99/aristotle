@@ -4,7 +4,7 @@
 
 ## A. Scope of the ontology tetrad (data / logic / action / security)
 
-1. **Actions**: should bacteria's memory include actions as first-class objects (modeled verbs with parameters/effects, validated before execution), or is v1 data+relations+conclusions only? Note: semantica shows the substrate is commodity *except* the action layer — actions are both the hardest and the most distinctive piece. (from 02, 03, 09)
+1. **Actions**: should aristotle's memory include actions as first-class objects (modeled verbs with parameters/effects, validated before execution), or is v1 data+relations+conclusions only? Note: semantica shows the substrate is commodity *except* the action layer — actions are both the hardest and the most distinctive piece. (from 02, 03, 09)
 2. **Logic sources**: what are they for a personal agent — user-defined rules? saved prompts? small functions attached to entity types? Is this the seam where the conclusions-taking engine plugs in? (from 02)
 3. **Security**: in scope for the mental model (what the agent may read/write/do autonomously), or deferred? (from 03)
 
@@ -28,7 +28,7 @@
 13. Bottom-up growth (agent harvests entities from interactions) vs top-down (user defines schema first) — which is primary? Both with what precedence? (from 01)
 14. Capabilities on entities: **interfaces implemented by types** (Palantir-style), **linked facet objects** (pure composition), or both? They differ visibly in the UI. (from 06)
 15. Is subtype specialization allowed at all in v1, or interfaces+composition only? (from 06)
-16. Do you buy the **"SDK of your ontology"** idea — the memory exposes a typed API the rest of bacteria consumes, rather than being an internal detail of the loop? (from 02)
+16. Do you buy the **"SDK of your ontology"** idea — the memory exposes a typed API the rest of aristotle consumes, rather than being an internal detail of the loop? (from 02)
 
 ## E. Process / meta
 
@@ -51,7 +51,7 @@
   - **LLM judgments are NOT logic.** They are conclusions, recorded in the decision layer with provenance and confidence. Logic computes; conclusions record that computing happened.
   - The conclusions engine is a *consumer* of logic, not a logic source: it reads the graph, applies constraints/derivations deterministically, invokes LLM judgment only where judgment is genuinely needed, then writes a Conclusion recording which logic was applied.
 
-- **(2026-08-22) Q3 — Security: AGREED, in scope but renamed.** Palantir's apparatus (roles, marking taxonomies, policy engines, runtime policy evaluation) stays **out** — it answers a multi-user problem bacteria doesn't have. What stays in is three concerns that the single word "security" hides:
+- **(2026-08-22) Q3 — Security: AGREED, in scope but renamed.** Palantir's apparatus (roles, marking taxonomies, policy engines, runtime policy evaluation) stays **out** — it answers a multi-user problem aristotle doesn't have. What stays in is three concerns that the single word "security" hides:
   - **Autonomy** — what the agent may do without asking. A trust dial, not access control; Palantir's "new team member gradually granted a wider purview". Already shaped in Q1: which action types commit without ratification.
   - **Exposure** — what leaves the machine. **Explicitly agreed as v1.** A personal memory graph is more dangerous than the chat logs it replaces (structured, queryable, complete: relationships, health, money, private opinions), and every inference ships context to a provider. The boundary is which parts of the graph may enter a context window, reach a tool, or land in an artifact. Needs one genuinely new concept: a sensitivity level on types/subgraphs.
   - **Trust** — whether an assertion can be believed given its origin. The live threat is prompt injection writing false facts into memory (memory poisoning is worse in a graph than in a transcript, because the graph is what the agent reasons *from*). Handled by provenance plus a ratified-vs-observed distinction, which Q7/Q8 need anyway.
@@ -143,7 +143,7 @@
   - **Leftover case** — types sharing fields but genuinely not the same kind of thing — uses source 03's **shared properties**, the graph equivalent of source 07's "if the parent exists only for code sharing, make it a generic, not a supertype".
   - **Meta-principle worth keeping for all of v1 scope**: adding subtyping later is additive and safe; removing it after the agent has built hierarchies on it is not. **When a decision is asymmetric, take the reversible side.**
 
-- **(2026-08-22) Q16 — Ontology as SDK: AGREED.** idea.md already said this in different words — "the first **substrate** on which some conclusions-taking engine could work" is platform language, not feature language. Either bacteria has a memory component, or bacteria is an application over a memory substrate; the second makes the memory outlive the agent (Q12), makes it valuable as open source, and stops the five known consumers (loop, UI, conclusions engine, validator, exporter) coupling to internals.
+- **(2026-08-22) Q16 — Ontology as SDK: AGREED.** idea.md already said this in different words — "the first **substrate** on which some conclusions-taking engine could work" is platform language, not feature language. Either aristotle has a memory component, or aristotle is an application over a memory substrate; the second makes the memory outlive the agent (Q12), makes it valuable as open source, and stops the five known consumers (loop, UI, conclusions engine, validator, exporter) coupling to internals.
   - **Generated, not authored.** Because the schema lives in the graph as data (Q10), typed accessors are *projected* from it, so the API tracks the model instead of drifting.
   - **Two layers, to resolve the tension with Q13's continuous schema growth**: a **stable generic core** (query, assert, traverse, subscribe) that does not change when the schema changes — what the UI and loop use — plus an **optional generated typed layer** for code that wants ergonomics.
   - **The agent doesn't want the SDK at all.** An LLM has no compile step: it reads the schema at runtime as *context* and acts through *tools*. Those tool definitions are exactly Q1's action types — Palantir states actions "can be automatically surfaced as tools for all types of agents". So action types serve simultaneously as the model's verbs, the validator's units, and the agent's toolset.
@@ -159,7 +159,7 @@
   - **Doctrine: never require the user to think like an ontologist.** The reason constraints must be readable sentences (Q10), clusters are drag-and-drop (Q11), review is ambient (Q6). The user brings domain truth; modeling vocabulary stays the agent's problem.
 
 - **(2026-08-22) Q18 — Semantica: AGREED, "borrow the pipeline, not the model."** Sharpened from the original "reference first, audit before depending" now that the other 17 answers exist.
-  - **Divergence is at the core, not the edges**: semantica merges decision and conclusion (Q4 splits them); its causal links are decision→decision with no evidence links, making Q4's staleness propagation impossible in its schema; it has no actions on the model (Q1), no staging or negotiation surface (Q5, Q6), and generates OWL *from* data rather than treating schema as living graph content (Q10, Q13). Building on its `ContextGraph` means fighting its decision model exactly where bacteria's differentiation lives.
+  - **Divergence is at the core, not the edges**: semantica merges decision and conclusion (Q4 splits them); its causal links are decision→decision with no evidence links, making Q4's staleness propagation impossible in its schema; it has no actions on the model (Q1), no staging or negotiation surface (Q5, Q6), and generates OWL *from* data rather than treating schema as living graph content (Q10, Q13). Building on its `ContextGraph` means fighting its decision model exactly where aristotle's differentiation lives.
   - **The ingestion pipeline is genuinely good and independently convergent** with our decisions: conflict detection with source credibility ↔ Q5's flag-don't-reject; blocking + semantic dedup ↔ Q8's confidence bands; PROV-O ↔ Q12. **Adopt the ordering regardless of the code**: extract → detect conflicts → dedupe → merge.
   - **Cautions**: the README admits the Rete matcher is "intentionally simple" (breadth over depth where depth is wanted); the repo was committed to the same day it was cloned (churn risk for a dependency).
   - **Resolution: if used, put semantica behind an anticorruption layer** (Q11) — an external source whose schema must not leak into the ontology; take its extraction output, translate at the boundary, stay free to swap or drop it.

@@ -1,4 +1,4 @@
-# bacteria-agent
+# aristotle-agent
 
 A small AI agent, built as **infrastructure** rather than as a script — and
 deliberately kept small enough to read in one sitting.
@@ -24,9 +24,9 @@ Working and exercised end to end against live APIs. Two model providers
 (Anthropic, Gemini), one tool, an interactive approval gate, and 61 tests
 covering the load-bearing invariants.
 
-Runnable on its own (`uv run bacteria-agent`) and embeddable in a host application —
+Runnable on its own (`uv run aristotle-agent`) and embeddable in a host application —
 both are supported and neither is the "real" one. In this workspace it is
-embedded by [`bacteria-app`](../app), which supplies a database-backed session
+embedded by [`aristotle-app`](../app), which supplies a database-backed session
 store; the agent itself has never learned what a database is.
 
 The layers that touch the outside world are async; the ones that only compute
@@ -58,7 +58,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 Then talk to it:
 
 ```bash
-uv run bacteria-agent
+uv run aristotle-agent
 ```
 
 To use Gemini instead, set `GEMINI_API_KEY` and `MODEL_PROVIDER=gemini`. Nothing
@@ -76,9 +76,9 @@ The CLI is one entry point, not the interface. A host application constructs the
 pieces itself and calls one method:
 
 ```python
-from bacteria.agent.model.client import ModelClient
-from bacteria.agent.runtime.runtime import Runtime
-from bacteria.agent.session.store import SessionStore
+from aristotle.agent.model.client import ModelClient
+from aristotle.agent.runtime.runtime import Runtime
+from aristotle.agent.session.store import SessionStore
 
 store = SessionStore()
 runtime = Runtime(model_client=ModelClient(), session_store=store)
@@ -95,7 +95,7 @@ that order — resolve, approve, then run — so a refusal means nothing happene
 rather than something happened and was reported as refused:
 
 ```python
-from bacteria.agent.tools.registry import ToolDefinition, ToolRegistry
+from aristotle.agent.tools.registry import ToolDefinition, ToolRegistry
 
 tools = ToolRegistry()
 tools.register(
@@ -127,7 +127,7 @@ registered tool has a side effect worth stopping.
 ### Supplying your own storage
 
 `Runtime` is typed against
-[`SessionRepository`](src/bacteria/session/protocol.py), not against the
+[`SessionRepository`](src/aristotle/session/protocol.py), not against the
 in-memory class. A durable store is a second implementation of five methods —
 `create_session`, `get_state`, `commit`, `remember`, `forget` — and no caller
 here changes. The dependency runs outward: this package declares the shape,
@@ -145,16 +145,16 @@ and that callers depend on:
 - `remember` overwrites by key; `forget` on an absent key is a no-op.
 - An unknown `session_id` raises `UnknownSessionError` rather than creating one.
 
-`bacteria-app` implements this against SQLModel and runs a conformance suite over
+`aristotle-app` implements this against SQLModel and runs a conformance suite over
 both implementations, which is the shape that catches the ones above.
 
 ### Adding a provider
 
 Implement one method — `async send(messages, **kwargs) -> ModelResponse` — per
-[`model/protocol.py`](src/bacteria/model/protocol.py). Budget for translation,
+[`model/protocol.py`](src/aristotle/model/protocol.py). Budget for translation,
 not just a signature: the runtime speaks Anthropic's block shapes, so a
 non-Anthropic client converts in both directions. Read
-[`model/gemini_client.py`](src/bacteria/model/gemini_client.py) first to see how
+[`model/gemini_client.py`](src/aristotle/model/gemini_client.py) first to see how
 much that actually is, and [ADR 0006](docs/adr/0006-anthropic-block-shapes-as-internal-format.md)
 for why the internal format is not neutral.
 
@@ -271,7 +271,7 @@ real before believing a provider integration works.
 ## Layout
 
 ```
-src/bacteria/
+src/aristotle/
   interfaces/   entry points and composition
   runtime/      turn sequencing and step discipline
   context/      working-set assembly

@@ -13,11 +13,11 @@ from typing import Any
 
 import pytest
 
-from bacteria.agent.model.protocol import ModelResponse
-from bacteria.app.architecture.conversation import ASKED, PREAMBLE, OnlyReads, ask, registry_for
-from bacteria.app.architecture.models import Project
-from bacteria.app.architecture.service import Model, model_of
-from bacteria.app.architecture.tools import (
+from aristotle.agent.model.protocol import ModelResponse
+from aristotle.app.architecture.conversation import ASKED, PREAMBLE, OnlyReads, ask, registry_for
+from aristotle.app.architecture.models import Project
+from aristotle.app.architecture.service import Model, model_of
+from aristotle.app.architecture.tools import (
     READ_ONLY,
     build_describe_package_tool,
     build_list_boundaries_tool,
@@ -40,7 +40,7 @@ def _model() -> Model:
     project = Project(
         project_id="p1",
         principal_id="tester",
-        name="bacteria",
+        name="aristotle",
         location=str(REPO),
         test_command=None,
         added_at=datetime.now(timezone.utc),
@@ -104,16 +104,18 @@ class TestWhatTheToolsAnswer:
         answering from memory would still be saying ``core``.
         """
         tool = build_describe_package_tool(model)
-        answer = json.loads(tool.handler({"name": "bacteria.app.graph"}))
+        answer = json.loads(tool.handler({"name": "aristotle.app.graph"}))
 
-        assert answer["package"] == "bacteria.app.graph"
+        assert answer["package"] == "aristotle.app.graph"
         assert answer["modules"]["count"] > 5
         assert "graph_assertion" in answer["tables"]
         # Nothing. The substrate imports no other package in this repository,
         # which is what makes it one, and is checked here rather than asserted
         # in prose somewhere.
         assert answer["depends_on"]["names"] == []
-        assert any(d.startswith("bacteria.app.personal") for d in answer["depended_on_by"]["names"])
+        assert any(
+            d.startswith("aristotle.app.personal") for d in answer["depended_on_by"]["names"]
+        )
 
     def test_an_unknown_name_is_said_rather_than_returned_empty(self, model: Model) -> None:
         """A model handed ``{}`` assumes failure and retries a variation.

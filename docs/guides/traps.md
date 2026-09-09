@@ -16,7 +16,7 @@ routes the URL to psycopg2, which is not installed.
 
 uvicorn passes its own `loop_factory`, hardcoded to `ProactorEventLoop`, which
 silently wins. Everything that starts a loop goes through
-`bacteria.app.core.platform.run`, and `bacteria-serve` drives `Server.serve()`
+`aristotle.app.core.platform.run`, and `aristotle-serve` drives `Server.serve()`
 rather than calling `uvicorn.run()`.
 
 ## Importing a module must not read settings.
@@ -25,7 +25,7 @@ rather than calling `uvicorn.run()`.
 process, so anything that reads it at import freezes configuration before tests
 can patch it. This already happened once: procrastinate discovers tasks by
 import, building the app read settings, and the chat tests called the live
-Anthropic API instead of the fake. If a test monkeypatches `BACTERIA_*`, it may
+Anthropic API instead of the fake. If a test monkeypatches `ARISTOTLE_*`, it may
 also need `get_settings.cache_clear()`.
 
 ## `just makemigration` produces a draft, not a migration.
@@ -38,7 +38,7 @@ that has data in it.
 ## `pkill` matches nothing in this shell, and says so by staying quiet.
 
 It
-returns without killing `bacteria-serve`, so a "restart" leaves the old process
+returns without killing `aristotle-serve`, so a "restart" leaves the old process
 holding port 8000, the new one exits with `[Errno 10048] error while attempting
 to bind`, and every request after that is answered by a server running the *old*
 configuration. That failure looks exactly like success: the endpoint responds,
@@ -97,7 +97,7 @@ a bug in the probe.
 They come from
 procrastinate's own SQL via a migration, not from SQLModel metadata, so
 autogenerate would write a migration to drop them. The filter is
-`bacteria.app.core.db.include_name`, used by both `migrations/env.py` and the drift
+`aristotle.app.core.db.include_name`, used by both `migrations/env.py` and the drift
 test.
 
 
@@ -114,4 +114,4 @@ pytest exits 0 on a run that skipped everything, so with Docker stopped the
 recipe people are told to run before pushing reported success having executed no
 database test at all. Iterating on one file from an editor should still skip;
 the aggregate gate has no business claiming success. Never name that variable
-with the `BACTERIA_` prefix — an unrecognized one is a refusal to boot.
+with the `ARISTOTLE_` prefix — an unrecognized one is a refusal to boot.

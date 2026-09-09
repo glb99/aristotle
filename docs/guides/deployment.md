@@ -15,10 +15,10 @@ and the way that is resolved gives up a property the code otherwise protects.
 | | |
 |---|---|
 | Build root | The **repository root**, not `backend/app` — set in *both* the workflow's `Deploy` step and the dashboard. See [§1](#1-the-application). |
-| Entrypoint | `bacteria.app.entrypoints.asgi:app`, from `[tool.fastapi]` in the **root** `pyproject.toml` |
+| Entrypoint | `aristotle.app.entrypoints.asgi:app`, from `[tool.fastapi]` in the **root** `pyproject.toml` |
 | Schema | Applied by the workflow, before the deploy. Nothing creates or upgrades it at startup. |
-| Worker | **In-process**, via `BACTERIA_RUN_WORKER_IN_API=true`. There is nowhere else to put it. |
-| Console | Built by the workflow **before** the deploy, into `backend/app/src/bacteria/app/console/`. The platform never runs npm, so nothing on their side produces it. |
+| Worker | **In-process**, via `ARISTOTLE_RUN_WORKER_IN_API=true`. There is nowhere else to put it. |
+| Console | Built by the workflow **before** the deploy, into `backend/app/src/aristotle/app/console/`. The platform never runs npm, so nothing on their side produces it. |
 
 ---
 
@@ -40,16 +40,16 @@ point at.
 
 **Neither may be `backend/app`, which is the obvious answer and fails.** The
 deployed application is that package, so pointing at it reads as correct —
-but the build runs `uv` from whatever directory it is given, and `bacteria-app`
-declares `bacteria-agent = { workspace = true }`. A workspace member does not
+but the build runs `uv` from whatever directory it is given, and `aristotle-app`
+declares `aristotle-agent = { workspace = true }`. A workspace member does not
 build without the root that declares `members = ["backend/*"]`.
 
 Rooted at `backend/app`, the build fails three ways at once and none of the
 messages names the cause:
 
 ```
-error: Failed to parse entry: `bacteria-agent`
-  Caused by: `bacteria-agent` references a workspace in `tool.uv.sources`, but is
+error: Failed to parse entry: `aristotle-agent`
+  Caused by: `aristotle-agent` references a workspace in `tool.uv.sources`, but is
   not a workspace member
 ```
 
@@ -60,14 +60,14 @@ Using CPython 3.14.6          # no .python-version in that directory
 
 The [`Dockerfile`](../../Dockerfile) has always had the right shape and is the thing
 to compare against: it copies `backend/`, `pyproject.toml` and `uv.lock`, then
-runs `uv sync --package bacteria-app`.
+runs `uv sync --package aristotle-app`.
 
-**The root depends on `bacteria-app`, and that line is load-bearing.** The
+**The root depends on `aristotle-app`, and that line is load-bearing.** The
 builder runs a plain `uv sync`, which installs a virtual root's `dependencies`
 and its groups and nothing else. Every command here names the package it wants —
 the Dockerfile, this workflow, the Justfile — so deleting that dependency leaves
 all of them green and produces an image with the entire toolchain and no
-`bacteria` in it. It fails at import, as `No module named 'bacteria'`, well past
+`aristotle` in it. It fails at import, as `No module named 'aristotle'`, well past
 the point anything looks like it could still fail. A test in
 `backend/app/tests/test_entrypoints.py` holds it in place.
 
@@ -79,10 +79,10 @@ Attach Postgres through the
 integration, or bring your own.
 
 **The integration sets a bare `DATABASE_URL`, which this application does not
-read.** `Settings` takes `BACTERIA_`-prefixed variables only, and ignores
-unprefixed ones — the prefix is what makes `BACTERIA_DATABSE_URL` a startup
+read.** `Settings` takes `ARISTOTLE_`-prefixed variables only, and ignores
+unprefixed ones — the prefix is what makes `ARISTOTLE_DATABSE_URL` a startup
 failure instead of a service quietly running on the default. So copy the
-connection string into a `BACTERIA_DATABASE_URL` secret by hand.
+connection string into a `ARISTOTLE_DATABASE_URL` secret by hand.
 
 Two things about that string:
 
@@ -102,7 +102,7 @@ dashboard offers both under one heading and the difference is not cosmetic:
 - **Transaction pooler** (port `6543`) hands out a connection per transaction, so
   it does not carry `LISTEN`/`NOTIFY` and breaks the prepared statements psycopg
   makes on its own after a query repeats. The queue is
-  [`PsycopgConnector`](../../backend/app/src/bacteria/app/core/jobs.py), which uses
+  [`PsycopgConnector`](../../backend/app/src/aristotle/app/core/jobs.py), which uses
   that notification to pick a job up promptly. It also polls, so the honest
   symptom is latency and intermittent statement errors rather than silence —
   which means **"jobs do eventually run" does not clear the pooler**. Session
@@ -121,22 +121,22 @@ In the FastAPI Cloud dashboard:
 
 | Variable | Value | |
 |---|---|---|
-| `BACTERIA_DATABASE_URL` | the connection string | **secret** |
-| `BACTERIA_RUN_WORKER_IN_API` | `true` | required here, and only here. Defaults to `false` |
-| `BACTERIA_MEMORY_EXTRACTION_ENABLED` | `true` | defaults to `false`, so without it no turn ever enqueues and no proposal is ever produced |
-| `BACTERIA_MODEL_PROVIDER` | `anthropic` or `gemini` | |
-| `BACTERIA_LOG_LEVEL` | `INFO` | |
+| `ARISTOTLE_DATABASE_URL` | the connection string | **secret** |
+| `ARISTOTLE_RUN_WORKER_IN_API` | `true` | required here, and only here. Defaults to `false` |
+| `ARISTOTLE_MEMORY_EXTRACTION_ENABLED` | `true` | defaults to `false`, so without it no turn ever enqueues and no proposal is ever produced |
+| `ARISTOTLE_MODEL_PROVIDER` | `anthropic` or `gemini` | |
+| `ARISTOTLE_LOG_LEVEL` | `INFO` | |
 | `ANTHROPIC_API_KEY` or `GEMINI_API_KEY` | provider credential | **secret**, unprefixed — the SDKs read these exact names |
-| `BACTERIA_WORKER_CONCURRENCY` | `4` | optional; competes with request handling on one loop |
-| `BACTERIA_LOGFIRE_TOKEN` | Logfire write token | **secret**; optional — absent means the process prints spans instead of exporting them |
-| `BACTERIA_LOGFIRE_ENVIRONMENT` | `production` | defaults to `local`, which is what makes one Logfire project serve both |
-| `BACTERIA_LOGFIRE_CONSOLE` | leave unset | spans are printed only when there is *no* token, so a deployment that exports does not also fill its log with one line per query. `true` gets both; `false` silences them with no exporter either |
+| `ARISTOTLE_WORKER_CONCURRENCY` | `4` | optional; competes with request handling on one loop |
+| `ARISTOTLE_LOGFIRE_TOKEN` | Logfire write token | **secret**; optional — absent means the process prints spans instead of exporting them |
+| `ARISTOTLE_LOGFIRE_ENVIRONMENT` | `production` | defaults to `local`, which is what makes one Logfire project serve both |
+| `ARISTOTLE_LOGFIRE_CONSOLE` | leave unset | spans are printed only when there is *no* token, so a deployment that exports does not also fill its log with one line per query. `true` gets both; `false` silences them with no exporter either |
 
 Use a **separate write token for this deployment from the one on a laptop**, against
 the same project. Same destination, and either can be revoked without disturbing
 the other — which matters because the laptop's is the one that leaks.
 
-Anything starting with `BACTERIA_` that is not a setting **fails startup on
+Anything starting with `ARISTOTLE_` that is not a setting **fails startup on
 purpose**. A typo is a refusal to boot, not a service running on defaults.
 
 The other direction — a setting's name *without* the prefix, such as
@@ -161,7 +161,7 @@ a job summary naming what is missing, rather than failing — a `main` that is r
 because a dashboard is half-configured teaches everyone to ignore the red. It
 does not report success for a deploy that did not happen either.
 
-Add `BACTERIA_DATABASE_URL` there too — the workflow migrates before deploying,
+Add `ARISTOTLE_DATABASE_URL` there too — the workflow migrates before deploying,
 so the runner needs it. Put all three in a `production` environment, which is
 what the workflow's `environment:` names.
 
@@ -175,8 +175,8 @@ It drives the post-deploy check in [§6](#6-check-that-deferred-work-is-actually
 which is skipped with a notice while it is unset rather than failing the deploy.
 A variable and not a secret because a public URL is not one, and a masked value
 is unreadable in exactly the log you would be reading to find out which host
-failed. It is deliberately not `BACTERIA_`-prefixed: anything with that prefix
-that is not a setting refuses to boot, and that step runs `bacteria-admin`.
+failed. It is deliberately not `ARISTOTLE_`-prefixed: anything with that prefix
+that is not a setting refuses to boot, and that step runs `aristotle-admin`.
 
 **The database has to be reachable from a GitHub-hosted runner.** Neon and
 Supabase are. One inside a private network is not, and the migration step would
@@ -189,7 +189,7 @@ from an operator command rather than an endpoint — minting one over HTTP needs
 credential, and the first has nowhere to come from.
 
 ```bash
-BACTERIA_DATABASE_URL='postgresql+psycopg://…' uv run bacteria-admin issue-key acme --label production
+ARISTOTLE_DATABASE_URL='postgresql+psycopg://…' uv run aristotle-admin issue-key acme --label production
 ```
 
 Printed once. Only a hash is stored.
@@ -279,13 +279,13 @@ Stated here as well as in the ADR, because this is the page someone reads before
 deciding.
 
 - **A worker failure can take the API with it.** One process, one loop, one pool.
-- **Scaling the API scales workers,** and the reverse. `BACTERIA_WORKER_CONCURRENCY`
+- **Scaling the API scales workers,** and the reverse. `ARISTOTLE_WORKER_CONCURRENCY`
   is the only dial.
 - **A blocking job would stall requests.** Today's task is safe — synchronous
   handler steps run in a worker thread — but nothing enforces that for the next
   one.
 
-Leave `BACTERIA_RUN_WORKER_IN_API` **unset** anywhere you can run two processes.
+Leave `ARISTOTLE_RUN_WORKER_IN_API` **unset** anywhere you can run two processes.
 `just stack` does, and so does any host with a worker service.
 
 ---

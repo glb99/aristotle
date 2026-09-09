@@ -36,7 +36,7 @@ or check a deployment that is already running, after it lands:
 
 That last mode starts nothing and runs a narrower set — see
 :func:`run_deployed_checks` for what it leaves out and why. It still needs
-`BACTERIA_DATABASE_URL` for the same database the deployment uses, because the
+`ARISTOTLE_DATABASE_URL` for the same database the deployment uses, because the
 one thing worth asserting after a deploy — that a worker is draining the queue —
 has no route that reports it.
 """
@@ -54,7 +54,7 @@ from typing import Any, Iterator
 import httpx
 import psycopg
 
-from bacteria.app.auth import keys
+from aristotle.app.auth import keys
 
 # Long enough to absorb a cold start on a CI runner, short enough that a hung
 # process fails the job rather than burning the timeout.
@@ -133,7 +133,7 @@ def wait_for_health(base_url: str, process: subprocess.Popen | None) -> None:
 
 
 def admin(*args: str) -> subprocess.CompletedProcess:
-    """Run `bacteria-admin` and, on failure, say what it actually said.
+    """Run `aristotle-admin` and, on failure, say what it actually said.
 
     **`check=True` was worse than useless here.** It raises a
     ``CalledProcessError`` whose message is the argv and an exit code, while the
@@ -147,13 +147,13 @@ def admin(*args: str) -> subprocess.CompletedProcess:
     system.
     """
     result = subprocess.run(
-        [sys.executable, "-m", "bacteria.app.entrypoints.cli", *args],
+        [sys.executable, "-m", "aristotle.app.entrypoints.cli", *args],
         capture_output=True,
         text=True,
     )
     if result.returncode != 0:
         raise SmokeFailure(
-            f"bacteria-admin {' '.join(args)} exited {result.returncode}"
+            f"aristotle-admin {' '.join(args)} exited {result.returncode}"
             f"\n    stdout: {result.stdout.strip() or '(empty)'}"
             f"\n    stderr: {result.stderr.strip() or '(empty)'}"
         )
@@ -338,7 +338,7 @@ def check_chat_cli(database_url: str) -> None:
 
     **This does not cover a turn**, for the reason in the module docstring — a
     turn needs a model provider. So it would not have caught the bug that
-    prompted it: `bacteria-admin chat` shipped without opening the queue, and
+    prompted it: `aristotle-admin chat` shipped without opening the queue, and
     that fails at the deferral, which is after the model has answered. The guard
     for *that* is `test_a_turn_refuses_before_the_model_when_it_cannot_enqueue`,
     which moved the failure in front of the model call where a test can reach
@@ -365,11 +365,11 @@ def check_chat_cli(database_url: str) -> None:
     issue_key("smoke-cli")
 
     result = subprocess.run(
-        [sys.executable, "-m", "bacteria.app.entrypoints.cli", "chat", "smoke-cli"],
+        [sys.executable, "-m", "aristotle.app.entrypoints.cli", "chat", "smoke-cli"],
         input="",
         capture_output=True,
         text=True,
-        env={**os.environ, "BACTERIA_MEMORY_EXTRACTION_ENABLED": "true"},
+        env={**os.environ, "ARISTOTLE_MEMORY_EXTRACTION_ENABLED": "true"},
     )
     check(
         result.returncode == 0,
@@ -423,7 +423,7 @@ def run_in_process_checks(base_url: str, database_url: str) -> None:
     **Every other check in this file runs a topology the deployment does not
     use.** `--managed` starts a server and a worker as two processes, and so
     does `compose.app.yml`. FastAPI Cloud runs one process, so the worker lives
-    in the API's lifespan behind `BACTERIA_RUN_WORKER_IN_API` (ADR 0001, "there
+    in the API's lifespan behind `ARISTOTLE_RUN_WORKER_IN_API` (ADR 0001, "there
     is nowhere else to put it"). That flag is therefore load-bearing in exactly
     one configuration and exercised by none of them.
 
@@ -518,7 +518,7 @@ def run_deployed_checks(base_url: str, database_url: str) -> None:
 
     That last one is the reason this exists. Six failures in a row shipped
     silently here — four packaging, two configuration — and the last was
-    `BACTERIA_RUN_WORKER_IN_API` never reaching the process, which left the
+    `ARISTOTLE_RUN_WORKER_IN_API` never reaching the process, which left the
     service conversing normally while no job was ever consumed. It was found by
     hand, days later. `check_deferred_ingestion` fails in sixty seconds on
     exactly that, and costs no model call, so it can run on every deploy without
@@ -563,7 +563,7 @@ def main() -> int:
         "--in-process-worker",
         action="store_true",
         help="With --managed: start no worker, and run the API with "
-        "BACTERIA_RUN_WORKER_IN_API=true instead. Checks the deployed topology.",
+        "ARISTOTLE_RUN_WORKER_IN_API=true instead. Checks the deployed topology.",
     )
     args = parser.parse_args()
 
@@ -581,7 +581,8 @@ def main() -> int:
     base_url = args.base_url.rstrip("/")
 
     database_url = os.environ.get(
-        "BACTERIA_DATABASE_URL", "postgresql+psycopg://bacteria:bacteria@localhost:5432/bacteria"
+        "ARISTOTLE_DATABASE_URL",
+        "postgresql+psycopg://aristotle:aristotle@localhost:5432/aristotle",
     )
 
     try:
@@ -595,9 +596,9 @@ def main() -> int:
             host, _, port = base_url.removeprefix("http://").partition(":")
             environment = {**os.environ, "HOST": host, "PORT": port or "8000"}
             if args.in_process_worker:
-                environment["BACTERIA_RUN_WORKER_IN_API"] = "true"
+                environment["ARISTOTLE_RUN_WORKER_IN_API"] = "true"
             server = subprocess.Popen(
-                [sys.executable, "-m", "bacteria.app.entrypoints.asgi"], env=environment
+                [sys.executable, "-m", "aristotle.app.entrypoints.asgi"], env=environment
             )
             try:
                 if args.in_process_worker:
@@ -605,7 +606,7 @@ def main() -> int:
                     run_in_process_checks(base_url, database_url)
                 else:
                     with background(
-                        "worker", [sys.executable, "-m", "bacteria.app.entrypoints.queue_worker"]
+                        "worker", [sys.executable, "-m", "aristotle.app.entrypoints.queue_worker"]
                     ):
                         wait_for_health(base_url, server)
                         run_checks(base_url, database_url, check_console=args.check_console)

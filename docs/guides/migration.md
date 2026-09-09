@@ -5,13 +5,13 @@ reasoning attached to each — what was tried, what was rejected, and what a
 decision cost. It is not a description of the current tree; the
 [README](../../README.md) is.
 
-Package names were updated in place when `bacteria-app` became `bacteria.app` and
-`bacteria` became `bacteria.agent`, so that a reader is not made to hold a
+Package names were updated in place when `aristotle-app` became `aristotle.app` and
+`aristotle` became `aristotle.agent`, so that a reader is not made to hold a
 retired vocabulary just to follow the argument. Quoted `pyproject.toml` excerpts
 are therefore not literal transcripts of what was committed at the time.
 
 What this repository is: a uv workspace holding two packages — the agent
-(`bacteria-agent`) and the application that hosts it (`bacteria-app`), both under
+(`aristotle-agent`) and the application that hosts it (`aristotle-app`), both under
 `backend/`, alongside a `frontend/` that does not exist yet.
 
 ## Step 0 — put this under version control *(done)*
@@ -29,7 +29,7 @@ return to is the only genuinely reckless part of it.
 ## Target tree *(steps 3-4 realize the skeleton; feature packages are not created yet)*
 
 ```
-bacteria/
+aristotle/
   pyproject.toml                 workspace root; builds nothing
   uv.lock                        one lockfile for both packages
   Justfile
@@ -39,13 +39,13 @@ bacteria/
   packages/
     agent/                       the agent — vendored whole, its own package
       pyproject.toml
-      src/bacteria/agent/        imports: `from bacteria...`
+      src/aristotle/agent/      imports: `from aristotle...`
       tests/
       docs/adr/
       CLAUDE.md  README.md
     app/                         the application
       pyproject.toml
-      src/bacteria/app/
+      src/aristotle/app/
         core/                    cross-cutting infrastructure
           __init__.py
           protocols.py           repository contracts
@@ -81,7 +81,7 @@ toolchain.
 
 ```toml
 [project]
-name = "bacteria-workspace"
+name = "aristotle-workspace"
 version = "0"
 requires-python = ">=3.13"
 dependencies = []
@@ -104,7 +104,7 @@ dev = [
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["bacteria.app"]
+source = ["aristotle.app"]
 
 [tool.coverage.report]
 show_missing = true
@@ -114,7 +114,7 @@ omit = ["**/entrypoints/*"]
 
 Two things in there are deliberate and worth not undoing.
 
-`source = ["bacteria.app"]` excludes `bacteria`. The agent's test suite is
+`source = ["aristotle.app"]` excludes `aristotle`. The agent's test suite is
 [architectural fitness functions by design](../../backend/agent/docs/adr/0013-test-load-bearing-invariants-only.md) —
 uneven coverage is the stated intent, and pointing a coverage report at it will
 produce a number that invites someone to "fix" it by writing the tests that ADR
@@ -133,7 +133,7 @@ lands.
 
 ```toml
 [project]
-name = "bacteria-agent"
+name = "aristotle-agent"
 version = "0.1.0"
 description = "A small AI agent built as infrastructure: layered ownership boundaries, kept minimal enough to read."
 requires-python = ">=3.11"
@@ -149,7 +149,7 @@ dependencies = [
 dev = ["pytest>=8.3.0", "pytest-asyncio>=0.24"]
 
 [project.scripts]
-bacteria = "bacteria.agent.interfaces.cli:main"
+aristotle = "aristotle.agent.interfaces.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
@@ -168,11 +168,11 @@ the library costs nothing and keeps it vendorable elsewhere.
 
 ```toml
 [project]
-name = "bacteria-app"
+name = "aristotle-app"
 version = "0"
 requires-python = ">=3.13"
 dependencies = [
-    "bacteria-agent",
+    "aristotle-agent",
     "fastapi",
     "granian",
     "sqlmodel",
@@ -182,7 +182,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-bacteria-agent = { workspace = true }
+aristotle-agent = { workspace = true }
 
 [build-system]
 requires = ["uv_build>=0.11,<0.12"]
@@ -202,17 +202,17 @@ excludes 3.14, which is what the agent's virtualenv is currently running.
 
 | Today | Target | Note |
 |---|---|---|
-| `src/agent/` (an earlier broken copy) | *delete* | Broken copy — the directory was renamed but every internal import still says `from bacteria...`. Replaced by the real package. |
+| `src/agent/` (an earlier broken copy) | *delete* | Broken copy — the directory was renamed but every internal import still says `from aristotle...`. Replaced by the real package. |
 | `tests/agent/` | *delete* | Ships with the package. |
 | `src/protocols.py` | `core/protocols.py` | Trimmed — see below. |
 | `src/handlers.py` | `core/handlers.py` | Two fixes — see below. |
 | `src/adapters.py` | `core/adapters.py` | As-is. |
-| `src/bacteria/app/models.py` | per feature | `User` is not a feature; it belongs wherever accounts land. Drop the unused `Session`, `create_engine`, `select` imports. |
-| `src/bacteria/app/repositories.py` | per feature | **Has no imports at all** — references `Session`, `User`, `UserCreate`, `UserId`, `Optional` from nowhere. Note this is *worse* than it looks on Python 3.14: PEP 649 defers annotation evaluation, so the module now imports cleanly and fails at first **call** instead of at import. Moved as-is; still to fix. |
-| `src/bacteria/app/services.py` | per feature | Empty today. |
-| `src/bacteria/app/dependencies.py` | `core/dependencies.py` | Empty today. |
-| `src/bacteria/app/views.py` | `<feature>/views.py` | The `/` hello route becomes a health check. |
-| `src/bacteria/app/entrypoints/asgi.py` | `entrypoints/asgi.py` | Add the missing `__init__.py`. |
+| `src/aristotle/app/models.py` | per feature | `User` is not a feature; it belongs wherever accounts land. Drop the unused `Session`, `create_engine`, `select` imports. |
+| `src/aristotle/app/repositories.py` | per feature | **Has no imports at all** — references `Session`, `User`, `UserCreate`, `UserId`, `Optional` from nowhere. Note this is *worse* than it looks on Python 3.14: PEP 649 defers annotation evaluation, so the module now imports cleanly and fails at first **call** instead of at import. Moved as-is; still to fix. |
+| `src/aristotle/app/services.py` | per feature | Empty today. |
+| `src/aristotle/app/dependencies.py` | `core/dependencies.py` | Empty today. |
+| `src/aristotle/app/views.py` | `<feature>/views.py` | The `/` hello route becomes a health check. |
+| `src/aristotle/app/entrypoints/asgi.py` | `entrypoints/asgi.py` | Add the missing `__init__.py`. |
 | `tests/test_e2e.py` | `backend/app/tests/` | |
 | `Justfile` | root, edited | Three stale `hello_svc` references break `just serve` and `just cov`. |
 | `README.md` | rewrite | Currently a link to the uv video the template came from. |
@@ -231,7 +231,7 @@ into `__init__`. And replace the two `print()` calls with structured logging —
 skipped step should leave a record of *why* it was skipped, which
 `can_handle` returning a bare `False` currently discards.
 
-## What changes in bacteria
+## What changes in aristotle
 
 Three things, in dependency order.
 
@@ -242,11 +242,11 @@ This has to land first — every item below is written against the async shape.
 **2. Persistence arrives by dependency inversion.** `session/store.py` names its
 own gap: persistence is "a second implementation of this class, not a change to
 any caller." The application supplies that implementation
-(`chat/session_repository.py`, SQLModel-backed), and bacteria declares the
+(`chat/session_repository.py`, SQLModel-backed), and aristotle declares the
 protocol it must satisfy.
 
-The direction matters. Bacteria declares `SessionRepository`; the application
-implements it. Bacteria never imports SQLModel, and the agent stays vendorable
+The direction matters. Aristotle declares `SessionRepository`; the application
+implements it. Aristotle never imports SQLModel, and the agent stays vendorable
 into a project that uses something else entirely.
 
 That protocol is **not** `CRUDRepository`. `SessionStore` exposes
@@ -269,15 +269,15 @@ knowing now that approval is what drags it in, and that it needs its own ADR.
 
 ### What does *not* change: the two composition roots
 
-Correcting something I said earlier — `bacteria.agent.interfaces` and
-`bacteria.app.entrypoints` do not actually collide. They compose different
+Correcting something I said earlier — `aristotle.agent.interfaces` and
+`aristotle.app.entrypoints` do not actually collide. They compose different
 processes. The agent keeps `interfaces/cli.py` and stays independently runnable
-via `uv run bacteria`, which is worth preserving: it is the reference
+via `uv run aristotle`, which is worth preserving: it is the reference
 implementation of how the layers wire together, and the thing you can run to
 check the agent still works without standing up a web service.
 
 The rule that keeps them from colliding is one line: **the application never
-imports `bacteria.agent.interfaces`.** It composes `Runtime`, a model client, a
+imports `aristotle.agent.interfaces`.** It composes `Runtime`, a model client, a
 registry, and a store itself, in `entrypoints/`. Provider selection exists in
 both places because both are entry points into the same library — that is what
 an entry point is for.
@@ -285,10 +285,10 @@ an entry point is for.
 ## Order of work
 
 1. ~~`git init` and commit the current state.~~ **Done.**
-2. ~~Async refactor in bacteria.~~ **Done** — 60 tests, one live Gemini
+2. ~~Async refactor in aristotle.~~ **Done** — 60 tests, one live Gemini
    tool-calling turn verified end to end.
    ([ADR 0014](../../backend/agent/docs/adr/0014-async-at-the-io-boundaries.md).)
-3. ~~Create the workspace skeleton; move bacteria in.~~ **Done** — brought in
+3. ~~Create the workspace skeleton; move aristotle in.~~ **Done** — brought in
    with `git subtree`, so its history came along rather than arriving as an
    anonymous copy. `just test` runs both suites; `just agent` runs the CLI.
 4. ~~Repair the framework files in `core/`; add `settings.py`; fix
@@ -298,7 +298,7 @@ an entry point is for.
    variables that match no field, so they never reach the extras check. The
    guard is written by hand in `Settings._reject_unknown_prefixed_variables`.
 5. ~~First feature end to end, `chat/`.~~ **Done.** The agent declares
-   `SessionRepository` (bacteria ADR 0015) and `chat/` implements it against
+   `SessionRepository` (aristotle ADR 0015) and `chat/` implements it against
    SQLModel; a conformance suite runs the same ten behaviours against both
    implementations. Routes create a session, take a turn, and read a
    transcript. Alembic is **not** done — `create_all` stands in, with the gap
@@ -397,7 +397,7 @@ an entry point is for.
     is injected into the system prompt of every later turn, so a model able to
     write it could write its own future instructions, and one injected user
     message would outlive the message that carried it. That is recorded as
-    bacteria's ADR 0016 rather than left as an absence, because the intuition
+    aristotle's ADR 0016 rather than left as an absence, because the intuition
     runs the other way and `remember` looks like a harmless first tool.
 
     Bounded in the same change, since opening the entrance without a bound
@@ -454,5 +454,5 @@ an entry point is for.
     Two tables, each with a primary key stating its own rule, replaced it.
 
 15. **Next.** Audio. This is the one that re-opens the model protocol for
-   `send_stream`, which is a boundary change in bacteria and gets its own ADR
+   `send_stream`, which is a boundary change in aristotle and gets its own ADR
    before any code.

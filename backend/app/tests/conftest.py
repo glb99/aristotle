@@ -35,19 +35,19 @@ from sqlmodel import Session, SQLModel
 
 # Imported for the side effect of registering every table on SQLModel.metadata,
 # which is what both the schema build and the truncation below iterate over.
-from bacteria.app import models as _root_models  # noqa: F401
-from bacteria.app.auth import models as _auth_models  # noqa: F401
-from bacteria.app.core import observability
-from bacteria.app.core import settings as settings_module
-from bacteria.app.core.settings import ENV_PREFIX, Settings, get_settings
-from bacteria.app.graph import models as _graph_models  # noqa: F401
-from bacteria.app.ingestion import models as _ingestion_models  # noqa: F401
-from bacteria.app.sessions import models as _session_models  # noqa: F401
+from aristotle.app import models as _root_models  # noqa: F401
+from aristotle.app.auth import models as _auth_models  # noqa: F401
+from aristotle.app.core import observability
+from aristotle.app.core import settings as settings_module
+from aristotle.app.core.settings import ENV_PREFIX, Settings, get_settings
+from aristotle.app.graph import models as _graph_models  # noqa: F401
+from aristotle.app.ingestion import models as _ingestion_models  # noqa: F401
+from aristotle.app.sessions import models as _session_models  # noqa: F401
 
 LOOP_FACTORY = asyncio.SelectorEventLoop if sys.platform == "win32" else None
 """The loop class the tests run on, or ``None`` to accept the default.
 
-Mirrors `bacteria.app.core.platform.event_loop_factory`, and is separate from it
+Mirrors `aristotle.app.core.platform.event_loop_factory`, and is separate from it
 because that one is about the loop a *process* runs on and this one is about the
 loop a test runs on.
 """
@@ -62,7 +62,7 @@ def pytest_asyncio_loop_factories(config, item):
     split was able to persist.
 
     The same loop choice the application makes, by the same mechanism: a
-    factory, not a policy. `bacteria.app.core.platform` explains why the policy
+    factory, not a policy. `aristotle.app.core.platform` explains why the policy
     route is a dead end there, and the hook here is pytest-asyncio's equivalent
     of the ``loop_factory`` argument that beat it.
 
@@ -76,7 +76,7 @@ def pytest_asyncio_loop_factories(config, item):
 REQUIRE_POSTGRES = "REQUIRE_POSTGRES"
 """Set by `just cov` to turn "Postgres is down" from a skip into a failure.
 
-**Deliberately not ``BACTERIA_``-prefixed.** Every variable with that prefix
+**Deliberately not ``ARISTOTLE_``-prefixed.** Every variable with that prefix
 that is not a setting is a refusal to boot (`core/settings.py`), and this suite
 drives entrypoints that build `Settings`. It is also outside the prefix
 `_ignore_ambient_configuration` strips, which is the second reason: a variable
@@ -120,7 +120,7 @@ def _require_postgres():
 
 
 KEPT_FROM_THE_AMBIENT_ENVIRONMENT = frozenset({f"{ENV_PREFIX}DATABASE_URL"})
-"""The only ``BACTERIA_*`` variable a test run inherits from outside.
+"""The only ``ARISTOTLE_*`` variable a test run inherits from outside.
 
 Kept because the suite genuinely reads it: :func:`database_url` derives the
 throwaway database's name from whatever this deployment is configured with, so
@@ -130,12 +130,12 @@ pointing a run at a different Postgres has to keep working.
 
 @pytest.fixture(scope="session", autouse=True)
 def _ignore_ambient_configuration():
-    """Start the run without the developer's own ``BACTERIA_*`` settings.
+    """Start the run without the developer's own ``ARISTOTLE_*`` settings.
 
     The Justfile's first line is ``set dotenv-load``, so ``just test-app`` hands
     pytest the contents of `.env` before Python starts. That is right for
     ``just serve`` and wrong for a test suite: a developer who configures the
-    project — ``BACTERIA_MODEL_PROVIDER=gemini``, extraction enabled — then runs
+    project — ``ARISTOTLE_MODEL_PROVIDER=gemini``, extraction enabled — then runs
     the supported command and watches fifteen tests fail on settings they never
     set and jobs they never queued.
 
@@ -166,7 +166,7 @@ def _ignore_ambient_configuration():
     # moment an entrypoint runs -- which the ASGI lifespan does, and which the
     # tests drive on purpose. Deleting a variable below is therefore not enough
     # to keep it deleted: `test_no_worker_runs_in_the_api_by_default` did
-    # `delenv("BACTERIA_RUN_WORKER_IN_API")`, started the lifespan, and got the
+    # `delenv("ARISTOTLE_RUN_WORKER_IN_API")`, started the lifespan, and got the
     # value straight back from the file -- so a test asserting the *safe default*
     # asserted it against a machine where the developer had turned the worker on.
     # It failed only for people who had configured the project, and passed in CI,
@@ -222,8 +222,8 @@ def _restore_environment():
     Any test that starts the ASGI lifespan therefore loads it, legitimately, and
     every test after that inherits the result.
 
-    That was not hypothetical. A `.env` carrying ``BACTERIA_MODEL_PROVIDER`` and
-    ``BACTERIA_MEMORY_EXTRACTION_ENABLED`` made fifteen tests fail: settings
+    That was not hypothetical. A `.env` carrying ``ARISTOTLE_MODEL_PROVIDER`` and
+    ``ARISTOTLE_MEMORY_EXTRACTION_ENABLED`` made fifteen tests fail: settings
     tests read a provider they never set, and chat tests inherited an extraction
     flag and tried to enqueue with no queue open. None of the failures were about
     the code under test, and none of them happened in CI, where `.env` does not
@@ -272,7 +272,7 @@ def database_url() -> str:
     get_settings.cache_clear()
 
     stem, _, _ = configured.rpartition("/")
-    name = f"bacteria_test_{uuid.uuid4().hex[:12]}"
+    name = f"aristotle_test_{uuid.uuid4().hex[:12]}"
 
     # connect_timeout because the default is no timeout: with nothing listening
     # on 5432 this blocks for minutes instead of being refused, and a suite that
@@ -291,7 +291,7 @@ def database_url() -> str:
 
     url = f"{stem}/{name}"
     patch = pytest.MonkeyPatch()
-    patch.setenv("BACTERIA_DATABASE_URL", url)
+    patch.setenv("ARISTOTLE_DATABASE_URL", url)
 
     # The schema is built synchronously, before any event loop exists, so that
     # this fixture stays usable by both the async and the sync tests below.
@@ -356,7 +356,7 @@ async def _engine(database_url):
     worker thread, so the overlap was harmless there and fatal here.
     """
     _truncate(database_url)
-    # get_settings is cached, and tests monkeypatch BACTERIA_* variables. Clear
+    # get_settings is cached, and tests monkeypatch ARISTOTLE_* variables. Clear
     # it here so each test builds settings from its own environment rather than
     # inheriting whatever the first test in the run happened to set.
     get_settings.cache_clear()

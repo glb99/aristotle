@@ -4,7 +4,7 @@ The registry's own tests cover registration and exposure. These cover the thing
 only this file can: what the handler actually does to the filesystem.
 """
 
-from bacteria.agent.tools.notes import build_add_note_tool
+from aristotle.agent.tools.notes import build_add_note_tool
 
 
 def test_add_note_appends_without_clobbering_existing_notes(tmp_path):

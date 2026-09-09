@@ -17,7 +17,7 @@ A worked refactoring showing why "favor composition over inheritance" (the Gang-
 This source is about *how to model*, and it transfers to ontology design almost 1:1 (which is exactly why Palantir cites the principle):
 
 - **Combinatorial explosion argument** = Palantir's `SchedulableBuilding` anti-pattern ([04](04-palantir-advanced-ontology.md)): entity types must not multiply per capability combination. In the memory graph: don't create "WorkFriend", "OldColleagueWhoIsAlsoNeighbor" types — compose a Person with capability facets/interfaces.
-- **"Has-a" over "is-a"** is a rule for the agent's schema growth: when bacteria needs to attach a new aspect to an entity, prefer a *linked* object or facet (composition) over specializing the entity's type (inheritance). This is the open/closed principle in graph form: core entity types stay closed; extension happens by attaching.
+- **"Has-a" over "is-a"** is a rule for the agent's schema growth: when aristotle needs to attach a new aspect to an entity, prefer a *linked* object or facet (composition) over specializing the entity's type (inheritance). This is the open/closed principle in graph form: core entity types stay closed; extension happens by attaching.
 - **Interfaces one-layer-deep** matches Palantir's capability interfaces (Inspectable, Schedulable) and grounds idea.md's link between open/closed and composition: open/closed is *achieved by* composition against interfaces.
 - The `Contract`/`Commission` decomposition is a miniature ontology-refactoring case study — useful as a prototype scenario later: could an agent perform this decomposition on a "Kitchen Sink" entity automatically, guided by the rule of three?
 
@@ -29,7 +29,7 @@ This source is about *how to model*, and it transfers to ontology design almost 
 
 ## Open questions for the human
 
-1. In bacteria's ontology, how should "capabilities" attach to entities — as **interfaces the entity type implements** (Palantir-style), as **linked facet objects** (pure composition), or both? (They differ in UI: a facet is a visible node; an interface is type metadata.)
+1. In aristotle's ontology, how should "capabilities" attach to entities — as **interfaces the entity type implements** (Palantir-style), as **linked facet objects** (pure composition), or both? (They differ in UI: a facet is a visible node; an interface is type metadata.)
 2. Should schema *specialization* (subtyping) be allowed at all in v1, or restricted to interfaces + composition to keep the graph flat and pluggable?
 
 ## Provisional conclusions

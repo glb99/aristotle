@@ -3,7 +3,7 @@
 import pytest
 from pydantic import BaseModel
 
-from bacteria.agent.model.output import OutputValidationError, validate_output
+from aristotle.agent.model.output import OutputValidationError, validate_output
 
 
 class RefundArgs(BaseModel):

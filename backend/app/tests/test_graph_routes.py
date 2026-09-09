@@ -20,15 +20,15 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.auth.service import issue_key
-from bacteria.app.core.db import session_scope
-from bacteria.app.graph.conclusions import Conclusion
-from bacteria.app.graph.log import Assertion
-from bacteria.app.graph.repository import SqlGraphRepository
-from bacteria.app.graph.service import refer_to
-from bacteria.app.graph.temporal import OPEN_ENDED, Interval
-from bacteria.app.personal.catalogue import VOCABULARY
-from bacteria.app.views import create_app
+from aristotle.app.auth.service import issue_key
+from aristotle.app.core.db import session_scope
+from aristotle.app.graph.conclusions import Conclusion
+from aristotle.app.graph.log import Assertion
+from aristotle.app.graph.repository import SqlGraphRepository
+from aristotle.app.graph.service import refer_to
+from aristotle.app.graph.temporal import OPEN_ENDED, Interval
+from aristotle.app.personal.catalogue import VOCABULARY
+from aristotle.app.views import create_app
 
 NOW = datetime(2026, 5, 4, tzinfo=timezone.utc)
 FEBRUARY = datetime(2026, 2, 15, tzinfo=timezone.utc)

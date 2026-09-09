@@ -206,7 +206,7 @@ which advertises the inversion the converse flag exists to undo. Converse aliase
 
 §8 specified a periodic chore. `core/jobs.py` lists scheduled jobs under "not built" and says they belong in the worker entrypoint. Building one for a report would have been infrastructure the record did not ask for — and a scheduled job writes its list into a log nobody tails, where the record's own *Not built* note already said the asking is a person reading a line.
 
-It shipped as `bacteria-admin relations`. **A report with no actor is a command, not a job**, and specifying a cadence for something nothing acts on was the record over-reaching.
+It shipped as `aristotle-admin relations`. **A report with no actor is a command, not a job**, and specifying a cadence for something nothing acts on was the record over-reaching.
 
 ### C6 — The evidence was destroyed by running the tests
 

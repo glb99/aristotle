@@ -58,7 +58,7 @@ The one genuine ontology change on the table. `layerOf` derives where things sit
 The design question is what it relates:
 
 1. **Between words** — `domain above infrastructure`. Layers are tier-three vocabulary, promoted by recurrence, and a word is already a kind. Three or four assertions describe the whole codebase, and they survive every package being renamed. But it only orders packages that somebody has already classified, and today most are unclassified — so the axis would be undefined for most of the tree, and the scene would fall back to `layerOf` for the rest, mixing two sources of height in one picture.
-2. **Between packages** — `bacteria.app.architecture above bacteria.app.graph`. Direct, always applicable, and needs no classification first. But it is O(packages²) statements to say what four words would say, and every rename or split invalidates a batch of them.
+2. **Between packages** — `aristotle.app.architecture above aristotle.app.graph`. Direct, always applicable, and needs no classification first. But it is O(packages²) statements to say what four words would say, and every rename or split invalidates a batch of them.
 
 The counterweight to both: **`imports` may already be the answer.** If a package's stated layer is only ever "the one its imports put it in", then `above` records nothing new and the honest move is to draw `layerOf`'s output and stop. The case for the relation rests entirely on intent and derivation being able to *disagree* — which is worth checking against the real repository before building it, because if they never disagree here the relation has no first user.
 
@@ -100,12 +100,12 @@ The open question is whether a fourth and fifth channel get assigned by the same
 **The derived axis collapses on the only codebase we have.** `layerOf`'s algorithm over the real package graph, grouped as the console groups it:
 
 ```
-  0  bacteria.agent, bacteria.app, .entrypoints, .repositories
-  1  bacteria.app.evaluation, .models, .views
-  2  bacteria.app.architecture
- 24  bacteria.agent.runtime, app.auth, app.core, app.graph
+  0  aristotle.agent, aristotle.app, .entrypoints, .repositories
+  1  aristotle.app.evaluation, .models, .views
+  2  aristotle.app.architecture
+ 24  aristotle.agent.runtime, app.auth, app.core, app.graph
  25  agent.context, agent.session, agent.tools, app.ingestion, app.personal
- 26  bacteria.agent.model
+ 26  aristotle.agent.model
 ```
 
 Nineteen packages, fifteen of them in three adjacent bands at the ceiling. Two cycles cause it — `core <-> ingestion` and `core <-> personal` — and the relaxation pumps everything reachable from them to the bound.

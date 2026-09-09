@@ -1,6 +1,6 @@
 # The memory graph
 
-The conceptual model behind `backend/app/src/bacteria/app/graph/`. What the
+The conceptual model behind `backend/app/src/aristotle/app/graph/`. What the
 model *is*; the [dialogues](../research/dialogues/) say *why*, and the
 [ADRs](../adr/README.md) say what was actually decided and built. Where this
 file and an ADR disagree, the ADR wins — it is the record; this is the
@@ -12,7 +12,7 @@ synthesis it was drawn from.
 > 2026-08-24.** Synthesised from sources 01–09 and settled question by question
 > in [`dialogues/01`](../research/dialogues/01-initial-questions.md), then
 > reconciled against the codebase in
-> [`dialogues/03`](../research/dialogues/03-bacteria-reconciliation.md). Those
+> [`dialogues/03`](../research/dialogues/03-aristotle-reconciliation.md). Those
 > hold the reasoning and citations behind every decision here. Vocabulary in
 > [the glossary](../research/glossary.md).
 
@@ -22,7 +22,7 @@ synthesis it was drawn from.
 
 The best way to solve a problem is to understand it as deeply as possible, which means modeling the reality around it — its entities, relationships, and abstractions. An AI agent's memory should therefore not be a flat store of facts but an **ontology**: an explicit, visualizable model of reality **shared** between human and agent.
 
-Two traditions define "shared model" identically, which is good evidence the thesis is sound. Gruber (1993): an ontology is "a formal specification of a **shared conceptualization**." DDD: the ubiquitous language emerges from "a feedback loop that creates a **united mental model** within the team." Bacteria's memory graph is the ubiquitous language of the human–agent team, and the graph UI is where that language gets negotiated.
+Two traditions define "shared model" identically, which is good evidence the thesis is sound. Gruber (1993): an ontology is "a formal specification of a **shared conceptualization**." DDD: the ubiquitous language emerges from "a feedback loop that creates a **united mental model** within the team." Aristotle's memory graph is the ubiquitous language of the human–agent team, and the graph UI is where that language gets negotiated.
 
 **The differentiation follows from this.** Every substrate concept below already exists in open source (semantica proves it). What nobody has built is the **negotiation surface** — a graph where human and agent jointly propose, contest, and ratify a model of reality. The substrate is known technology; the interface is the novel work.
 
@@ -207,7 +207,7 @@ LLMs inverted the historical bottleneck. Coyle's expert systems failed on *knowl
 
 **Reusable taxonomies**: schema.org, FOAF, Dublin Core.
 
-**bacteria is the target, and it had already decided part of this.** Its accepted ADR for a Postgres-tables memory graph occupies the same ground, with the extractor and proposal queue shipped and the graph itself unbuilt. Where the two disagreed — one time axis instead of two, a disposable graph, blanket confirmation, no conclusions, no retrieval story, a single-user assumption — the reconciliation is [`dialogues/03`](../research/dialogues/03-bacteria-reconciliation.md) and the code-level mapping is [the architecture overview](README.md). Most of what is above survived contact; §9 lost a sentence that was simply false.
+**aristotle is the target, and it had already decided part of this.** Its accepted ADR for a Postgres-tables memory graph occupies the same ground, with the extractor and proposal queue shipped and the graph itself unbuilt. Where the two disagreed — one time axis instead of two, a disposable graph, blanket confirmation, no conclusions, no retrieval story, a single-user assumption — the reconciliation is [`dialogues/03`](../research/dialogues/03-aristotle-reconciliation.md) and the code-level mapping is [the architecture overview](README.md). Most of what is above survived contact; §9 lost a sentence that was simply false.
 
 ## 13. Deliberately deferred
 

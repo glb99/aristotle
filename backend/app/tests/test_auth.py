@@ -9,9 +9,9 @@ import pytest
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bacteria.app.auth import keys
-from bacteria.app.auth.models import ApiKey
-from bacteria.app.auth.service import issue_key, list_keys, principal_is_known, revoke_key
+from aristotle.app.auth import keys
+from aristotle.app.auth.models import ApiKey
+from aristotle.app.auth.service import issue_key, list_keys, principal_is_known, revoke_key
 
 
 @pytest.fixture(name="db")

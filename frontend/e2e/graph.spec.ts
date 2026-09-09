@@ -25,7 +25,7 @@
 
 import { expect, test, type Page } from "@playwright/test";
 
-const KEY = process.env["BACTERIA_KEY"] ?? "";
+const KEY = process.env["ARISTOTLE_KEY"] ?? "";
 
 async function signIn(page: Page): Promise<void> {
   await page.goto("/");

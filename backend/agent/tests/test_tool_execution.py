@@ -4,8 +4,8 @@ import threading
 
 import pytest
 
-from bacteria.agent.tools.execution import ToolExecutionError, execute_tool_call
-from bacteria.agent.tools.registry import ToolDefinition, ToolRegistry
+from aristotle.agent.tools.execution import ToolExecutionError, execute_tool_call
+from aristotle.agent.tools.registry import ToolDefinition, ToolRegistry
 
 
 def make_registry(handler=None) -> ToolRegistry:

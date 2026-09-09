@@ -39,7 +39,7 @@ A Palantir ontology-team lead walks through advanced primitives, framing everyth
 
 ## Open questions for the human
 
-1. **Temporality**: do you want bacteria's memory to be historic by default (multi-valued properties with reducers) or current-state with explicit history only where needed? This decision shapes storage, UI, and the conclusion engine.
+1. **Temporality**: do you want aristotle's memory to be historic by default (multi-valued properties with reducers) or current-state with explicit history only where needed? This decision shapes storage, UI, and the conclusion engine.
 2. **Entity resolution UX**: when the agent suspects two entities are the same, should it auto-merge, propose a merge in the graph UI, or keep an "is-possibly-same-as" link? (Connects to the shared-mental-model flow: resolution is exactly a moment where human and agent must align.)
 3. Are **relationships-with-properties** (object-backed links) in the core model from day one? Plain property graphs (e.g. Neo4j-style) support edge properties natively — is that enough, or do we want full "link objects"?
 4. Should the agent's own **reasoning/conclusions be ontologized** as objects (Slack-bot pattern)? This seems to be your "conclusions-taking engine" substrate again, arrived at from a different direction.
