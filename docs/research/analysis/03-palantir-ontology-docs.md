@@ -32,7 +32,7 @@ Plus a pragmatism section: principles are guides; defend the invariants that are
 
 ## Relevance to the project
 
-- This gives us a **complete candidate type system** for bacteria's memory: object types, properties, shared properties, link types, action types, functions, interfaces. We don't have to invent the meta-model — we have to *decide what subset applies* to a personal-agent memory.
+- This gives us a **complete candidate type system** for aristotle's memory: object types, properties, shared properties, link types, action types, functions, interfaces. We don't have to invent the meta-model — we have to *decide what subset applies* to a personal-agent memory.
 - **Decision lineage is a memory-system concept**, stated by Palantir themselves: recording *why* something was concluded/decided (inputs, options, chosen action) is what turns a knowledge graph into a substrate for learning. This is arguably the missing piece in most agent memory designs and maps directly to idea.md's "conclusions-taking engine".
 - **Scenarios** = a mechanism for hypothetical reasoning over the memory (what-if branches of the graph) — relates to Coyle's "no side effects until validated" ([01](01-agentic-ontologies-coyle.md)) but generalizes it: stage → simulate → review → commit.
 - The four design principles double as **rules for how the memory should evolve its own schema** — e.g. an agent adding entities should obey DDD (model the user's reality, not the chat format) and the rule of three (dedupe near-identical entity types).
@@ -47,10 +47,10 @@ Plus a pragmatism section: principles are guides; defend the invariants that are
 
 ## Open questions for the human
 
-1. **Decision lineage**: do you want bacteria's memory to record decisions/conclusions as first-class objects (with links to the evidence entities and the options considered)? This looks like the natural substrate for your "conclusions-taking engine".
+1. **Decision lineage**: do you want aristotle's memory to record decisions/conclusions as first-class objects (with links to the evidence entities and the options considered)? This looks like the natural substrate for your "conclusions-taking engine".
 2. **Scenarios/branching**: is hypothetical staging (agent proposes graph changes → user reviews → commit) part of your memory UX vision? It fits the "shared mental model" flow: the agent proposes an update to the shared reality, the human ratifies it.
 3. **Security dimension**: Palantir's fourth component. For a personal agent this could mean: what the agent may read/write/act on autonomously. In scope for the mental model, or out?
-4. The dataset analogy (row→object, join→link) is a good teaching device for the UI. Worth adopting in bacteria's docs/onboarding?
+4. The dataset analogy (row→object, join→link) is a good teaching device for the UI. Worth adopting in aristotle's docs/onboarding?
 
 ## Provisional conclusions
 

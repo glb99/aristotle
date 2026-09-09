@@ -25,7 +25,7 @@ Standards worth noting: RDF/OWL/SHACL/SKOS/PROV-O (W3C) alongside labeled proper
 ## Relevance to the project
 
 - **Existence proof + vocabulary check**: nearly every concept our other sources converged on already ships here — decision lineage ([03](03-palantir-ontology-docs.md)) → Decision Intelligence; guardrails/validation ([01](01-agentic-ontologies-coyle.md)) → SHACL + policy rules; entity resolution & temporality ([04](04-palantir-advanced-ontology.md)) → dedup + bi-temporal facts; append-only/derived-present ([05](05-ddd-article.md), [07](07-python-generics.md)) → snapshots and recorded-vs-valid time. Our mental model is not exotic; it's implementable.
-- **Gap that matters for bacteria**: semantica targets *enterprise compliance* (regulators, audit). Bacteria's goal is a *shared human↔agent mental model* — the visualization/negotiation UX (proposing entities, ratifying conclusions, reorganizing hierarchies) is exactly the part semantica does **not** center (its Explorer is an inspection tool, not a negotiation surface). That's our differentiation.
+- **Gap that matters for aristotle**: semantica targets *enterprise compliance* (regulators, audit). Aristotle's goal is a *shared human↔agent mental model* — the visualization/negotiation UX (proposing entities, ratifying conclusions, reorganizing hierarchies) is exactly the part semantica does **not** center (its Explorer is an inspection tool, not a negotiation surface). That's our differentiation.
 - **Reuse candidates** (as library or as reference design): extraction→conflict→dedup ordering; `record_decision` schema (category/scenario/reasoning/outcome/confidence); PROV-O for provenance; bi-temporal fact model; the "no LLM required for the substrate" stance (determinism below, probability above — Coyle's split made architectural).
 - **Caution**: the README oversells in places (own admission on Rete; breadth over depth is likely). Treat as a quarry of parts and patterns, not a foundation to bet on without a code-level audit of the specific modules we'd use.
 
@@ -38,8 +38,8 @@ Standards worth noting: RDF/OWL/SHACL/SKOS/PROV-O (W3C) alongside labeled proper
 
 ## Open questions for the human
 
-1. **Build on vs learn from**: should bacteria depend on semantica (or parts: extraction, PROV-O export, conflict detection), or build its own substrate and use semantica only as a design reference? My lean: reference first, audit specific modules before any dependency.
-2. Semantica has no **action types** (Palantir's kinetics). Does that confirm your scope for bacteria v1 (memory = data+conclusions, actions later), or do you see actions as the differentiator worth building early?
+1. **Build on vs learn from**: should aristotle depend on semantica (or parts: extraction, PROV-O export, conflict detection), or build its own substrate and use semantica only as a design reference? My lean: reference first, audit specific modules before any dependency.
+2. Semantica has no **action types** (Palantir's kinetics). Does that confirm your scope for aristotle v1 (memory = data+conclusions, actions later), or do you see actions as the differentiator worth building early?
 3. Their `record_decision` schema (scenario / reasoning / outcome / confidence + causal links) — good enough as the v1 shape of your "conclusions" objects?
 4. RDF-standards alignment (PROV-O, SHACL, OWL) buys interoperability at complexity cost. For a personal agent, do we care about W3C compatibility, or is a pragmatic property-graph schema enough?
 

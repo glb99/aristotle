@@ -1,6 +1,6 @@
 # Dialogue 11 — The name, and what the tail cannot say
 
-> Opened 2026-08-26, from running `bacteria-admin memory-diff` over three real conversations rather than from reasoning. [Dialogue 06](06-one-memory-or-two.md) agreed a four-step order to unify the two stores; steps one and two are built and **have never been switched on**, and step three — retiring the transcript extractor — is blocked by exactly two things.
+> Opened 2026-08-26, from running `aristotle-admin memory-diff` over three real conversations rather than from reasoning. [Dialogue 06](06-one-memory-or-two.md) agreed a four-step order to unify the two stores; steps one and two are built and **have never been switched on**, and step three — retiring the transcript extractor — is blocked by exactly two things.
 >
 > Both are questions rather than defects, and one of them reverses a decision already recorded.
 
@@ -142,7 +142,7 @@ And it amends [ADR 0008](../../adr/0008-preferences-are-assertions.md), which ch
 
 Falls out of Q2 rather than being asked independently.
 
-`bacteria-admin relations` reports relation names the extractor keeps producing and the catalogue lacks, reading a `GROUP BY rel` over the log. There is no sibling for kinds, and there cannot be the same one: a refused kind never reaches the log, because the claim carrying it is dropped whole.
+`aristotle-admin relations` reports relation names the extractor keeps producing and the catalogue lacks, reading a `GROUP BY rel` over the log. There is no sibling for kinds, and there cannot be the same one: a refused kind never reaches the log, because the claim carrying it is dropped whole.
 
 So it needs somewhere to be counted — a tally of refusals rather than a query over what was written. Small, and it makes `_KINDS` growable in exactly the way `rel` already is: deliberately, top-down, from evidence about what arrived.
 

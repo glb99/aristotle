@@ -7,8 +7,8 @@ log's conceptual model, and
 for the agent's own layer stack, which stays with the package because the
 package is vendorable.
 
-Two packages. `bacteria.agent` is the agent — layered by ownership boundary, knowing
-nothing about databases, HTTP, or this application. `bacteria.app` is the
+Two packages. `aristotle.agent` is the agent — layered by ownership boundary, knowing
+nothing about databases, HTTP, or this application. `aristotle.app` is the
 application that hosts it. The dependency runs one way, and what connects them
 is a protocol the agent declares and the application implements.
 
@@ -21,10 +21,10 @@ whole, in the order a request moves through it.
 
 ```
 backend/
-  agent/              bacteria-agent — see its own README and docs/adr/
-    src/bacteria/agent/
-  app/                bacteria-app
-    src/bacteria/app/
+  agent/              aristotle-agent — see its own README and docs/adr/
+    src/aristotle/agent/
+  app/                aristotle-app
+    src/aristotle/app/
       auth/           API keys and principals — who is calling
       core/           protocols, handlers, adapters, settings, db — cross-cutting
       chat/           conversations with the agent, durably stored
@@ -225,7 +225,7 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     note over Operator,DB: alembic upgrade head has already run —<br/>nothing here creates a schema
-    Operator->>CLI: bacteria-admin issue-key acme-corp
+    Operator->>CLI: aristotle-admin issue-key acme-corp
     CLI->>Keys: generate()
     Keys-->>CLI: token, key_id, sha256(secret)
     CLI->>Repo: create(key_id, secret_hash, principal_id)
@@ -244,7 +244,7 @@ database, which is the right bar.
 
 | Boundary | Enforced by | What breaks if it erodes |
 |---|---|---|
-| The agent knows nothing of this app | `bacteria.agent` imports no ORM, no web framework | The agent stops being vendorable elsewhere |
+| The agent knows nothing of this app | `aristotle.agent` imports no ORM, no web framework | The agent stops being vendorable elsewhere |
 | Authentication ≠ authorization | separate packages, `auth/` vs `personal/access.py` | "You know the id" becomes "you may read it" |
 | The runtime implements nothing | every step delegates | Ownership questions stop having answers |
 | Only the store writes turn state | one `commit` path, detached reads | State edited from outside, with no trace |

@@ -75,7 +75,7 @@ arguing with the rule, not after. Full set: [`docs/guides/traps.md`](docs/guides
   coverage on that basis, so logic there is untested by rule.
 - **Migrations own the schema.** Nothing creates tables at startup. A test
   asserts migrations and models agree.
-- **The application never imports `bacteria.agent.interfaces`.** Two composition
+- **The application never imports `aristotle.agent.interfaces`.** Two composition
   roots is correct; they compose different processes.
 - **Jobs are enqueued inside the caller's transaction.** That is the entire
   reason the queue is Postgres rather than Redis. Do not add a broker without
@@ -112,12 +112,13 @@ that ceremony.
 ## Naming
 
 This workspace is **aristotle**, at `~/Documents/Projects/aristotle`. It was
-called bacteria until 2026-09-07 — the rename was documentation-only, so code
-identifiers that predate it (`bacteria.agent`, `bacteria-admin`, `BACTERIA_KEY`,
-the `bacteria` namespace package) still say bacteria and are unaffected.
+called bacteria until 2026-09-07, when the rename was documentation-only and
+code identifiers were deliberately left alone; a later pass completed the
+rename in code too, so `bacteria.agent`, `bacteria-admin`, `BACTERIA_KEY`, and
+the `bacteria` namespace package no longer appear anywhere in this repository.
 
 Separately, **the origin** is `~/Documents/Projects/bacteria-core`, frozen, and
 code never flows from it —
 [`docs/guides/the-origin-repository.md`](docs/guides/the-origin-repository.md).
-That file still refers to this workspace by its old name and path; it hasn't
-been updated for the rename yet.
+That repository was never renamed and its name stays literal wherever it is
+referenced.

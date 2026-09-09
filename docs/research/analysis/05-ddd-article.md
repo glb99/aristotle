@@ -23,11 +23,11 @@ A distilled tour of Evans/Vernon DDD, split into strategic and tactical design.
 
 ## Relevance to the project
 
-- **Ubiquitous language ≈ the ontology's vocabulary.** DDD says the shared mental model *is* a negotiated language between parties; idea.md says the memory graph is the shared mental model between human and agent. Fusing the two: bacteria's ontology is the ubiquitous language of the human–agent team, and the graph UI is where it gets negotiated. (This is the "interfaces let you think deeper" thread the user flagged.)
+- **Ubiquitous language ≈ the ontology's vocabulary.** DDD says the shared mental model *is* a negotiated language between parties; idea.md says the memory graph is the shared mental model between human and agent. Fusing the two: aristotle's ontology is the ubiquitous language of the human–agent team, and the graph UI is where it gets negotiated. (This is the "interfaces let you think deeper" thread the user flagged.)
 - **Bounded contexts warn against one global graph.** The same word means different things in different areas of a user's life/work ("project", "client"). A single undifferentiated memory graph would blur meanings — DDD suggests the memory may need context/namespace boundaries, with explicit mappings between them. This also matches idea.md's "reorganize the visualization (hierarchies, clusters) as more metadata": clusters may literally be bounded contexts.
 - **Domain events + event sourcing** offer the mechanics for memory dynamics: the memory's state as an append-only log of semantic events ("EntityObserved", "ConclusionReached", "RelationRevised") from which the current graph is derived. This cleanly implements the temporality and provenance needs from [04](04-palantir-advanced-ontology.md) and the decision lineage from [03](03-palantir-ontology-docs.md).
 - **Anticorruption layer** is a useful pattern for ingesting external sources (files, apps, other agents' outputs) into the ontology without letting their schemas contaminate it — the "model reality, not systems" rule ([03](03-palantir-ontology-docs.md)) operationalized at the boundary.
-- **Event storming** is basically a human ritual for bootstrapping an ontology — the human+agent equivalent could be a guided conversation where bacteria proposes entities/events and the user corrects, exactly the dialogue-driven modeling flow idea.md wants.
+- **Event storming** is basically a human ritual for bootstrapping an ontology — the human+agent equivalent could be a guided conversation where aristotle proposes entities/events and the user corrects, exactly the dialogue-driven modeling flow idea.md wants.
 
 ## Connections to other sources
 
@@ -38,7 +38,7 @@ A distilled tour of Evans/Vernon DDD, split into strategic and tactical design.
 
 ## Open questions for the human
 
-1. Should bacteria's memory be **partitioned into bounded contexts** (work / personal / per-project…), each with its own vocabulary, with explicit context mappings — or one graph with clustering as a soft, visual-only device?
+1. Should aristotle's memory be **partitioned into bounded contexts** (work / personal / per-project…), each with its own vocabulary, with explicit context mappings — or one graph with clustering as a soft, visual-only device?
 2. Are you drawn to an **event-sourced memory** (append-only semantic events, graph as a projection)? It's the strongest unification of provenance + temporality + decision lineage seen so far, but it costs implementation complexity.
 3. In the human↔agent relationship, who plays "domain expert" and who plays "developer"? Presumably the human is the domain expert of their own reality and the agent is the modeler that proposes structure — do you agree with that division as a design stance?
 

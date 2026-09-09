@@ -84,9 +84,9 @@ Terms coined or narrowed for this project. Sources are in [`dialogues/01-initial
 | "Is it a thing?" test | The promotion rule: a thing → object; a bundle of fields about something else → struct; what-you-can-do-with-this → interface. | Q9, Q14 |
 | Ontology refactoring chore | Periodic agent-run audit against the anti-pattern catalogue, proposing consolidations in batch. | Q13 |
 
-## Vocabulary from the bacteria reconciliation (dialogue 03)
+## Vocabulary from the aristotle reconciliation (dialogue 03)
 
-Terms added when the model was reconciled against the target codebase. Reasoning in [`dialogues/03-bacteria-reconciliation.md`](dialogues/03-bacteria-reconciliation.md).
+Terms added when the model was reconciled against the target codebase. Reasoning in [`dialogues/03-aristotle-reconciliation.md`](dialogues/03-aristotle-reconciliation.md).
 
 | Term | Definition | Decided in |
 |------|------------|-----------|

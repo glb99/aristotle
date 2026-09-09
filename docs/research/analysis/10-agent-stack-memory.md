@@ -8,7 +8,7 @@
 
 The article is not another design to borrow from. It is a **taxonomy**, and we have been arguing about a boundary it already has names for: the question "should memories and the graph be separate?" is, in its vocabulary, "is the graph memory, or retrieval?"
 
-It also matters that bacteria read this **before** designing its memory layer. Where its ADRs and our model agree, this article is a plausible common ancestor rather than a coincidence — which changes what the agreement is evidence *of*.
+It also matters that aristotle read this **before** designing its memory layer. Where its ADRs and our model agree, this article is a plausible common ancestor rather than a coincidence — which changes what the agreement is evidence *of*.
 
 ---
 

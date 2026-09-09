@@ -49,13 +49,13 @@ Do confidence bands adapt as the graph matures? Do early merges batch until ther
 
 ## Answers & agreed conclusions
 
-**(2026-08-23) F3 — Evidence links pin to assertion identities: RESOLVED as a side effect of [R1](03-bacteria-reconciliation.md).**
+**(2026-08-23) F3 — Evidence links pin to assertion identities: RESOLVED as a side effect of [R1](03-aristotle-reconciliation.md).**
 
 R1 gave assertions a surrogate identity of their own, distinct from the triple they state, because the alternative — keying an edge by `(owner, src, rel, dst)` — cannot represent a relation believed, retracted and believed again. Evidence links pin to that identity, so a later revision creates a new assertion rather than rewriting the premise a past conclusion cited. The suspicion recorded in F3 was right: with an append-only log the pinning is natural. What was missing was the *identity* to pin to, and a current-state primary key would have silently denied it. The projection layer must not resolve evidence links to "current" behind the scenes.
 
 **(2026-08-23) F5 — `possibly-same-as` is resolved by consumer, and citing across it makes the link itself evidence: AGREED**
 
-Three of dialogue 03's decisions narrowed this before it was discussed: assertions are addressable ([R1](03-bacteria-reconciliation.md)), prompt text is confirmed-only while the graph may hold more (R3), and conclusions carry mandatory evidence links (R4).
+Three of dialogue 03's decisions narrowed this before it was discussed: assertions are addressable ([R1](03-aristotle-reconciliation.md)), prompt text is confirmed-only while the graph may hold more (R3), and conclusions carry mandatory evidence links (R4).
 
 **Both obvious answers fail.** *Union semantics* — one entity until disproven — silently asserts the very thing we declined to assert, and makes the separate band pointless, since it would then behave identically to `sameAs`. *Separation semantics* — two until confirmed — never over-claims but leaves the system knowing something it refuses to act on, answering "everyone at Acme" with an apparent duplicate and no explanation.
 

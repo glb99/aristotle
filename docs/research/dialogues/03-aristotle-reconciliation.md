@@ -1,8 +1,8 @@
-# Dialogue 03 — Reconciling the model with bacteria
+# Dialogue 03 — Reconciling the model with aristotle
 
-> Opened 2026-08-23, after reading the `bacteria` tree at `5a04b87`. Context and citations are in [`INTEGRATION-BACTERIA.md`](../../architecture/memory-graph.md).
+> Opened 2026-08-23, after reading the `aristotle` tree at `5a04b87`. Context and citations are in [`INTEGRATION-ARISTOTLE.md`](../../architecture/memory-graph.md).
 >
-> The finding that prompted this: bacteria's application **ADR 0002 — "the memory graph is Postgres tables"** was accepted on 2026-08-14 and already occupies the same ground as this project. Its phase one (the extractor and the proposals it writes) shipped; its **phase two — nodes, edges, vectors, traversal — is unbuilt**. `MENTAL-MODEL.md` is a much more developed design for that phase two, and arrives before anything depends on it.
+> The finding that prompted this: aristotle's application **ADR 0002 — "the memory graph is Postgres tables"** was accepted on 2026-08-14 and already occupies the same ground as this project. Its phase one (the extractor and the proposals it writes) shipped; its **phase two — nodes, edges, vectors, traversal — is unbuilt**. `MENTAL-MODEL.md` is a much more developed design for that phase two, and arrives before anything depends on it.
 >
 > These seven questions are the places the two designs disagree. Unlike dialogue 01 (scope) and dialogue 02 (operational policy), these are **compatibility** questions, and several have a deadline: they change a table schema that does not exist yet and would be expensive to change once it does.
 
@@ -32,9 +32,9 @@ So the question is whether assertions join `chat_memory_entry` on the durable si
 
 §8 auto-commits additive, low-stakes, clearly-sourced facts, because the interruption budget is the scarce resource and a review everyone clicks through is worse than no review.
 
-bacteria forbids this in three places: agent ADR 0016 (memory is written by the owner, not the model), agent ADR 0017 (proposed and confirmed), and ADR 0002's "the graph never contributes text… what it may do is decide which already activated memories are surfaced." That is a security posture, and it is the same threat §9 calls memory poisoning — bacteria's answer is simply stricter than ours.
+aristotle forbids this in three places: agent ADR 0016 (memory is written by the owner, not the model), agent ADR 0017 (proposed and confirmed), and ADR 0002's "the graph never contributes text… what it may do is decide which already activated memories are surfaced." That is a security posture, and it is the same threat §9 calls memory poisoning — aristotle's answer is simply stricter than ours.
 
-**Proposed reconciliation**: they govern two different surfaces. Our auto-commit is a **write to the graph**. bacteria's rule is about **text reaching a model**. An auto-committed assertion may exist, be traversed, influence which memories rank highest, and be visible in the UI, while contributing no text to a prompt until a human activates it. Both rules survive untouched, and the interruption budget is spent only on things that will actually be said.
+**Proposed reconciliation**: they govern two different surfaces. Our auto-commit is a **write to the graph**. aristotle's rule is about **text reaching a model**. An auto-committed assertion may exist, be traversed, influence which memories rank highest, and be visible in the UI, while contributing no text to a prompt until a human activates it. Both rules survive untouched, and the interruption budget is spent only on things that will actually be said.
 
 This is not what either document currently says, so it needs accepting rather than assuming.
 
@@ -52,7 +52,7 @@ The cost is that conclusions then arrive at the same rate as everything else in 
 
 ## R5 — Does our model adopt vectors?
 
-This is a hole on our side, not bacteria's. §5 has derivations and traversal and says nothing about similarity search. ADR 0002 committed to pgvector, 1,536 dimensions (an index cap, not a preference), and a separate `BACTERIA_EMBEDDING_PROVIDER`.
+This is a hole on our side, not aristotle's. §5 has derivations and traversal and says nothing about similarity search. ADR 0002 committed to pgvector, 1,536 dimensions (an index cap, not a preference), and a separate `ARISTOTLE_EMBEDDING_PROVIDER`.
 
 Retrieval by traversal answers "what is connected to this"; retrieval by similarity answers "what is *about* this". A memory system plausibly needs both, and ADR 0002's strongest rejected alternative was vectors with no graph at all.
 
@@ -60,11 +60,11 @@ Retrieval by traversal answers "what is connected to this"; retrieval by similar
 
 ## R6 — §9 assumed a single user, and that is now false
 
-§9 says the enterprise apparatus "answers a multi-user problem bacteria does not have." bacteria has `user_id` everywhere, shared authentication (app ADR 0004), browser-held sessions (0005), user-scoped memory (agent ADR 0021), and ADR 0002 keys the whole graph by `user_id`.
+§9 says the enterprise apparatus "answers a multi-user problem aristotle does not have." aristotle has `user_id` everywhere, shared authentication (app ADR 0004), browser-held sessions (0005), user-scoped memory (agent ADR 0021), and ADR 0002 keys the whole graph by `user_id`.
 
 Nothing in §9's substance is wrong — autonomy, exposure and trust are still the right three — but "one person's graph on one machine" was load-bearing for how lightly it treats them, particularly exposure.
 
-**Question**: revise §9 for a hosted multi-user deployment, or scope our model explicitly to the single-user case and let bacteria's own auth handle the rest?
+**Question**: revise §9 for a hosted multi-user deployment, or scope our model explicitly to the single-user case and let aristotle's own auth handle the rest?
 
 ## R7 — Which half gets built first?
 
@@ -141,13 +141,13 @@ This is ADR 0002's own criterion — "loses a human's activation decision that e
 
 - The memory graph now needs backup and migration care like any other table. "A migration may drop and rebuild it" stops being true.
 - Fixing bad data becomes more expensive than deleting rows — by design, since that expense is what makes the history trustworthy.
-- **Retention becomes a real open question.** ADR 0002 flagged it and leaned on disposability as the mitigation: "being derived means it can be rebuilt smaller once a retention rule exists, which is a mitigation and not an answer." That mitigation is now gone. **Parked deliberately** as bacteria's own question rather than answered here.
+- **Retention becomes a real open question.** ADR 0002 flagged it and leaned on disposability as the mitigation: "being derived means it can be rebuilt smaller once a retention rule exists, which is a mitigation and not an answer." That mitigation is now gone. **Parked deliberately** as aristotle's own question rather than answered here.
 
 **(2026-08-23) R3 — Two surfaces, with a reserved floor as the load-bearing defence: AGREED**
 
-bacteria's rule and ours were never about the same thing. Every argument in `agent/tools/memory.py` is about what the model *will be told next* — "a single injected user message … would become an instruction outliving the message that carried it, with the transcript showing only a tool call that succeeded." That is prompt-injection persistence, and §9 names the identical threat. The disagreement was only about where the gate sits.
+aristotle's rule and ours were never about the same thing. Every argument in `agent/tools/memory.py` is about what the model *will be told next* — "a single injected user message … would become an instruction outliving the message that carried it, with the transcript showing only a tool call that succeeded." That is prompt-injection persistence, and §9 names the identical threat. The disagreement was only about where the gate sits.
 
-**The split, which is bacteria's own line named rather than a new concession.** ADR 0002 already grants the graph influence over *which* activated memories surface while forbidding it any contribution to their *content*.
+**The split, which is aristotle's own line named rather than a new concession.** ADR 0002 already grants the graph influence over *which* activated memories surface while forbidding it any contribution to their *content*.
 
 - **Surface A — writing to the graph**: what exists, what is traversable, what renders, what a contradiction can fire against. Governed by §8's risk-weighted ratification.
 - **Surface B — contributing text to a prompt**: what the model is told. Governed by ADRs 0016/0017 — confirmed only, always.
@@ -189,7 +189,7 @@ So the question posed in R4's framing — does the proposal lifecycle need exten
 **Agreed design:**
 
 - **Conclusions are their own table in layer 2** (durable, since an LLM call produced them and R2's determinism test puts them there), keyed like the graph — `user_id` plus a surrogate id — with mandatory evidence links to `assertion_id`s, confidence, prose, and the §6 lifecycle.
-- **Activation emits; the supplier learns nothing new.** Activating a conclusion writes an ordinary `chat_memory_entry` carrying the conclusion's prose and a back-link to its id. This keeps ADR 0024's boundary verbatim — "the supplier returning `MemoryEntry` values and nothing else" — and preserves the property that **`bacteria-agent` is never touched**. Teaching the supplier to return conclusions would break that for no gain.
+- **Activation emits; the supplier learns nothing new.** Activating a conclusion writes an ordinary `chat_memory_entry` carrying the conclusion's prose and a back-link to its id. This keeps ADR 0024's boundary verbatim — "the supplier returning `MemoryEntry` values and nothing else" — and preserves the property that **`aristotle-agent` is never touched**. Teaching the supplier to return conclusions would break that for no gain.
 - **Staleness demotes, never deletes.** When evidence is retracted the conclusion goes stale and its emitted entry stops being supplied as a candidate, while the entry and the human's activation decision survive and it returns to the queue as "this went stale: `a3` was retracted."
 
 **The asymmetry decides the direction, as in R1**: continuing to tell the model something known to rest on retracted evidence is worse than briefly not telling it something true. It also maps onto R2's layering exactly — the activation decision is durable, the supply is a projection. Removing something from a projection needs no human; deleting a human's decision does.
@@ -236,9 +236,9 @@ ADR 0002 supplies the evidence for the shape: roughly 85% of LightRAG's graph ca
 
 **(2026-08-23) R6 — §9's three concerns survive; its single-user framing, its security claim and its scope of autonomy do not: AGREED**
 
-**Most of §9 was right for a slightly different reason than it gave.** bacteria is multi-*tenant*, not multi-*party within one graph*: each user has their own graph keyed by `user_id`, and nothing is shared between users. Roles, marking taxonomies and policy engines therefore still stay out. Three things break.
+**Most of §9 was right for a slightly different reason than it gave.** aristotle is multi-*tenant*, not multi-*party within one graph*: each user has their own graph keyed by `user_id`, and nothing is shared between users. Roles, marking taxonomies and policy engines therefore still stay out. Three things break.
 
-**1. "Visibility is the security model" no longer holds.** It was true when the owner was the only viewer and the machine was theirs. Hosted, the graph lives on someone else's Postgres and visibility to the owner says nothing about who else can read the table. §9's own warning gets *worse*, not better: a graph "structured, queryable and complete across relationships, health, money and private opinion" is more dangerous on a shared server than on a laptop. Exposure now has leak paths that are not the LLM call — bacteria ships `logfire[fastapi,psycopg,google-genai]`, and **instrumented psycopg spans carry query parameters**; add operator access and backups. None of these is visible in the graph UI.
+**1. "Visibility is the security model" no longer holds.** It was true when the owner was the only viewer and the machine was theirs. Hosted, the graph lives on someone else's Postgres and visibility to the owner says nothing about who else can read the table. §9's own warning gets *worse*, not better: a graph "structured, queryable and complete across relationships, health, money and private opinion" is more dangerous on a shared server than on a laptop. Exposure now has leak paths that are not the LLM call — aristotle ships `logfire[fastapi,psycopg,google-genai]`, and **instrumented psycopg spans carry query parameters**; add operator access and backups. None of these is visible in the graph UI.
 
 **2. Exposure needs isolation, not only gating.** Sensitivity levels on types and subgraphs still make sense, but the boundary moved from "my laptop versus the internet" to "my rows versus everyone else's in this process." A missing `WHERE user_id = ?` stops being a bug and becomes a cross-user leak. `chat/access.py` is the right shape and names the cost — "an ownership rule per feature, forgotten silently, with nothing in the build to notice. **Ingestion has not written one**" — which is a documented instance in this codebase, not a hypothetical. A graph feature keyed by `user_id` is the next place it happens.
 
@@ -246,12 +246,12 @@ ADR 0002 supplies the evidence for the shape: roughly 85% of LightRAG's graph ca
 
 **Agreed corrections to §9:**
 
-- Replace "a multi-user problem bacteria does not have" with the accurate statement: one graph per user, no sharing between users, so the enterprise apparatus stays out — but **tenancy isolation is a hard requirement**, enforced per feature per ADR 0004, citing the ingestion precedent as what forgetting looks like.
+- Replace "a multi-user problem aristotle does not have" with the accurate statement: one graph per user, no sharing between users, so the enterprise apparatus stays out — but **tenancy isolation is a hard requirement**, enforced per feature per ADR 0004, citing the ingestion precedent as what forgetting looks like.
 - **Demote visibility to the *comprehension* model**: it is what lets a user understand what the agent knows, which no permission dialog achieves, and it is not access control. Name the non-LLM exposure paths explicitly — operator and database access, backups, telemetry.
 - Autonomy and sensitivity levels become per-user, durable, layer 2.
 - **§13 gains a deferral: sharing a graph between users.** That is where roles and marking taxonomies would become necessary, and it is a different product. Foreclosed deliberately rather than drifted into.
 
-**Raised, not resolved — recorded as an open question in the model.** §9's argument for why this data is dangerous is *strengthened* by hosting it. Local-first or self-hosted answers it; hosted requires deciding the convenience is worth it. This may eventually be the deciding constraint on what bacteria is, and it is not a question this dialogue should settle by assumption.
+**Raised, not resolved — recorded as an open question in the model.** §9's argument for why this data is dangerous is *strengthened* by hosting it. Local-first or self-hosted answers it; hosted requires deciding the convenience is worth it. This may eventually be the deciding constraint on what aristotle is, and it is not a question this dialogue should settle by assumption.
 
 **(2026-08-23) R7 — Minimum graph, then the negotiation surface, then complete phase two — with a kill criterion: AGREED**
 
@@ -261,7 +261,7 @@ The two documents nominate different halves as speculative, and they are not in 
 
 **And R3 forced it.** Under R3 the graph cannot contribute prompt text until a human activates something, so without a negotiation surface a completed phase two cannot change the agent's behaviour at all except through candidate ranking — a retrieval system whose entire output is gated behind a review nobody can perform efficiently.
 
-**The objection does not hold.** Building the surface before knowing the graph earns its keep is not wasted effort, because the surface is the fix for a problem bacteria already has: ADR 0002 calls the queue problem acute and leaves it open, and reviewing evidence-bearing proposals in bulk is valuable with or without traversal. The work does double duty; completing phase two first does not. The worked example agrees — its only two interruptions were a merge and a type promotion, decisions that exist *only if there is a surface to make them on*.
+**The objection does not hold.** Building the surface before knowing the graph earns its keep is not wasted effort, because the surface is the fix for a problem aristotle already has: ADR 0002 calls the queue problem acute and leaves it open, and reviewing evidence-bearing proposals in bulk is valuable with or without traversal. The work does double duty; completing phase two first does not. The worked example agrees — its only two interruptions were a merge and a type promotion, decisions that exist *only if there is a surface to make them on*.
 
 **Agreed order:**
 

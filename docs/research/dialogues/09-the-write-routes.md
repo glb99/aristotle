@@ -98,7 +98,7 @@ Which makes the asymmetry worth naming rather than inheriting silently. A conclu
 
 ### Q5 — Which surface, given the console is read-only and the CLI already reviews
 
-`GET /graph` renders; `bacteria-admin` already holds a review flow for memory proposals, with `accept-proposal` and `reject-proposal`.
+`GET /graph` renders; `aristotle-admin` already holds a review flow for memory proposals, with `accept-proposal` and `reject-proposal`.
 
 So there is a precedent for a person deciding things at a terminal, and a half-built precedent for deciding them in a browser. §8 wants ambient review — *a queue inside the graph, pending changes drawn as ghosted diffs, acceptable in bulk* — which is a console feature and not a CLI one.
 

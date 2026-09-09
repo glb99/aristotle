@@ -4,7 +4,7 @@
 >
 > They share a shape. Every one is a capability ADR 0006 **decided** and phase one did not fill in — three columns that exist, are documented, are indexed, and are never written; and one decision, *identity is linked and never merged*, with no writer at all. Nothing here is a wrong design. It is a design that shipped with its writer producing the minimum that made rows appear.
 >
-> **Q1 and Q2 were already fixed when this was opened**, in `bacteria`'s `9746064`, and both are recorded below as answered rather than deleted — the reasoning stands and one of them was decided against the way this leaned. The questions were drawn from live rows, every one of which was written before that commit; **a database is a record of what the writer used to do**, and reading it as the current state is the mistake to carry forward.
+> **Q1 and Q2 were already fixed when this was opened**, in `aristotle`'s `9746064`, and both are recorded below as answered rather than deleted — the reasoning stands and one of them was decided against the way this leaned. The questions were drawn from live rows, every one of which was written before that commit; **a database is a record of what the writer used to do**, and reading it as the current state is the mistake to carry forward.
 >
 > **All four are now settled**, every one of them by implementation rather than by discussion. The dialogue read the repository more slowly than the repository wrote itself. What it was worth is the two places its reasoning was wrong — Q1's false analogy, and Q3's assumption that a date must be complete.
 

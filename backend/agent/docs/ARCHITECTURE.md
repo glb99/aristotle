@@ -39,7 +39,7 @@ things everyone has to remember rather than things the code guarantees.
 One turn, in order, with the module responsible for each step.
 
 ```
-bacteria.agent.interfaces.cli.main
+aristotle.agent.interfaces.cli.main
   │  reads a line of input
   ▼
 Runtime.run_turn                                    runtime/runtime.py
@@ -380,7 +380,7 @@ standing liability now that a host persists it.
 Deterministic evaluation exists, in the host rather than here — the agent
 produces the evidence, the application judges it
 ([ADR 0020](adr/0020-deterministic-evals-over-recorded-runs.md), implemented in
-`bacteria.app.evaluation`). Five checks read recorded runs and the gate fails on any
+`aristotle.app.evaluation`). Five checks read recorded runs and the gate fails on any
 finding.
 
 What that is not: those runs are seeded fixtures, so the checks verify the

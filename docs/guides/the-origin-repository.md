@@ -1,12 +1,13 @@
-# The other bacteria repository
+# The `bacteria-core` origin repository
 
-**Two different things are now called bacteria, and the ambiguity is new.** This
-repository took the name in the rename that produced `bacteria.agent` and
-`bacteria.app`; the repository below had it first. When either is meant, say
-which:
+This workspace was called bacteria until the rename that produced
+`aristotle.agent` and `aristotle.app`, code identifiers included — it is
+`aristotle` throughout now, so there is no longer any ambiguity about which
+`bacteria` is meant. The repository below kept the old name; it had it first,
+and nothing here renames it.
 
-- **this one** — the workspace, at `~/Documents/Projects/bacteria`, whose agent
-  package is `backend/agent` and imports as `bacteria.agent`.
+- **this one** — the workspace, at `~/Documents/Projects/aristotle`, whose agent
+  package is `backend/agent` and imports as `aristotle.agent`.
 - **the origin** — `~/Documents/Projects/bacteria-core`, frozen, described below.
 
 This file said the origin was at `~/Projects/bacteria` until that path was

@@ -21,7 +21,7 @@ cheap to fix.
 coverage for that reason. If an entrypoint ever looks like it deserves a test,
 that is the signal it holds logic belonging to a feature.
 
-**The application never imports `bacteria.agent.interfaces`.** That package is the
+**The application never imports `aristotle.agent.interfaces`.** That package is the
 agent's own composition root, for running it standalone. The application
 composes what it needs in `entrypoints/`. Two composition roots is correct —
 they compose different processes — and this rule is what stops them becoming one
@@ -45,6 +45,6 @@ codebase is otherwise organized against, and it is why the queue is not Redis.
 See `core/jobs.py`.
 
 **Entrypoints choose the event loop.** On Windows psycopg cannot run on the
-default `ProactorEventLoop`, and uvicorn hardcodes it — so `bacteria-serve`
+default `ProactorEventLoop`, and uvicorn hardcodes it — so `aristotle-serve`
 drives the server itself rather than calling `uvicorn.run()`. All of that is in
 `core/platform.py`; nothing else needs to know.

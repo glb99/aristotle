@@ -2,7 +2,7 @@
 
 > Opened 2026-08-24. **The proposal is the human's**: make the graph the global concept of memory, and treat `chat_memory_entry` as a primitive earlier version of it that the richer system eventually supersedes.
 >
-> This is a larger decision than anything in [dialogue 05](05-what-building-it-taught.md). It changes what §1 and §5 have to specify, it would refactor a shipped and working feature in `bacteria`, and it is the first question in this project where **the model and the target codebase's own ADRs give opposite answers**.
+> This is a larger decision than anything in [dialogue 05](05-what-building-it-taught.md). It changes what §1 and §5 have to specify, it would refactor a shipped and working feature in `aristotle`, and it is the first question in this project where **the model and the target codebase's own ADRs give opposite answers**.
 
 ## What made it live
 
@@ -47,7 +47,7 @@ Not a second store — a materialized view of *what this person ratified as saya
 
 - **One source of truth.** Everything durable is an assertion or a conclusion, carrying time, provenance and the ability to contradict.
 - **The structural guarantee survives.** Only the projection is ever injected, so "reaches the model" is still a question of which table a row is in. ADR 0017 keeps its property while stopping being a separate store.
-- **[R2](03-bacteria-reconciliation.md)'s layering applies unchanged.** Ledger durable, projection rebuildable — with the ratification *decision* living in the ledger, because it is a human decision and R2's determinism test makes those durable.
+- **[R2](03-aristotle-reconciliation.md)'s layering applies unchanged.** Ledger durable, projection rebuildable — with the ratification *decision* living in the ledger, because it is a human decision and R2's determinism test makes those durable.
 - **Retrieval acquires its missing join.** Every entry would descend from a node, so "the graph narrows memory" finally has a mechanism.
 
 That last point is the reason to believe the reframing rather than merely prefer it: the proposal and the retrieval gap have the same solution, and neither was derived from the other.
@@ -85,7 +85,7 @@ That produces a projection with exactly one producer, alongside the store that a
 
 Which surfaced the thing this dialogue had been missing: **those tables are not the application's to delete.**
 
-`bacteria.agent`'s `SessionRepository` declares eight methods and five are memory — `remember`, `forget`, `propose`, `activate`, `reject` — plus `get_state`, which returns `SessionState.memory` and `.user_memory`. `MemoryEntry` is an **agent-side type**; `assemble_context` reads it; the `remember` tool is registered by the agent. And that package carries real semver precisely because "things implement its protocols", and is meant to be vendorable into hosts that have never heard of this application.
+`aristotle.agent`'s `SessionRepository` declares eight methods and five are memory — `remember`, `forget`, `propose`, `activate`, `reject` — plus `get_state`, which returns `SessionState.memory` and `.user_memory`. `MemoryEntry` is an **agent-side type**; `assemble_context` reads it; the `remember` tool is registered by the agent. And that package carries real semver precisely because "things implement its protocols", and is meant to be vendorable into hosts that have never heard of this application.
 
 So dropping the tables is one of two much larger things:
 
