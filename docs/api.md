@@ -27,25 +27,34 @@ a page cannot hold a key safely —
 | `GET` | `/chat/sessions/{id}/extraction` | How far memory extraction has read this conversation, and how far behind it is. A watermark that stops while the transcript grows is a worker that is not running. |
 | `PUT` | `/chat/sessions/{id}/memory/{key}` | `{"value", "reason"}`. Preserved into the system prompt of every later turn. Overwrites by key. |
 | `DELETE` | `/chat/sessions/{id}/memory/{key}` | `204`, whether or not it was there. |
+| `GET` | `/chat/proposals` | **Everything awaiting a decision, in every conversation.** The listing below cannot give this, because it needs a session id — which meant *what is waiting anywhere* required already holding them all. |
 | `GET` | `/chat/sessions/{id}/memory-proposals` | Suggested memories awaiting a decision. These reach no model. |
 | `POST` | `/chat/sessions/{id}/memory-proposals/{source}/{key}` | Accept a suggestion, making it active. `404` if there is no such proposal. |
 | `DELETE` | `/chat/sessions/{id}/memory-proposals/{source}/{key}` | Discard a suggestion. `204`. |
 
-### The graph — the personal ontology
+### Ontologies — the substrate's verbs, over any model
 
-What the extractor believes about the person it is talking to, and the write
-surface for correcting it. Nothing here edits history: a correction records a new
-belief and closes the old one — [ADR 0009](adr/0009-the-graph-is-correctable.md).
+What is claimed in one model, and the surface for correcting it. **Uniform
+across domains**, because these are operations on an assertion and an assertion
+is the substrate's — [ADR 0013](adr/0013-the-console-is-domain-by-view-and-the-api-is-ontologies.md)
+§5. `{ontology}` is the `ontology` column's own value: `personal`, or
+`architecture:<project_id>`. Nothing here edits history: a correction records a
+new belief and closes the old one — [ADR 0009](adr/0009-the-graph-is-correctable.md).
+
+An ontology that does not exist and one belonging to somebody else answer the
+same 404, so a guessable path segment is not an oracle for enumerating
+checkouts.
 
 | | | |
 |---|---|---|
-| `GET` | `/graph` | The caller's own graph as it currently stands. |
-| `GET` | `/graph/conclusions` | Beliefs the system drew, including the ones that have gone stale. |
-| `POST` | `/graph/assertions/{id}/retract` | Stop believing a claim. |
-| `POST` | `/graph/assertions/{id}/confirm` | Endorse a claim the extractor proposed, so a prompt may be told it — [ADR 0011](adr/0011-a-confirmed-fact-may-be-spoken.md). |
-| `POST` | `/graph/conclusions/{id}/reject` | Withdraw an inferred belief the owner disagrees with. |
-| `POST` | `/graph/nodes/{id}/rename` | Correct what a node is called — [ADR 0012](adr/0012-a-name-is-a-claim-about-a-value.md). |
-| `POST` | `/graph/links` | Say two nodes are the same thing. Refuses a mismatch of kinds. |
+| `GET` | `/ontologies` | Every model this caller can open, personal first. What a domain switcher needs. |
+| `GET` | `/ontologies/{ontology}` | What is currently believed in this model — nodes, claims, contradictions. |
+| `GET` | `/ontologies/{ontology}/conclusions` | Beliefs the system drew, including the ones that have gone stale. |
+| `POST` | `/ontologies/{ontology}/assertions/{id}/retract` | Stop believing a claim. |
+| `POST` | `/ontologies/{ontology}/assertions/{id}/confirm` | Endorse a claim the extractor proposed, so a prompt may be told it — [ADR 0011](adr/0011-a-confirmed-fact-may-be-spoken.md). |
+| `POST` | `/ontologies/{ontology}/conclusions/{id}/reject` | Withdraw an inferred belief the owner disagrees with. |
+| `POST` | `/ontologies/{ontology}/nodes/{id}/rename` | Correct what a node is called — [ADR 0012](adr/0012-a-name-is-a-claim-about-a-value.md). |
+| `POST` | `/ontologies/{ontology}/links` | Say two nodes are the same thing. Refuses a mismatch of kinds. |
 
 ### Architecture — the codebase's ontology
 

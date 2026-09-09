@@ -1,18 +1,18 @@
-<h1 align="center">bacteria</h1>
+<h1 align="center">aristotle</h1>
 
 <p align="center">
   <em>A neurosymbolic agent that builds a model of your system, and shows it to you.</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/glb99/bacteria/actions/workflows/test.yml"><img alt="Test" src="https://github.com/glb99/bacteria/actions/workflows/test.yml/badge.svg"></a>
-  <a href="https://github.com/glb99/bacteria/actions/workflows/smoke.yml"><img alt="Smoke" src="https://github.com/glb99/bacteria/actions/workflows/smoke.yml/badge.svg"></a>
+  <a href="https://github.com/glb99/aristotle/actions/workflows/test.yml"><img alt="Test" src="https://github.com/glb99/aristotle/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://github.com/glb99/aristotle/actions/workflows/smoke.yml"><img alt="Smoke" src="https://github.com/glb99/aristotle/actions/workflows/smoke.yml/badge.svg"></a>
   <a href=".python-version"><img alt="Python 3.13+" src="https://img.shields.io/badge/python-3.13+-blue.svg"></a>
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg"></a>
   <a href="docs/README.md"><img alt="Docs" src="https://img.shields.io/badge/docs-read-blue.svg"></a>
 </p>
 
-<!-- TODO(#93): add a screenshot of Console v0 — the chat tab beside the graph tab —
+<!-- TODO(#93): add a screenshot of the console — the domain row above MODEL · REVIEW · ASK · RULES —
      at docs/assets/console.png, and a GIF of accepting a proposal. Left out rather
      than committed broken; this is the first thing a visitor should see. -->
 
@@ -23,7 +23,7 @@
 An agent that remembers things about you is common. An agent whose memory you
 can **open, read, disagree with, and correct** is not.
 
-bacteria is an experiment in the second. A language model does the reasoning —
+aristotle is an experiment in the second. A language model does the reasoning —
 probabilistic, fluent, occasionally wrong. Underneath it sits an **ontology**: an
 explicit model of the entities in some domain and the relations between them,
 stored as an append-only log of claims, each carrying who said it, when it was
@@ -40,7 +40,7 @@ from its answers, but from carrying in your head what it does and does not know.
 **Two surfaces over one model:**
 
 - **A chat** — a full agent turn. It clarifies, reasons, and proposes actions.
-- **A graph** — the ontology itself. What bacteria believes about your system,
+- **A graph** — the ontology itself. What aristotle believes about your system,
   which of those beliefs contradict each other, what it concluded and from what,
   and where the boundaries it was told about are being violated.
 

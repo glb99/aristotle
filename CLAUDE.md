@@ -1,4 +1,4 @@
-# bacteria — working in this repository
+# aristotle — working in this repository
 
 A uv workspace of two packages. `backend/agent` is an AI agent built as layered
 infrastructure; `backend/app` is the HTTP service that hosts it. The application
@@ -111,8 +111,13 @@ that ceremony.
 
 ## Naming
 
-Two different things are called bacteria. **This one** is the workspace at
-`~/Documents/Projects/bacteria`. **The origin** is `~/Documents/Projects/bacteria-core`,
-frozen, and code never flows from it —
+This workspace is **aristotle**, at `~/Documents/Projects/aristotle`. It was
+called bacteria until 2026-09-07 — the rename was documentation-only, so code
+identifiers that predate it (`bacteria.agent`, `bacteria-admin`, `BACTERIA_KEY`,
+the `bacteria` namespace package) still say bacteria and are unaffected.
+
+Separately, **the origin** is `~/Documents/Projects/bacteria-core`, frozen, and
+code never flows from it —
 [`docs/guides/the-origin-repository.md`](docs/guides/the-origin-repository.md).
-Say which one you mean.
+That file still refers to this workspace by its old name and path; it hasn't
+been updated for the rename yet.

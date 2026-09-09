@@ -126,7 +126,8 @@ And what each has that the other does not:
 | `personal/memory.py` | the memory port — a keyed memory behind an interface, so it can come from elsewhere ([ADR 0010](../adr/0010-memory-has-a-port.md)) |
 | `personal/graph_memory.py` | that port, backed by the assertion graph instead of by two tables |
 | `personal/comparison.py` | asks both stores the same question and reports where they differ — the migration's evidence |
-| `personal/models.py`, `repository.py`, `access.py`, `service.py`, `tasks.py` | hosting the agent: session tables, the durable `SessionRepository`, ownership, composing a turn, the background jobs |
+| `personal/service.py`, `tasks.py` | composing a turn, and this domain's background jobs |
+| `personal/backing.py` | which memory this deployment chose, and the one construction path for a session repository |
 | `architecture/tools.py` | what a model may **ask** about a codebase, and nothing it may do to one |
 | `architecture/models.py`, `repository.py`, `service.py` | the project list, and `model_of()` — the only part of the feature that touches a filesystem |
 
