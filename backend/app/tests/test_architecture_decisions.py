@@ -420,7 +420,9 @@ class TestARenamedPackage:
         order -- and it would carry judgments backwards into a subject the parse
         still produces.
         """
-        response = rename(client, token, project, "aristotle.app.graph", "aristotle.app.architecture")
+        response = rename(
+            client, token, project, "aristotle.app.graph", "aristotle.app.architecture"
+        )
 
         assert response.status_code == 409
         assert "still here" in response.json()["detail"]
@@ -559,7 +561,9 @@ class TestTheStatedOrder:
         """
         a_layer(client, token, project, "aristotle.app.core")
 
-        refused = state_order(client, token, project, "aristotle.app.personal", "aristotle.app.core")
+        refused = state_order(
+            client, token, project, "aristotle.app.personal", "aristotle.app.core"
+        )
 
         assert refused.status_code == 409
         assert "not agreed to be a layer" in refused.json()["detail"]

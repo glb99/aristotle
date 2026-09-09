@@ -581,7 +581,8 @@ def main() -> int:
     base_url = args.base_url.rstrip("/")
 
     database_url = os.environ.get(
-        "ARISTOTLE_DATABASE_URL", "postgresql+psycopg://aristotle:aristotle@localhost:5432/aristotle"
+        "ARISTOTLE_DATABASE_URL",
+        "postgresql+psycopg://aristotle:aristotle@localhost:5432/aristotle",
     )
 
     try:

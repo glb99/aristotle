@@ -113,7 +113,9 @@ class TestWhatTheToolsAnswer:
         # which is what makes it one, and is checked here rather than asserted
         # in prose somewhere.
         assert answer["depends_on"]["names"] == []
-        assert any(d.startswith("aristotle.app.personal") for d in answer["depended_on_by"]["names"])
+        assert any(
+            d.startswith("aristotle.app.personal") for d in answer["depended_on_by"]["names"]
+        )
 
     def test_an_unknown_name_is_said_rather_than_returned_empty(self, model: Model) -> None:
         """A model handed ``{}`` assumes failure and retries a variation.
