@@ -1,0 +1,566 @@
+# Dialogue 17 — The surfaces still say memory
+
+> Opened 2026-09-09 by the human, after a session spent adding views to a scene:
+>
+> *"I think there is a little mess with the project, I would like it to have a clear goal, that is reflected in the ui (the different tabs, etc.) also the api should reflect that. Also the codebase structure is so important."*
+
+The mess is real and it has one cause. [Dialogue 13](13-the-subject-changed.md)
+changed what this project is — *one engine, many instances, and the adapter is
+what a domain is* — and [dialogue 14](14-the-domain-with-no-package.md) rebuilt
+the packages around that ruling. **Neither reached the surfaces.** The tab bar,
+the route prefixes and the biggest package still describe the thing this was
+before 2026-08-28: an assistant with a memory, plus an architecture feature
+bolted alongside it.
+
+So this is dialogue 14 again, one level out. That one found a domain with no
+package; this one finds a decision that reorganised the code and left every
+door still labelled the old way.
+
+## The measurement
+
+**The tab bar mixes two axes.**
+
+```
+chat   graph   architecture
+```
+
+`chat` and `graph` are two *views* of one domain — the personal ontology.
+`architecture` is a whole *domain*, sitting as their peer. There is no reading
+of that row on which the three items are the same kind of thing.
+
+**So do the route prefixes**, and for the same reason:
+
+| prefix | routes | what it actually is |
+|---|---|---|
+| `/chat` | 11 | the personal domain's surface, plus the agent session transport |
+| `/graph` | 7 | the personal domain's graph — the word is generic, the rows are not |
+| `/architecture` | 8 | a second domain, entire |
+| `/auth` | 2 | infrastructure |
+| `/ingestion` | 2 | from the service this used to be |
+
+`/graph` is the sharp one. It is served from `personal/graph_views.py`, so the
+route that reads *the substrate* lives inside *a domain* — the same category
+error as the tabs, one layer down. A third domain has nothing to copy: it
+either takes `/business` and duplicates seven graph routes, or reaches into
+`/graph` and finds it means somebody's dog.
+
+**The domain switcher already exists, one level too deep.** `index.html` line
+110:
+
+```html
+<span class="arch-pill on">ARCHITECTURE</span>
+<span class="arch-pill off" title="not built">BUSINESS</span>
+<span class="arch-pill off" title="not built">RESEARCH</span>
+```
+
+Inside the architecture tab. The right control, nested within one of the things
+it is supposed to switch between.
+
+**And the two domains have already built the same four surfaces, separately.**
+This is the strongest evidence in the dialogue, because nobody planned it:
+
+| | personal | architecture |
+|---|---|---|
+| the model | `graph` tab, node-link | the scene, node-link |
+| what is waiting | `review queue` rail (index.html:70) | `PROPOSED` column (index.html:159) |
+| ask it something | the `chat` tab | the `ASK` column (index.html:124) |
+| the rules | conflict badges | `BOUNDARIES` column (index.html:156) |
+
+Four surfaces each, under different names, with no shared component between
+them. Two independent implementations converging is the design saying what it
+wants.
+
+**Package sizes, for the codebase half of the question:**
+
+```
+personal       17 modules   5,208 lines
+architecture   14 modules   3,361 lines
+graph          11 modules   3,178 lines
+core           11 modules   1,296 lines
+entrypoints     4 modules   1,239 lines
+auth            8 modules     872 lines
+evaluation      5 modules     681 lines
+ingestion       7 modules     563 lines
+```
+
+`personal` is the largest, and dialogue 14 recorded why: it is a domain *and*
+the agent host. That was accepted knowingly, with a named trigger for splitting
+it — **a second domain wanting durable sessions** — and the trigger has *not*
+fired. `architecture/conversation.py` refuses persistence on purpose: *"Each ask
+opens an in-memory session, runs one turn and discards it."*
+
+## What the goal is, phrased so a surface can fail it
+
+The founding document never said memory ([dialogue 13](13-the-subject-changed.md)).
+Stated so that an element of the UI can be held against it:
+
+> **A negotiation surface over an ontology.** Something derives or extracts
+> claims about a domain; a person judges them; the log keeps both sides and
+> never edits. The domain is a plug-in; the argument is the product.
+
+Run the current surfaces against it. The chat tab passes — it is where claims
+come from. The graph tab passes. `/ingestion`'s two routes do not: batch import
+of records models nothing and is judged by nobody. That is not an argument for
+deleting them today, but it is the first thing the test finds, which is some
+evidence the test works.
+
+## Questions
+
+### Q1 — Do the tabs become *domain × view*, and is that two rows or one?
+
+The claim: the console has two axes and currently draws them as one. Domain
+across the top (personal · architecture · +), views below, and **the same views
+for every domain**, because that is what *one engine* has to mean on a screen:
+
+```
+aristotle ://console        [ personal ]  architecture   · + add
+─────────────────────────────────────────────────────────────────
+  MODEL      REVIEW ⑤      ASK      RULES ⚑2
+```
+
+`MODEL` absorbs the graph tab and the scene; flat, layered and any later
+projection are settings of that view rather than siblings of it. `REVIEW`
+absorbs the review queue and the proposals column — and would fix a defect
+`docs/status.md` already records: *"answering 'what is waiting anywhere' means
+already knowing every session id."* One review surface across domains answers it
+by construction.
+
+**What would make this wrong:** that the two domains only *look* alike. A
+personal claim is auto-committed and retracted afterwards; an architecture
+proposal is refused until accepted. If those two need different affordances at
+the point of judgment, `REVIEW` is one word covering two acts, and merging them
+makes the more dangerous one look like the safer one.
+
+**Also open:** whether the counts belong in the nav. `REVIEW ⑤` and `RULES ⚑2`
+are the only reason to return to the console when nothing has been asked, and
+badges that are always lit stop being read — the notification-fatigue failure
+[§8](../../architecture/memory-graph.md) names in another costume.
+
+### Q2 — Does the API become `/ontologies/{id}`, and what happens to `/chat`?
+
+The shape that follows from Q1:
+
+```
+GET    /ontologies                                  what models exist
+GET    /ontologies/{id}                             the model
+GET    /ontologies/{id}/conclusions
+POST   /ontologies/{id}/assertions/{aid}/retract    · /confirm
+POST   /ontologies/{id}/nodes/{nid}/rename
+POST   /ontologies/{id}/links
+POST   /ontologies/{id}/judgments                   accept or reject a proposal
+POST   /ontologies/{id}/order                       testimony nothing derives
+POST   /ontologies/{id}/ask
+GET    /ontologies/{id}/rules
+POST   /ontologies/{id}/probes/tests                architecture only
+```
+
+Two consequences worth stating rather than discovering. **`/chat` stops being a
+domain** and becomes what it is — the agent session transport — which is the
+same correction dialogue 14 applied to the package and never applied to the
+route. And **the ontology moves into the path**, where today it is implied by
+which prefix you called; `SqlGraphRepository` already takes it as a constructor
+argument, so the substrate is ready and only the routes are not.
+
+**What would make this wrong:** that a uniform surface over non-uniform domains
+is a lie that costs more than it saves. `probes/tests` is architecture-only
+already; if half the verbs end up conditioned on which ontology is open, the
+uniformity is decoration and two honest surfaces beat one dishonest one.
+
+**The version of this question that has to be answered first:** is
+`architecture:<project_id>` one ontology or many? Today every project gets its
+own partition, so `GET /ontologies` lists one entry per checkout plus one
+personal — which is either exactly right or a category error, depending on
+whether *the architecture ontology* is the vocabulary or the instance.
+
+### Q3 — What is a domain, in code, such that a third one is a fill-in?
+
+Dialogue 14 established the five parts by observation — vocabulary, adapter,
+rules, proposer, surface. Nothing declares them. "Which domains exist" is
+implicit in which packages happen to have a `catalogue.py`, and `GET
+/ontologies` cannot be written against that.
+
+The proposal is a registry: each domain declares its catalogue, its adapter, its
+rules and its label, and the shared routes are parameterised by it. The
+acceptance test writes itself, and it is the kind dialogue 14 liked — a number
+rather than a preference:
+
+> **Adding a third domain touches no file outside its own package and the
+> registry.**
+
+**What would make this wrong:** a plug-in seam built for two users, which is the
+mistake dialogue 14 refused when it declined a shared `sessions/` package —
+*building a shared home for a thing with one user*. Two domains is one more than
+one, and not obviously enough. The counter is that the seam is not being
+invented here: the five parts are already present twice, and the registry only
+writes down what is already true both times.
+
+### Q4 — Does `personal/` split, and is this the trigger?
+
+Dialogue 14 named the trigger narrowly so it could not be invoked on taste: **a
+second domain wanting durable sessions.** It has not fired — architecture's ask
+is stateless by choice.
+
+But Q1 puts both conversations behind one `ASK` view, and Q2 puts both behind
+`POST /ontologies/{id}/ask`. That is a uniform surface over one durable and one
+disposable implementation. Either that is fine — the surface is the same and the
+storage is the domain's business — or it is exactly the pressure that fires the
+trigger, one step removed.
+
+**The narrow question:** does a shared `ask` surface count as a second domain
+wanting durable sessions, or does it only count when architecture asks to
+*remember* an answer? The second reading keeps the wart and the trigger both
+intact, and this dialogue prefers it, but it is worth saying out loud rather
+than assuming.
+
+### Q5 — What is the cost, and what is the evidence it was worth paying?
+
+This changes no behaviour. It is a large rename across every route, the whole
+console, the generated client and the e2e specs, justified entirely by a claim
+about what the code *means* — which is [dialogue 14](14-the-domain-with-no-package.md)'s
+justification, and also its recorded risk of churn.
+
+What made #14 safe to do was that its acceptance test was a number this
+codebase's own tool produced: `graph -> personal` must be 0 edges. Q3 offers the
+equivalent here. **Is that enough, or does a surface refactor need a different
+kind of evidence than an import-graph one?** The failure mode is real: an
+interface can satisfy every structural check and still be worse to use, and
+nothing in this repository measures that.
+
+---
+
+## What is agreed
+
+### Q1 — Domain by view, two rows, and `REVIEW` carries state
+
+**Agreed 2026-09-09.**
+
+The tabs become two axes: domain across the top with `+ add`, views beneath, and
+the same views for every domain. Two rows rather than one, because drawing two
+axes on a single line is the error this dialogue opened about.
+
+**The counter was right and stronger than it was stated, and it changes the
+answer rather than defeating it.** The two domains do not have two judgment
+models. They have three, and only two of them have a review surface:
+
+| | what it is | where it lives | the act |
+|---|---|---|---|
+| **live claim** | live the moment it is written -- `claim_extraction.py:315` calls `observe()` straight into the log | `graph_assertion` | **retract** |
+| **waiting memory** | inert; reaches no prompt until activated | `chat_memory_proposal` | **activate** |
+| **proposal** | not stored at all -- `service.py:143` recomputes `propose(derived)` per request | nowhere | **accept** |
+
+Personal's rail lists the second. Architecture's column lists the third. **The
+first has no review surface at all** -- an extracted claim is live, traversable,
+drawable and able to fire a conflict, and nothing anywhere lists *what it just
+decided about you*. `docs/status.md` records the small version of this ("review
+across sessions"); this is the large one, and it was found by asking whether one
+word covered two acts and discovering it covered three.
+
+So `REVIEW` is one surface with three visibly distinct rows, which is
+[§9](../../architecture/memory-graph.md)'s drawing rule applied one surface out:
+`architecture.ts` already refuses to let an agreed feature look like a rejected
+one, and a list that draws *live*, *waiting* and *proposed* alike makes the same
+mistake with higher stakes, because the reader is about to act on it.
+
+**Counts: `REVIEW` yes, `RULES` no.** A queue that drains is worth returning
+for; a standing condition is not. `core -> personal` has been crossed since
+[dialogue 14](14-the-domain-with-no-package.md) recorded it and deliberately left
+it standing, so a `RULES` badge would be lit on day one and every day after --
+the notification-fatigue failure [§8](../../architecture/memory-graph.md) names,
+arriving through a door this dialogue would have built for it. The count belongs
+on the page, not in the nav.
+
+**What would reopen this:** the three states needing different *layouts* rather
+than different rows. Activating a memory wants to show the prompt it would join;
+accepting a classification wants to show the five packages that repeat. If those
+cannot share a list, `REVIEW` is three surfaces wearing one name and the merge
+is cosmetic.
+
+### Q2 — `/ontologies/{id}`, where `{id}` is the column's own value
+
+**Agreed 2026-09-09.**
+
+**The prerequisite answered itself: the `ontology` column already is the id.**
+`NULL` for personal, `architecture:<project_id>` for a checkout — and
+`decisions.ontology_of` says the prefix exists *"so that a row is legible in a
+database somebody is reading by hand."* It already carries both facts, which
+vocabulary and which instance, so the URL names exactly what the column names
+and `GET /ontologies` lists partitions. One translation at the edge: `NULL`
+cannot be a path segment, so the URL says `personal` and the repository maps it
+back. The column stays `NULL`, because rewriting it is the backfilling its own
+docstring forbids.
+
+**The uniform core is the substrate's verbs, and the evidence is a duplicate
+that already exists:**
+
+```
+POST /graph/nodes/{node_id}/rename                 personal
+POST /architecture/projects/{project_id}/renames   architecture
+```
+
+One act — *say a subject is the same thing under a new name* — two spellings,
+and `architecture/decisions.py` implements it with `SAME_AS`, the substrate's
+own relation. Not two similar features; one verb written twice.
+
+Counted against the real routes the split is eight uniform to two specific, so
+the counter — *uniformity over non-uniform domains is decoration* — does not
+hold at these numbers, and will not hold later for a reason rather than by luck:
+**the uniform verbs are the substrate's, and the substrate does not grow per
+domain.** That is [dialogue 10](10-a-place-to-stand.md) Q4 applied to routes.
+
+```
+GET  /ontologies                                 personal + one per checkout
+GET  /ontologies/{id}                            the model
+GET  /ontologies/{id}/conclusions
+POST /ontologies/{id}/assertions/{aid}/retract   · /confirm
+POST /ontologies/{id}/conclusions/{cid}/reject
+POST /ontologies/{id}/nodes/{nid}/rename
+POST /ontologies/{id}/links
+POST /ontologies/{id}/judgments
+POST /ontologies/{id}/ask
+POST /ontologies/{id}/probes/tests               architecture
+POST /ontologies/{id}/order                      architecture
+```
+
+**`/chat` splits, and memory does not follow the graph.** Sessions, turns,
+transcript and extraction are transport and become `/sessions/...` — the
+correction [dialogue 14](14-the-domain-with-no-package.md) made to the package
+and never made to the route. Memory stays with them at
+`/sessions/{sid}/memory`, because **memory is the agent's and not an
+ontology's**: it is what reaches a prompt, [ADR 0010] gave it a port precisely so
+the graph is one possible backing rather than its home, and
+`chat_user_memory_entry` is scoped to a user while `chat_memory_entry` is scoped
+to a session — so it already spans both and belongs to neither ontology.
+
+The consequence for Q1: `REVIEW` composes two sources, waiting memories from
+`/sessions/...` and live claims and proposals from `/ontologies/...`. Honest,
+because Q1 established they are different kinds of thing.
+
+**Creation stays domain-specific**, ruled by the human. `POST /ontologies` does
+not mean the same thing twice: creating an architecture ontology means
+registering a checkout and takes a filesystem path, while creating a personal one
+is meaningless because it exists when the user does. So `POST
+/architecture/projects` remains beside the uniform surface rather than being
+forced into it. It costs the tidiness of a single prefix and buys an honest
+statement that **creation is the adapter's business** — it is the one route that
+has to know what a checkout is.
+
+**What would make this wrong:** that one entry per checkout is the wrong
+granularity. If *the architecture ontology* should be a single thing with
+projects inside it, the nesting inverts and `{id}` becomes the domain rather than
+the partition.
+
+### Q3 — A registry, above the domains rather than beside them
+
+**Agreed 2026-09-09.**
+
+**The counter does not hold, and the reason is specific rather than a
+judgement call.** [Dialogue 14](14-the-domain-with-no-package.md) refused
+`sessions/` for *building a shared home for a thing with one user* — but that
+proposal *moved* one implementation into a shared home. A registry moves
+nothing; it declares what already exists twice. And it has a job the moment Q2
+lands: **a uniform route has to resolve `{id}` to a vocabulary.**
+`personal/graph_views.py` hardcodes `VOCABULARY` and `architecture/views.py`
+hardcodes `ontology_of(project)`; `GET /ontologies/{id}` can hardcode neither.
+So the registry is not built for a hypothetical third domain — it is built
+because Q2's routes need a lookup that does not exist. The third domain is the
+payoff, not the justification.
+
+**What it holds, and only this:**
+
+```python
+@dataclass(frozen=True)
+class Domain:
+    name: str                    # "personal", "architecture"
+    label: str                   # the UI's domain row
+    vocabulary: Vocabulary       # SqlGraphRepository(vocabulary=...)
+    owns: Callable[[str], bool]  # does this ontology id belong to me
+    model: Callable[..., Model]  # nodes · assertions · conclusions · proposals · rules
+```
+
+`model()` is where a plug-in seam usually goes fake, so: **the response has a
+common core and the production differs.** Personal's model is a projection of
+the log; architecture's is a fresh parse plus stored judgments. Each fills what
+it has and omits what it does not — fields absent, rather than routes
+conditioned. That is already the shape of `architecture.Model`.
+
+**Where it lives is the structural point.** Not `core/`, where
+`_core_names_a_domain_concept` would fire and be right — a registry naming
+domains is domain concepts. Not `graph/`, which is substrate and imports no
+domain. So a new top-level `ontologies/` package holding the registry and the
+uniform routes, importing both domains: **a composition root for domains**, the
+role `entrypoints/` plays for processes.
+
+That is what distinguishes it from `sessions/`. Dialogue 14's rule governs
+things trying to sit *beside* domains; this sits *above* them, a position with
+precedent in this tree. None of the seven boundaries forbids a package importing
+two features, so it is legal as well as principled.
+
+**The acceptance test, checkable by this codebase's own tool** the way #14's
+0-edge test was — `derive` produces the import graph, and a rule over it can say
+whether a third domain was added without editing the first two:
+
+> Adding a third domain touches no file outside its own package and the registry.
+
+**What would make this wrong:** `model()` needing a different signature per
+domain. Architecture's takes a `Project` and touches a filesystem; personal's
+takes a principal and touches only the log. If unifying that means a union type
+and a branch at every call site, the seam is a wrapper around an `if`, and two
+honest constructions beat one dishonest interface. Implementation answers this,
+not argument — write the registry against the two domains that exist before
+believing it.
+
+### Q4 — `sessions/` is built, and the trigger that fired is not the named one
+
+**Agreed 2026-09-09.**
+
+**The named trigger has not fired.** [Dialogue 14](14-the-domain-with-no-package.md)
+set it at *a second domain wanting durable sessions*, and Q1 and Q2 do not
+reach it. The seam already exists and both domains already use it — the agent's
+`SessionRepository` protocol, with `SessionStore` in memory for architecture and
+`SqlSessionRepository` durable for personal. A uniform `POST
+/ontologies/{id}/ask` dispatches to the domain and each composes its own runtime
+against that protocol. Architecture would have to want *persistence*, and
+`conversation.py` still refuses it on purpose.
+
+**A different trigger fired, and Q2 pulled it.** Splitting `/chat` gives the
+transport its own routes — `/sessions`, turns, transcript, extraction, memory —
+and those have to live somewhere. Leaving them in `personal/views.py` puts the
+transport's routes inside a domain, which is the category error Q2 just fixed
+for `/graph`. Dialogue 14 could not have seen this: the transport had no
+separate surface then.
+
+**Why `sessions/` is legal now when it was not.** #14 refused it on the
+five-part test — *no adapter, no vocabulary, no rules, no proposer, no surface;
+tables and a repository and no domain.* Four of the five are still true and the
+fifth changed: it now has a surface. And the objection underneath was
+accumulation — *"a package beside the real domains that is nobody's domain is
+precisely what `chat/` became, which is how `build_model_client` ended up
+there."* That risk inverts here, because under Q2 the domain logic moves *into*
+`personal/`, so `sessions/` starts empty of it rather than collecting it.
+
+**The precedent is `auth/`**: a feature that is not a domain, owning its tables,
+its routes and one job. `sessions/` is that shape — the session tables, the
+transport routes, the durable `SessionRepository`. The five-part test is not the
+right test for it, any more than it is for `auth/`.
+
+**Where the seventeen modules land**, after Q2 and Q3:
+
+| | |
+|---|---|
+| `sessions/` | `models.py`, `repository.py`, `access.py`, `tasks.py`, the transport half of `views.py` |
+| `ontologies/` | `graph_views.py`, becoming the uniform surface |
+| `personal/` | `catalogue`, `claim_extraction`, `memory_extraction`, `dates`, `graph_candidates`, `graph_memory`, `memory`, `review`, `comparison`, `service` |
+
+This also clears #14's recorded wart rather than carrying it: *"`personal/` owns
+four tables whose columns name nothing personal."* In `sessions/` the column
+names stop being a wart at all. **No table is renamed** — classes move,
+`__tablename__` stays, no migration, the same discipline #14 held to.
+
+**The acceptance test, same shape as #14's:** `sessions -> personal` must be **0
+edges**. If `sessions/` ends up importing `personal/` to serve a route, it is
+the wart in a new spelling and worse for having moved.
+
+**What would make this wrong,** and it is a cost rather than an objection: this
+is now three structural moves in one dialogue — `ontologies/`, `sessions/`, and
+a shrunken `personal/`. Each is justified separately; they land together or not
+at all. Q5 is where that is weighed.
+
+### Q5 — The evidence is that it builds the instrument the kill criterion needs
+
+**Agreed 2026-09-09.**
+
+**The cost, stated plainly.** Three structural moves landing together, every
+route renamed, the generated client regenerated, the console rewritten, the e2e
+specs rewritten. Behaviour-neutral except for one addition — `REVIEW`, which
+surfaces the live claims that have no review surface at all today.
+
+Q3 and Q4 each supplied a structural test. Both prove the import graph is clean
+and neither proves the interface is better, which was the worry this question
+opened with and it stands.
+
+**But the project's own kill criterion is currently unmeasurable, and that is
+the argument.** [Dialogue 13](13-the-subject-changed.md) retired
+[§14](../../architecture/memory-graph.md)'s bet and replaced it, because *a
+retired kill criterion must be replaced or the project stops being able to be
+wrong*:
+
+> **If the human accepts essentially everything the agent proposes, there is no
+> negotiation.** The surface is a rubber stamp, the "shared" model is the
+> agent's model with a signature on it, and the thesis is wrong. Measured as the
+> proportion of proposed classifications and rules **rejected or edited** rather
+> than waved through, with **both tails failing**.
+
+Nothing measures it. `architecture.ts` counts verdicts for the open project,
+personal counts nothing, and nothing counts across domains or over time. **Q1's
+`REVIEW` is the instrument that criterion needs, and it does not exist.**
+
+**And the one reading available already fails.** The architecture deck, in a
+screenshot taken while answering this dialogue:
+
+```
+PROPOSED   9 agreed · 0 disagreed · 5 open
+```
+
+Nine accepted, none rejected — the failure tail dialogue 13 named, and
+[§8](../../architecture/memory-graph.md) says why it matters: *"a review
+everyone clicks through is worse than no review, because everyone believes it
+was checked."*
+
+The caveat sharpens it rather than excusing it: **an agent made those nine
+judgments, not the human.** An agent proposed classifications, an agent accepted
+all nine, they were written with `origin="stated"` and `trust="user"`, and
+nothing anywhere flagged it. That is the rubber stamp literally, and it is
+invisible precisely because no surface reports a rejection rate.
+
+So the evidence that this refactor is worth its churn is not that the code is
+tidier. **It is that it builds the instrument the project's falsifiability
+depends on**, and the one reading available says the criterion is failing now.
+
+**This adds a requirement to Q1**: `REVIEW` must record *who judged* and report
+the rate. `stated_by` and `trust` are already on the row and nothing reads them
+for this. Without it the refactor is the same blind spot with a better layout.
+
+**What it still does not prove.** Nothing here measures whether the console is
+nicer to use, and this dialogue does not pretend otherwise. The weak substitute
+is a task test, binary and currently failing: *can a person answer "what is
+waiting anywhere?"* Today no, and `docs/status.md` records it. After Q1, yes by
+construction. One question is not a usability programme; it beats asserting an
+improvement nobody can check.
+
+---
+
+## Closing note
+
+Every answer here was decided by something already in the repository rather than
+by preference. Q1 by three storage states the code already distinguishes and one
+word did not. Q2 by a column whose docstring had already chosen the identifier,
+and by a verb spelled twice. Q3 by a lookup Q2 requires and neither domain can
+provide. Q4 by a trigger [dialogue 14](14-the-domain-with-no-package.md) named
+narrowly, which did *not* fire — a different one did, which #14 could not have
+seen. Q5 by a criterion dialogue 13 installed and nothing implemented.
+
+The pattern [dialogue 14](14-the-domain-with-no-package.md) named holds an
+eighth time: **the repository was the more reliable witness.** What this
+dialogue adds is that it was also the witness against the *project*, not only
+against a design — the rubber-stamp reading in Q5 is the first time an answer
+here has been evidence that the thesis might be wrong rather than that a
+structure is untidy.
+
+**What is now unbuilt and specified:** the two-row nav with four views and a
+three-state `REVIEW` that reports who judged; `/ontologies/{id}` over the
+substrate's eight verbs with creation left to the adapter; `/sessions` for the
+transport; an `ontologies/` registry above the domains; `sessions/` beside
+`auth/` as a feature that is not a domain; and two acceptance tests —
+`sessions -> personal` at 0 edges, and a third domain touching no file outside
+its own package and the registry.
+
+---
+
+Related: [dialogue 10](10-a-place-to-stand.md) Q4 (substrate travels, policy
+does not — the rule Q2 applies to routes),
+[dialogue 13](13-the-subject-changed.md) (the subject changed and the surfaces
+did not), [dialogue 14](14-the-domain-with-no-package.md) (the same correction
+one level in, and the `personal/` wart Q4 revisits),
+[dialogue 15](15-the-third-axis.md) (`MODEL` is where its projections live), and
+[`architecture/modules.md`](../../architecture/modules.md) for what the packages
+hold today.
