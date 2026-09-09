@@ -24,7 +24,7 @@ backend/**/.ruff_cache/
 backend/**/.mypy_cache/
 backend/**/dist/
 
-# **`backend/app/src/bacteria/app/console/` must NOT be listed here**, however
+# **`backend/app/src/aristotle/app/console/` must NOT be listed here**, however
 # much it looks like it belongs -- it is build output, and excluding build output
 # is what the rest of this file does.
 #

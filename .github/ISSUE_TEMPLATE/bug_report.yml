@@ -28,7 +28,7 @@ body:
         loudly without it, and `just serve` fails.
       placeholder: |
         just db-up && just migrate
-        uv run bacteria-admin issue-key acme --label local
+        uv run aristotle-admin issue-key acme --label local
         curl -sX POST localhost:8000/chat/sessions -H "Authorization: Bearer fp_..."
       render: bash
     validations:

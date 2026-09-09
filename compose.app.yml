@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: bacteria:local
+    image: aristotle:local
     command: ["alembic", "upgrade", "head"]
     depends_on:
       postgres:
@@ -29,21 +29,21 @@ services:
     environment:
       # `postgres` -- the compose service -- rather than localhost. The default
       # in settings.py is written for a process on the host.
-      BACTERIA_DATABASE_URL: postgresql+psycopg://bacteria:bacteria@postgres:5432/bacteria
+      ARISTOTLE_DATABASE_URL: postgresql+psycopg://aristotle:aristotle@postgres:5432/aristotle
     restart: "no"
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: bacteria:local
+    image: aristotle:local
     # 0.0.0.0, because the default 127.0.0.1 in asgi.py is only reachable from
     # inside the container -- the port publish below would connect to nothing.
-    command: ["bacteria-serve"]
+    command: ["aristotle-serve"]
     environment:
-      BACTERIA_DATABASE_URL: postgresql+psycopg://bacteria:bacteria@postgres:5432/bacteria
-      BACTERIA_LOG_LEVEL: ${BACTERIA_LOG_LEVEL:-INFO}
-      BACTERIA_MODEL_PROVIDER: ${BACTERIA_MODEL_PROVIDER:-anthropic}
+      ARISTOTLE_DATABASE_URL: postgresql+psycopg://aristotle:aristotle@postgres:5432/aristotle
+      ARISTOTLE_LOG_LEVEL: ${ARISTOTLE_LOG_LEVEL:-INFO}
+      ARISTOTLE_MODEL_PROVIDER: ${ARISTOTLE_MODEL_PROVIDER:-anthropic}
       # Passed through unprefixed, because the provider SDKs read these exact
       # names. Empty is fine until a turn is taken.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
@@ -75,12 +75,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: bacteria:local
-    command: ["bacteria-worker"]
+    image: aristotle:local
+    command: ["aristotle-worker"]
     environment:
-      BACTERIA_DATABASE_URL: postgresql+psycopg://bacteria:bacteria@postgres:5432/bacteria
-      BACTERIA_LOG_LEVEL: ${BACTERIA_LOG_LEVEL:-INFO}
-      BACTERIA_MODEL_PROVIDER: ${BACTERIA_MODEL_PROVIDER:-anthropic}
+      ARISTOTLE_DATABASE_URL: postgresql+psycopg://aristotle:aristotle@postgres:5432/aristotle
+      ARISTOTLE_LOG_LEVEL: ${ARISTOTLE_LOG_LEVEL:-INFO}
+      ARISTOTLE_MODEL_PROVIDER: ${ARISTOTLE_MODEL_PROVIDER:-anthropic}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     depends_on:

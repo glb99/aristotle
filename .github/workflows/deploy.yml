@@ -68,13 +68,13 @@ jobs:
         env:
           TOKEN: ${{ secrets.FASTAPI_CLOUD_TOKEN }}
           APP_ID: ${{ secrets.FASTAPI_CLOUD_APP_ID }}
-          DB: ${{ secrets.BACTERIA_DATABASE_URL }}
+          DB: ${{ secrets.ARISTOTLE_DATABASE_URL }}
         run: |
           set -euo pipefail
           missing=()
           [ -n "$TOKEN" ]  || missing+=("FASTAPI_CLOUD_TOKEN")
           [ -n "$APP_ID" ] || missing+=("FASTAPI_CLOUD_APP_ID")
-          [ -n "$DB" ]     || missing+=("BACTERIA_DATABASE_URL")
+          [ -n "$DB" ]     || missing+=("ARISTOTLE_DATABASE_URL")
 
           if [ ${#missing[@]} -eq 0 ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -105,7 +105,7 @@ jobs:
       - name: Apply migrations
         if: steps.configured.outputs.ready == 'true'
         env:
-          BACTERIA_DATABASE_URL: ${{ secrets.BACTERIA_DATABASE_URL }}
+          ARISTOTLE_DATABASE_URL: ${{ secrets.ARISTOTLE_DATABASE_URL }}
         run: uv run just migrate
 
       # Before `fastapi deploy`, and the ordering is the whole point of this
@@ -113,7 +113,7 @@ jobs:
       #
       # The platform builds from `pyproject.toml` and does not run npm, so
       # nothing on their side will ever produce this. The console is installed as
-      # package data out of `backend/app/src/bacteria/app/console/`, and
+      # package data out of `backend/app/src/aristotle/app/console/`, and
       # `fastapi deploy` packages its working directory *at the moment it runs* --
       # so building afterwards, or in a separate job, ships an application whose
       # console directory is empty.
@@ -154,13 +154,13 @@ jobs:
         if: steps.configured.outputs.ready == 'true'
         run: |
           set -euo pipefail
-          sed -i '\#^backend/app/src/bacteria/app/console/$#d' .gitignore
+          sed -i '\#^backend/app/src/aristotle/app/console/$#d' .gitignore
 
-          if git check-ignore -q backend/app/src/bacteria/app/console/index.html; then
+          if git check-ignore -q backend/app/src/aristotle/app/console/index.html; then
             echo "::error title=Console would not be uploaded::The built console is still ignored, so the archive will not contain it and the deployment will serve no console. The pattern this step removes no longer matches .gitignore."
             exit 1
           fi
-          echo "console is uploadable: $(find backend/app/src/bacteria/app/console -type f | wc -l) files"
+          echo "console is uploadable: $(find backend/app/src/aristotle/app/console -type f | wc -l) files"
 
       # Run from the repository root, and no `working-directory:`. This step is
       # what chooses the build context -- `fastapi deploy` packages its own
@@ -169,8 +169,8 @@ jobs:
       #
       # It said `working-directory: backend/app`, which is where the deployed
       # application lives and is therefore the natural thing to write. The build
-      # then failed on every attempt, always the same way: `bacteria-app`
-      # declares `bacteria-agent = { workspace = true }`, and a workspace member
+      # then failed on every attempt, always the same way: `aristotle-app`
+      # declares `aristotle-agent = { workspace = true }`, and a workspace member
       # does not build without the root declaring `members = ["backend/*"]`.
       # Uploading only `backend/app` leaves that root behind.
       #
@@ -193,7 +193,7 @@ jobs:
       # Verifies the deployment that just landed, which nothing did before. Six
       # failures shipped silently from this workflow -- four packaging, two
       # configuration -- and every one was found by hand from a pasted log, days
-      # later. The last was `BACTERIA_RUN_WORKER_IN_API` never reaching the
+      # later. The last was `ARISTOTLE_RUN_WORKER_IN_API` never reaching the
       # process: the service conversed perfectly while nothing drained the queue.
       #
       # `--deployed` runs the narrow subset that says something about a
@@ -203,13 +203,13 @@ jobs:
       #
       # `vars.SMOKE_BASE_URL` and not a secret: a public URL is not one, and a
       # secret would be masked in exactly the log you are reading to find out
-      # which host failed. Deliberately NOT named `BACTERIA_*` -- every variable
+      # which host failed. Deliberately NOT named `ARISTOTLE_*` -- every variable
       # with that prefix that is not a setting is a refusal to boot, and this
-      # step runs `bacteria-admin`.
+      # step runs `aristotle-admin`.
       - name: Smoke-test what was deployed
         if: steps.configured.outputs.ready == 'true'
         env:
-          BACTERIA_DATABASE_URL: ${{ secrets.BACTERIA_DATABASE_URL }}
+          ARISTOTLE_DATABASE_URL: ${{ secrets.ARISTOTLE_DATABASE_URL }}
           SMOKE_BASE_URL: ${{ vars.SMOKE_BASE_URL }}
         run: |
           set -euo pipefail

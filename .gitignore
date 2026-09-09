@@ -31,7 +31,7 @@ dist/
 # deploy after the console existed reported success while `/` answered 404.
 # The workflow removes this exact line before deploying and fails if the path is
 # still ignored afterwards. Changing the pattern below means changing that step.
-backend/app/src/bacteria/app/console/
+backend/app/src/aristotle/app/console/
 
 # The OpenAPI document, dumped from the application to generate the client from.
 # An intermediate: `frontend/src/api.gen.ts` is the committed artifact, and the

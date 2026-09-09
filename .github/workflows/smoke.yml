@@ -65,7 +65,7 @@ jobs:
       # The same system in the arrangement it is actually deployed in, which the
       # step above does not cover. That one starts a server and a worker as two
       # processes; FastAPI Cloud runs one, so the worker lives in the API's
-      # lifespan behind `BACTERIA_RUN_WORKER_IN_API` (ADR 0001).
+      # lifespan behind `ARISTOTLE_RUN_WORKER_IN_API` (ADR 0001).
       #
       # So the flag that production depends on was exercised by nothing. It
       # failed exactly that way once -- the variable never reached the process,
@@ -122,7 +122,7 @@ jobs:
           enable-cache: true
 
       # Needed on the runner as well as in the image: the smoke script issues a
-      # credential through `bacteria-admin` locally and reads the job queue over
+      # credential through `aristotle-admin` locally and reads the job queue over
       # the published port, while the API and worker under test are the
       # containers. That split is the point -- an operator's CLI and a deployed
       # service have to agree about a database neither of them owns.

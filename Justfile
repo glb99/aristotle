@@ -38,12 +38,12 @@ test *args:
 # Run the agent's tests alone
 [group('qa')]
 test-agent *args:
-    uv run --package bacteria-agent {{ ARGS_TEST }} -m pytest backend/agent/tests {{ args }}
+    uv run --package aristotle-agent {{ ARGS_TEST }} -m pytest backend/agent/tests {{ args }}
 
 # Run the application's tests alone
 [group('qa')]
 test-app *args:
-    uv run --package bacteria-app {{ ARGS_TEST }} -m pytest backend/app/tests {{ args }}
+    uv run --package aristotle-app {{ ARGS_TEST }} -m pytest backend/app/tests {{ args }}
 
 _cov *args:
     uv run -m coverage {{ args }}
@@ -56,7 +56,7 @@ _cov *args:
 # executed no database test at all. The variable turns that skip into a failure.
 # `just test-app` deliberately does not set it -- that recipe is for iterating.
 #
-# Not `BACTERIA_`-prefixed, and that is not a style choice: an unrecognized
+# Not `ARISTOTLE_`-prefixed, and that is not a style choice: an unrecognized
 # variable with that prefix is a refusal to boot, and this suite builds
 # `Settings`. See conftest.py.
 
@@ -68,7 +68,7 @@ _cov *args:
     # see the note on `source` in pyproject.toml.
     REQUIRE_POSTGRES=1 just _cov run -m pytest backend/app/tests
     # The entrypoint import check used to live here as `run -m
-    # bacteria.app.entrypoints.asgi`, which quietly stopped being one when asgi.py
+    # aristotle.app.entrypoints.asgi`, which quietly stopped being one when asgi.py
     # grew a __main__ block: -m runs the module, so it started a server and hung.
     # It is tests/test_entrypoints.py now.
     just _cov combine
@@ -108,7 +108,7 @@ hooks-all:
 # Judge the runs recorded in the configured database (ADR 0020)
 [group('qa')]
 eval *args:
-    uv run bacteria-admin eval {{ args }}
+    uv run aristotle-admin eval {{ args }}
 
 # Check types
 [group('qa')]
@@ -184,7 +184,7 @@ console-check: console-types
 # Drive the console in a real browser, against a running server
 [group('qa')]
 e2e key:
-    cd frontend && BACTERIA_KEY={{ key }} npm run e2e
+    cd frontend && ARISTOTLE_KEY={{ key }} npm run e2e
 
 
 # Perform all checks
@@ -203,7 +203,7 @@ check-all: lint test-agent cov typing audit-ci console-check console-build
 db-up:
     docker compose up -d --wait postgres
 
-# Start Adminer at http://localhost:8080 -- server "postgres", user/password/db "bacteria"
+# Start Adminer at http://localhost:8080 -- server "postgres", user/password/db "aristotle"
 [group('db')]
 db-admin:
     docker compose up -d --wait adminer
@@ -223,33 +223,33 @@ db-reset:
 # Apply all pending migrations
 [group('db')]
 migrate *args="head":
-    uv run --package bacteria-app -m alembic -c backend/app/alembic.ini upgrade {{ args }}
+    uv run --package aristotle-app -m alembic -c backend/app/alembic.ini upgrade {{ args }}
 
 # Generate a migration from changes to the models -- always read it before committing
 [group('db')]
 makemigration message:
-    uv run --package bacteria-app -m alembic -c backend/app/alembic.ini revision --autogenerate -m "{{ message }}"
+    uv run --package aristotle-app -m alembic -c backend/app/alembic.ini revision --autogenerate -m "{{ message }}"
 
 # Undo the last migration
 [group('db')]
 rollback *args="-1":
-    uv run --package bacteria-app -m alembic -c backend/app/alembic.ini downgrade {{ args }}
+    uv run --package aristotle-app -m alembic -c backend/app/alembic.ini downgrade {{ args }}
 
 # Show the migration the database is currently at
 [group('db')]
 db-version:
-    uv run --package bacteria-app -m alembic -c backend/app/alembic.ini current
+    uv run --package aristotle-app -m alembic -c backend/app/alembic.ini current
 
 
 # Run development server -- migrates first, as a deployment would
 [group('run')]
 serve: db-up migrate
-    uv run {{ ARGS_SERVE }} bacteria-serve
+    uv run {{ ARGS_SERVE }} aristotle-serve
 
 # Run the background worker
 [group('run')]
 worker *args:
-    uv run bacteria-worker {{ args }}
+    uv run aristotle-worker {{ args }}
 
 # Migrations run to completion first, then the API and the worker start against
 # the same image. Combined explicitly rather than named `compose.override.yml`,
@@ -308,7 +308,7 @@ stack-down:
 # Talk to the agent in a terminal
 [group('run')]
 agent:
-    uv run bacteria-agent
+    uv run aristotle-agent
 
 # Starts a server and a worker, issues a credential through the CLI, and makes
 # real requests -- because three times here a green suite described a system
@@ -321,7 +321,7 @@ agent:
 #
 # `just smoke --in-process-worker` runs the arrangement a deployment uses
 # instead -- one process, worker inside the API -- which is the only
-# configuration `BACTERIA_RUN_WORKER_IN_API` is load-bearing in and the one that
+# configuration `ARISTOTLE_RUN_WORKER_IN_API` is load-bearing in and the one that
 # shipped broken once. Note that a local `.env` setting that flag makes the
 # plain run a hybrid: both this recipe's worker and one inside the API.
 
