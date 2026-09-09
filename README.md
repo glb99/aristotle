@@ -1,4 +1,10 @@
-<h1 align="center">aristotle</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner-light.svg">
+    <img alt="aristotle — a neurosymbolic agent that builds a model of your system, and shows it to you" src="docs/assets/banner-light.svg" width="100%">
+  </picture>
+</p>
 
 <p align="center">
   <em>A neurosymbolic agent that builds a model of your system, and shows it to you.</em>
