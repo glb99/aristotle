@@ -14,8 +14,8 @@ from typing import Any, Optional
 import pytest
 
 from bacteria.agent.session.store import OWNER, SESSION_SCOPE, MemoryEntry, MemoryScope
-from bacteria.app.personal.memory import MemoryView
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.memory import MemoryView
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 
 class RecordingStore:

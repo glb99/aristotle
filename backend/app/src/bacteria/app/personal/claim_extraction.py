@@ -57,7 +57,7 @@ from bacteria.app.graph.service import observe, refer_to
 from bacteria.app.graph.temporal import OPEN_ENDED, Interval
 from bacteria.app.personal.catalogue import VOCABULARY
 from bacteria.app.personal.dates import parse_bound, stated_in
-from bacteria.app.personal.models import ChatSession, ChatTranscriptItem
+from bacteria.app.sessions.models import ChatSession, ChatTranscriptItem
 
 logger = logging.getLogger(__name__)
 

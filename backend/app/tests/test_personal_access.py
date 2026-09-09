@@ -25,6 +25,36 @@ class FakeModelClient:
         return ModelResponse(text="ok", tool_calls=[], stop_reason="end_turn", raw=None)
 
 
+class ProposingModelClient:
+    """Proposes a memory on its first turn, then answers normally.
+
+    Duplicated from `test_personal_api.py` rather than shared: these two files
+    have different `client` fixtures, and a test file that imports another one's
+    fakes couples them at exactly the point they are meant to be independent.
+    Stateful because the runtime calls the model twice when a tool runs.
+    """
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    async def send(self, messages, **kwargs) -> ModelResponse:
+        self.calls += 1
+        if self.calls == 1:
+            return ModelResponse(
+                text=None,
+                tool_calls=[
+                    {
+                        "id": "call-1",
+                        "name": "remember",
+                        "input": {"key": "tone", "value": "bullets", "reason": "asked twice"},
+                    }
+                ],
+                stop_reason="tool_use",
+                raw=None,
+            )
+        return ModelResponse(text="noted", tool_calls=[], stop_reason="end_turn", raw=None)
+
+
 @pytest.fixture(name="client")
 def _client(engine, monkeypatch, backend_options):
     async def _test_session():
@@ -276,6 +306,29 @@ async def test_one_principal_cannot_review_anothers_proposals(client, issue):
     )
 
     assert listed.status_code == activated.status_code == rejected.status_code == 404
+
+
+async def test_the_cross_session_queue_shows_only_the_callers_own(client, issue, monkeypatch):
+    """The second route with no id to check, and the newer of the two.
+
+    `/chat/proposals` answers *what is waiting anywhere*, so it cannot compare a
+    session id against the caller — ownership is the ``WHERE`` inside
+    ``list_sessions``, which ``waiting_for`` walks. That is the failing-open
+    shape: a missing comparison is a 404 for a legitimate caller and loud, while
+    a missing filter hands one principal another's suggestions and looks exactly
+    like working.
+
+    Asserted as a pair. Only checking that the intruder sees nothing would pass
+    against a route that returns nothing at all, which is the version of this
+    test that catches no bug.
+    """
+    monkeypatch.setitem(model_client.PROVIDERS, "fake", ProposingModelClient)
+    owner, intruder = await issue("acme"), await issue("rival")
+    session_id = client.post("/chat/sessions", headers=auth(owner)).json()["session_id"]
+    client.post(f"/chat/sessions/{session_id}/turns", headers=auth(owner), json={"text": "hi"})
+
+    assert client.get("/chat/proposals", headers=auth(owner)).json() != []
+    assert client.get("/chat/proposals", headers=auth(intruder)).json() == []
 
 
 async def test_a_listing_shows_only_the_callers_own_sessions(client, issue):

@@ -24,7 +24,7 @@ from bacteria.app.evaluation import checks as checks_module
 from bacteria.app.evaluation.checks import CHECKS, Policy, evaluate
 from bacteria.app.evaluation.fixtures import FIXTURE_MODEL, FIXTURE_TOOL, seed
 from bacteria.app.evaluation.runs import RecordedRun, load_runs
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 POLICY = Policy(
     expected_models=frozenset({FIXTURE_MODEL}),

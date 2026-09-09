@@ -95,7 +95,7 @@ async def test_the_graph_comes_back_with_its_nodes_and_claims(client, issue, eng
     token = await issue("acme")
     await _seed(engine, "acme")
 
-    body = client.get("/graph", headers=auth(token)).json()
+    body = client.get("/ontologies/personal", headers=auth(token)).json()
 
     assert {n["label"] for n in body["nodes"]} == {"Acme", "diane"}
     assert [a["rel"] for a in body["assertions"]] == ["cto"]
@@ -136,7 +136,7 @@ async def test_a_claim_says_whether_its_relation_was_ever_ratified(client, issue
         )
         await session.commit()
 
-    body = client.get("/graph", headers=auth(token)).json()
+    body = client.get("/ontologies/personal", headers=auth(token)).json()
     canonical = {a["rel"]: a["canonical"] for a in body["assertions"]}
 
     assert canonical == {"cto": True, "interlocutor": False}
@@ -155,7 +155,7 @@ async def test_a_bound_says_which_of_its_three_states_it_is_in(client, issue, en
     await _seed(engine, "acme", holder="bob", end=None)
     await _seed(engine, "acme", holder="carol", end=FEBRUARY)
 
-    body = client.get("/graph", headers=auth(token)).json()
+    body = client.get("/ontologies/personal", headers=auth(token)).json()
 
     assert {a["ends"] for a in body["assertions"]} == {
         "open",
@@ -175,7 +175,7 @@ async def test_a_contradiction_is_reported_with_the_rule_that_found_it(client, i
     await _seed(engine, "acme", holder="diane")
     await _seed(engine, "acme", holder="bob")
 
-    body = client.get("/graph", headers=auth(token)).json()
+    body = client.get("/ontologies/personal", headers=auth(token)).json()
 
     assert [c["state"] for c in body["conflicts"]] == ["conflict"]
     assert body["conflicts"][0]["sentence"] == "An organization has one CTO at a time."
@@ -191,11 +191,11 @@ async def test_one_principal_never_sees_anothers_graph(client, issue, engine):
     owner, intruder = await issue("acme"), await issue("rival")
     await _seed(engine, "acme")
 
-    theirs = client.get("/graph", headers=auth(intruder)).json()
+    theirs = client.get("/ontologies/personal", headers=auth(intruder)).json()
 
     assert theirs["nodes"] == []
     assert theirs["assertions"] == []
-    assert client.get("/graph", headers=auth(owner)).json()["assertions"] != []
+    assert client.get("/ontologies/personal", headers=auth(owner)).json()["assertions"] != []
 
 
 async def test_the_graph_needs_a_credential(client):
@@ -204,7 +204,7 @@ async def test_the_graph_needs_a_credential(client):
     An empty body would be indistinguishable from a new user's real graph, so a
     broken dependency would look like a working route.
     """
-    assert client.get("/graph").status_code == 401
+    assert client.get("/ontologies/personal").status_code == 401
 
 
 async def test_conclusions_come_back_with_their_evidence(client, issue, engine):
@@ -226,7 +226,7 @@ async def test_conclusions_come_back_with_their_evidence(client, issue, engine):
         )
         await session.commit()
 
-    body = client.get("/graph/conclusions", headers=auth(token)).json()
+    body = client.get("/ontologies/personal/conclusions", headers=auth(token)).json()
 
     assert [c["statement"] for c in body] == ["Diane is the decision-maker"]
     assert body[0]["evidence"] == ["a-acme-diane"]
@@ -237,7 +237,7 @@ async def test_one_principal_never_sees_anothers_conclusions(client, issue, engi
     _, intruder = await issue("acme"), await issue("rival")
     await _seed(engine, "acme")
 
-    assert client.get("/graph/conclusions", headers=auth(intruder)).json() == []
+    assert client.get("/ontologies/personal/conclusions", headers=auth(intruder)).json() == []
 
 
 async def test_retracting_a_claim_ends_the_conflict_it_was_in(client, issue, engine):
@@ -249,14 +249,16 @@ async def test_retracting_a_claim_ends_the_conflict_it_was_in(client, issue, eng
     token = await issue("retracts")
     await _seed(engine, "retracts", holder="diane")
     await _seed(engine, "retracts", holder="marta")
-    before = client.get("/graph", headers=auth(token)).json()
+    before = client.get("/ontologies/personal", headers=auth(token)).json()
     assert [c["state"] for c in before["conflicts"]] == ["conflict"]
 
-    response = client.post("/graph/assertions/a-retracts-marta/retract", headers=auth(token))
+    response = client.post(
+        "/ontologies/personal/assertions/a-retracts-marta/retract", headers=auth(token)
+    )
 
     assert response.status_code == 200
     assert response.json()["conflicts"] == []
-    after = client.get("/graph", headers=auth(token)).json()
+    after = client.get("/ontologies/personal", headers=auth(token)).json()
     assert [a["dst"] for a in after["assertions"]] == [
         a["dst"] for a in before["assertions"] if a["assertion_id"] == "a-retracts-diane"
     ]
@@ -271,7 +273,9 @@ async def test_another_persons_claim_cannot_be_retracted(client, issue, engine):
     await _seed(engine, "owner", holder="diane")
     intruder = await issue("intruder")
 
-    response = client.post("/graph/assertions/a-owner-diane/retract", headers=auth(intruder))
+    response = client.post(
+        "/ontologies/personal/assertions/a-owner-diane/retract", headers=auth(intruder)
+    )
 
     assert response.status_code == 404
 
@@ -287,7 +291,7 @@ async def test_renaming_the_owner_node(client, issue, engine):
         await session.commit()
 
     response = client.post(
-        f"/graph/nodes/{me.node_id}/rename",
+        f"/ontologies/personal/nodes/{me.node_id}/rename",
         headers=auth(token),
         json={"label": "Guillermo"},
     )
@@ -311,7 +315,9 @@ async def test_a_rename_onto_a_taken_name_says_to_link_instead(client, issue, en
         await session.commit()
 
     response = client.post(
-        f"/graph/nodes/{me.node_id}/rename", headers=auth(token), json={"label": "diane"}
+        f"/ontologies/personal/nodes/{me.node_id}/rename",
+        headers=auth(token),
+        json={"label": "diane"},
     )
 
     assert response.status_code == 409
@@ -329,13 +335,14 @@ async def test_linking_two_nodes_leaves_both_and_adds_a_claim(client, issue, eng
         await session.commit()
 
     response = client.post(
-        "/graph/links",
+        "/ontologies/personal/links",
         headers=auth(token),
         json={"left": me.node_id, "right": other.node_id},
     )
 
     assert response.status_code == 201
-    graph = client.get("/graph", headers=auth(token)).json()
+
+    graph = client.get("/ontologies/personal", headers=auth(token)).json()
     assert len([n for n in graph["nodes"] if n["kind"] == "person"]) == 2
     assert "same_as" in [a["rel"] for a in graph["assertions"]]
 
@@ -349,11 +356,11 @@ async def test_confirming_does_not_double_a_claim_on_the_page(client, issue, eng
     """
     token = await issue("doubles")
     await _seed(engine, "doubles", holder="diane")
-    before = client.get("/graph", headers=auth(token)).json()["assertions"]
+    before = client.get("/ontologies/personal", headers=auth(token)).json()["assertions"]
 
-    client.post("/graph/assertions/a-doubles-diane/confirm", headers=auth(token))
+    client.post("/ontologies/personal/assertions/a-doubles-diane/confirm", headers=auth(token))
 
-    after = client.get("/graph", headers=auth(token)).json()["assertions"]
+    after = client.get("/ontologies/personal", headers=auth(token)).json()["assertions"]
     assert len(after) == len(before)
     assert [a["origin"] for a in after] == ["stated"], "and the endorsement is the one shown"
 
@@ -368,9 +375,9 @@ async def test_a_confirmed_claim_does_not_contradict_itself(client, issue, engin
     token = await issue("agrees")
     await _seed(engine, "agrees", holder="diane")
 
-    client.post("/graph/assertions/a-agrees-diane/confirm", headers=auth(token))
+    client.post("/ontologies/personal/assertions/a-agrees-diane/confirm", headers=auth(token))
 
-    assert client.get("/graph", headers=auth(token)).json()["conflicts"] == []
+    assert client.get("/ontologies/personal", headers=auth(token)).json()["conflicts"] == []
 
 
 async def test_retracting_a_confirmed_claim_removes_it_entirely(client, issue, engine):
@@ -381,9 +388,74 @@ async def test_retracting_a_confirmed_claim_removes_it_entirely(client, issue, e
     """
     token = await issue("undoes")
     await _seed(engine, "undoes", holder="diane")
-    client.post("/graph/assertions/a-undoes-diane/confirm", headers=auth(token))
-    shown = client.get("/graph", headers=auth(token)).json()["assertions"][0]
+    client.post("/ontologies/personal/assertions/a-undoes-diane/confirm", headers=auth(token))
+    shown = client.get("/ontologies/personal", headers=auth(token)).json()["assertions"][0]
 
-    client.post(f"/graph/assertions/{shown['assertion_id']}/retract", headers=auth(token))
+    client.post(
+        f"/ontologies/personal/assertions/{shown['assertion_id']}/retract", headers=auth(token)
+    )
 
-    assert client.get("/graph", headers=auth(token)).json()["assertions"] == []
+    assert client.get("/ontologies/personal", headers=auth(token)).json()["assertions"] == []
+
+
+async def test_an_unknown_ontology_is_not_distinguishable_from_somebody_elses(client, issue):
+    """404, and the same 404 a real id belonging to another principal would get.
+
+    The ontology is a path segment now, so it is guessable in a way the old
+    prefixes were not. Answering 422 for a malformed one and 404 for a real one
+    would turn the id into an oracle: try `architecture:<uuid>` until the status
+    changes and you have enumerated somebody's checkouts.
+    """
+    token = await issue("acme")
+
+    assert client.get("/ontologies/business", headers=auth(token)).status_code == 404
+    assert (
+        client.get(
+            "/ontologies/architecture:00000000000000000000000000000000", headers=auth(token)
+        ).status_code
+        == 404
+    )
+
+
+async def test_the_personal_ontology_reads_the_null_partition(client, issue, engine):
+    """`personal` in a URL is `NULL` in the column, and this is the only translation.
+
+    The column keeps `NULL` because rewriting it would be the backfilling its
+    own docstring rejects, and a path segment cannot be null -- so the two
+    spellings meet in `registry.partition` and nowhere else. If that mapping
+    broke, this route would narrow on the literal string `personal`, match no
+    rows, and answer an empty graph that looks exactly like a new account.
+    """
+    token = await issue("acme")
+    await _seed(engine, "acme")
+
+    graph = client.get("/ontologies/personal", headers=auth(token)).json()
+
+    assert graph["nodes"] != []
+    assert graph["assertions"] != []
+
+
+async def test_another_principals_ontology_is_a_404_not_an_empty_graph(client, issue, engine):
+    """Ownership is checked on the ontology, not merely on the rows it returns.
+
+    Parameterising the routes by ontology dropped this at first: any well-formed
+    `architecture:<uuid>` resolved on its prefix and read an empty partition, so
+    a stranger's project answered 200 with nothing in it instead of 404. Nothing
+    leaked -- the partition really was empty -- but the rule had stopped being
+    enforced, and an unenforced rule is one that fails silently the first time
+    the partition is not empty.
+
+    Asserted against a project that genuinely exists and genuinely is not the
+    caller's. A test using a made-up id would pass against a route that checks
+    nothing at all.
+    """
+    owner, intruder = await issue("acme"), await issue("rival")
+    created = client.post(
+        "/architecture/projects",
+        headers=auth(owner),
+        json={"name": "theirs", "location": "."},
+    ).json()
+    ontology = f"architecture:{created['project_id']}"
+
+    assert client.get(f"/ontologies/{ontology}", headers=auth(owner)).status_code == 200
+    assert client.get(f"/ontologies/{ontology}", headers=auth(intruder)).status_code == 404

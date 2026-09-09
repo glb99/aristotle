@@ -201,14 +201,16 @@ code {
   min-height: 0;
 }
 
-.tab-panel {
+.view {
   height: 100%;
   min-height: 0;
 }
 
-#tab-chat {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+#ask-personal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .conversation {
@@ -432,9 +434,192 @@ code {
   font-size: 12px;
 }
 
+/* ---------- two rows, two axes ----------
+   Dialogue 17: which ontology, then which view of it. Drawn as two rows
+   because they are two questions, and the row this replaced answered both at
+   once by putting views and a domain on one line. */
+
+.domains {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 0 0.6rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+
+.domains button[data-domain] {
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.domains button[data-domain].on { color: var(--text); border-bottom-color: var(--accent); }
+.domains button[data-domain]:hover { color: var(--text); }
+.domains .sub { display: block; font-size: 10px; color: var(--muted); margin-top: 1px; }
+.domains-spacer { flex: 1; }
+
+.views {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.7rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+
+.views button[data-view] {
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.11em;
+  cursor: pointer;
+}
+
+.views button[data-view].on { color: var(--accent); border-bottom-color: var(--accent); }
+.views button[data-view]:hover { color: var(--text); }
+.views-spacer { flex: 1; }
+.views .context { font-size: 11px; color: var(--muted); }
+
+/* A queue that drains, so the number is worth returning for. RULES has no badge
+   on purpose: `core -> personal` has been crossed since dialogue 14 left it
+   standing, so that one would be lit on day one and every day after -- and a
+   badge always lit stops being read. */
+.views .count {
+  margin-left: 0.4rem;
+  padding: 0 0.4rem;
+  border-radius: 9px;
+  background: var(--raised);
+  color: var(--text);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.pane { height: 100%; min-height: 0; }
+
+/* ---------- review ----------
+   Three states, three treatments. The drawing rule `architecture.ts` already
+   applies to glyphs, applied where the reader is about to act: a live claim,
+   an inert suggestion and an unstored proposal are three different acts and
+   must not be one row style. */
+
+#v-review { overflow-y: auto; padding: 1rem 1.1rem 2rem; }
+
+.rate {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+}
+
+.rate.alarming { border-left-color: var(--danger); }
+.rate.quiet { color: var(--muted); }
+.rate .big { font-size: 14px; color: var(--text); }
+.rate .fig { font-size: 12px; color: var(--muted); }
+.rate .why {
+  flex-basis: 100%;
+  margin: 0.2rem 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.band { margin-bottom: 1.3rem; }
+.band > header { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.45rem; }
+.band .tag {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 1px 0.5rem;
+  border-radius: 2px;
+  border: 1px solid currentColor;
+}
+.band .lede { font-size: 11.5px; color: var(--muted); }
+
+.t-live { color: var(--accent); }
+.t-waiting { color: oklch(0.85 0.15 85); }
+.t-proposed { color: var(--user); }
+
+.band .row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+}
+
+.band .row.live { border-left: 2px solid var(--accent); }
+.band .row.waiting { border-left: 2px solid oklch(0.85 0.15 85); }
+.band .row.proposed { border-left: 2px solid var(--user); border-style: dashed; border-left-style: solid; }
+.band .row .claim { color: var(--text); }
+.band .row .meta { margin-top: 0.2rem; font-size: 11px; color: var(--muted); }
+
+.band .acts { display: flex; gap: 0.35rem; }
+.band .acts button {
+  font-size: 11px;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.band .acts button:hover { border-color: var(--accent); color: var(--accent); }
+.band .acts button.danger:hover { border-color: var(--danger); color: var(--danger); }
+.band .acts button:disabled { opacity: 0.4; cursor: default; }
+
+.band .empty {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* `.arch` carries this surface's palette *and* a grid whose first row was the
+   44px deck. The deck is now the shell's two nav rows, so a pane keeping the
+   grid drops its content into a 44px track — which rendered as an empty scene
+   with a legend on top of it. The tokens are what these panes want; the grid is
+   not. */
+.pane.arch {
+  display: block;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#model-architecture .arch-scene { height: 100%; }
+#ask-architecture .arch-ask { height: 100%; }
+
+.rules { overflow-y: auto; padding: 1rem 1.1rem 2rem; }
+.arch-cards.wide { max-width: 62rem; }
+.arch-ask.wide { border-right: 0; max-width: 54rem; }
+
 /* ---------- graph ---------- */
 
-#tab-graph {
+#model-personal {
   display: flex;
   flex-direction: column;
   overflow-y: auto;

@@ -51,9 +51,8 @@ from bacteria.agent.session.store import (
     TranscriptItemKind,
     UnknownSessionError,
 )
-from bacteria.app.core.settings import get_settings
-from bacteria.app.personal.memory import MemoryStore, TableMemoryStore
-from bacteria.app.personal.models import (
+from bacteria.app.sessions.memory import MemoryStore, TableMemoryStore
+from bacteria.app.sessions.models import (
     ChatMemoryEntry,
     ChatMemoryExtraction,
     ChatMemoryProposal,
@@ -146,21 +145,20 @@ def _as_utc(value: datetime) -> datetime:
     return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
 
-def _configured_store(session: AsyncSession) -> MemoryStore:
-    """The store this deployment chose, defaulting to the tables that work.
+def _default_store(session: AsyncSession) -> MemoryStore:
+    """The backing this package can supply on its own: the tables it owns.
 
-    Read here rather than at every call site, so that "which memory is in use" is
-    one answer for the process rather than a thing each caller could get
-    differently -- which is the property that makes a discrepancy between the two
-    attributable to the stores rather than to the caller.
+    **It does not choose.** Choosing is composition, which is what
+    [ADR 0010](../../../../../../docs/adr/0010-memory-has-a-port.md) made the
+    port for, and the alternative implementation is a *domain's* -- the
+    graph-backed store reads the personal vocabulary. A default that reached for
+    it would put this package's only import of a domain in the one line that
+    decides which domain is in use, and `sessions -> personal` at zero edges is
+    the acceptance test for this package existing at all.
+
+    So the deployment's choice is made where the alternatives are known --
+    :func:`bacteria.app.personal.backing.configured_store` -- and handed in.
     """
-    if get_settings().graph_backed_memory:
-        # Imported here rather than at module scope: the graph store imports the
-        # graph package, which imports this one for its own models, and a
-        # top-level import would close the cycle.
-        from bacteria.app.personal.graph_memory import GraphMemoryStore
-
-        return GraphMemoryStore(session)
     return TableMemoryStore(session)
 
 
@@ -188,7 +186,7 @@ class SqlSessionRepository:
         # graph's memory passes one; ADR 0010 puts that choice in configuration
         # rather than per request, because a store chosen per call makes "which
         # memory answered" unanswerable exactly when the two disagree.
-        self._memory: MemoryStore = memory or _configured_store(session)
+        self._memory: MemoryStore = memory or _default_store(session)
 
     @property
     def session(self) -> AsyncSession:

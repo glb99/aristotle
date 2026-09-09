@@ -61,6 +61,17 @@ let projection: "flat" | "layered" = "flat";
 let running: Scene3d | null = null;
 
 let model: ArchitectureModel | null = null;
+
+/**
+ * Which project is open, remembered across refreshes.
+ *
+ * `selector.value` cannot answer this: `refresh` rebuilds the options first, so
+ * reading it afterwards always finds the empty string and falls back to the
+ * first project. That was invisible while `refresh` ran only when the tab was
+ * clicked, and became a selection resetting on every keystroke of navigation the
+ * moment the shell began calling it per view.
+ */
+let chosen: string | null = null;
 let scope: string | null = null;
 
 // ---------------------------------------------------------------- packages
@@ -725,6 +736,15 @@ async function load(projectId: string): Promise<void> {
   render();
 }
 
+/**
+ * The model this surface is currently showing, or null before one is loaded.
+ *
+ * Exposed so `review.ts` can list proposals without asking for the model again:
+ * `model_of` re-parses the tree on every request, so a second read to draw a
+ * list would walk a filesystem to render text this module already holds.
+ */
+export const currentModel = (): ArchitectureModel | null => model;
+
 export async function refresh(): Promise<void> {
   const projects: Project[] = await listProjects();
   selector.replaceChildren(
@@ -747,9 +767,13 @@ export async function refresh(): Promise<void> {
     return;
   }
 
-  const chosen = selector.value || projects[0]!.project_id;
-  selector.value = chosen;
-  await load(chosen);
+  const wanted =
+    chosen && projects.some((project) => project.project_id === chosen)
+      ? chosen
+      : projects[0]!.project_id;
+  chosen = wanted;
+  selector.value = wanted;
+  await load(wanted);
 }
 
 projectionToggle.addEventListener("click", (event) => {
@@ -763,6 +787,7 @@ projectionToggle.addEventListener("click", (event) => {
 });
 
 selector.addEventListener("change", () => {
+  chosen = selector.value;
   void load(selector.value);
 });
 

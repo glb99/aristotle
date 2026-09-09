@@ -14,7 +14,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from bacteria.agent.session.store import USER_SCOPE
 from bacteria.app.personal.catalogue import VOCABULARY
 from bacteria.app.personal.graph_memory import GraphMemoryStore, UnknownPreferenceError
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 USER = "graph-memory"
 

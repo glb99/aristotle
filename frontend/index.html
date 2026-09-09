@@ -3,21 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>bacteria console</title>
+    <title>aristotle console</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
     <header class="bar">
-      <span class="brand">bacteria</span>
+      <span class="brand">aristotle</span>
       <span class="path">://console</span>
       <span class="version">v0</span>
-
-      <div id="tabs" class="tabs">
-        <button type="button" data-tab="chat" class="on">chat</button>
-        <button type="button" data-tab="graph">graph</button>
-        <button type="button" data-tab="architecture">architecture</button>
-      </div>
-
       <span class="spacer"></span>
       <span id="watermark" class="status"></span>
       <span id="who" class="who" hidden></span>
@@ -30,7 +23,7 @@
     <section id="sign-in" hidden>
       <h1>sign in</h1>
       <p class="note">
-        Paste a key from <code>bacteria-admin issue-key</code>. It is sent once and exchanged
+        Paste a key from <code>aristotle-admin issue-key</code>. It is sent once and exchanged
         for a session cookie this page cannot read.
       </p>
       <form id="sign-in-form">
@@ -40,100 +33,51 @@
       <p id="sign-in-error" class="error" hidden></p>
     </section>
 
+    <!-- Two axes, drawn as two rows. Dialogue 17: which ontology, then which
+         view of it, and the same four views for every domain. The row this
+         replaces mixed them — `chat` and `graph` were views of one domain
+         sitting beside `architecture`, which is a domain. -->
+    <nav id="domains" class="domains" hidden>
+      <button type="button" data-domain="personal" class="on">
+        personal<span class="sub">your own graph</span>
+      </button>
+      <button type="button" data-domain="architecture">
+        architecture<span class="sub" id="domain-arch-sub">a codebase</span>
+      </button>
+      <span class="domains-spacer"></span>
+      <select id="arch-project" class="arch-select" aria-label="project" hidden></select>
+      <button id="arch-add" type="button" class="ghost" hidden>+ add a checkout</button>
+    </nav>
+
+    <nav id="views" class="views" hidden>
+      <button type="button" data-view="model" class="on">MODEL</button>
+      <button type="button" data-view="review">REVIEW<span id="review-count" class="count">0</span></button>
+      <button type="button" data-view="ask">ASK</button>
+      <button type="button" data-view="rules">RULES</button>
+      <span class="views-spacer"></span>
+      <span id="arch-reading" class="arch-pill" hidden>not checked</span>
+      <button id="arch-run-tests" type="button" class="ghost" hidden>run tests · WORLD</button>
+      <span id="arch-counts" class="context"></span>
+    </nav>
+
     <main id="workspace" hidden>
-      <p id="tab-error" class="tab-error" hidden></p>
+      <p id="view-error" class="tab-error" hidden></p>
 
-      <section id="tab-chat" class="tab-panel">
-        <div class="conversation">
-          <div class="picker">
-            <label for="session-picker">session</label>
-            <select id="session-picker"></select>
-            <button id="new-session" type="button" class="ghost">new</button>
-          </div>
-
-          <div id="transcript" class="transcript"></div>
-
-          <p id="pending" class="pending" hidden></p>
-
-          <form id="composer" class="composer" hidden>
-            <textarea
-              id="message"
-              rows="2"
-              placeholder="message — enter sends, shift+enter breaks the line"
-              required
-            ></textarea>
-            <button id="send" type="submit">send</button>
-          </form>
-        </div>
-
-        <aside class="rail">
-          <h2>review queue <span id="queue-count" class="count">0</span></h2>
-          <p class="note">Nothing reaches a prompt until it is accepted.</p>
-          <ul id="queue"></ul>
-        </aside>
-      </section>
-
-      <section id="tab-graph" class="tab-panel" hidden>
-        <p class="preamble">
-          What the agent has worked out from your conversations.
-          <strong>None of this is sent to the model</strong> — it is what the
-          system believes about your world, not what it says. Facts it may
-          repeat back live under <em>chat</em>, and a person has approved each
-          one.
-        </p>
-
-        <div class="graph-controls">
-          <span class="label">layout</span>
-          <div id="graph-layout" class="segmented">
-            <button type="button" data-layout="subject" class="on">by thing</button>
-            <button type="button" data-layout="relation">by relation</button>
-          </div>
-          <div id="graph-legend" class="legend"></div>
-        </div>
-
-        <div id="graph" class="graph"></div>
-        <details class="diagnostic">
-          <summary>Diagnostics</summary>
-          <dl id="graph-verdict" class="verdict"></dl>
-        </details>
-      </section>
-
-      <!-- The reworked surface: a conversation column and a scene it scopes.
-           Its own visual language, scoped to this panel, because the memory
-           tabs have not been reworked yet and two half-applied palettes read
-           worse than two whole ones. -->
-      <section id="tab-architecture" class="tab-panel arch" hidden>
-        <div class="arch-deck">
-          <span class="arch-brand">bacteria</span>
-          <span class="arch-rule"></span>
-          <div class="arch-domains">
-            <span class="arch-pill on">ARCHITECTURE</span>
-            <span class="arch-pill off" title="not built">BUSINESS</span>
-            <span class="arch-pill off" title="not built">RESEARCH</span>
-          </div>
-          <select id="arch-project" class="arch-select" aria-label="project"></select>
-          <button id="arch-add" type="button" class="arch-act">add a checkout</button>
-          <button id="arch-run-tests" type="button" class="arch-act world">run tests · WORLD</button>
-          <span id="arch-reading" class="arch-pill">not checked</span>
-          <span class="arch-spacer"></span>
-          <span id="arch-counts" class="arch-data"></span>
-          <div id="arch-tallies" class="arch-domains"></div>
-        </div>
-
-        <div class="arch-body">
-          <aside class="arch-ask">
-            <div class="arch-ask-head">
-              <span class="arch-k">ASK</span>
-              <span id="arch-ask-note" class="arch-data arch-ghost">every answer moves the scene</span>
+      <!-- ============================ MODEL ============================ -->
+      <section id="v-model" class="view">
+        <div id="model-personal" class="pane">
+          <div class="graph-controls">
+            <span class="label">layout</span>
+            <div id="graph-layout" class="segmented">
+              <button type="button" data-layout="subject" class="on">by thing</button>
+              <button type="button" data-layout="relation">by relation</button>
             </div>
-            <div id="arch-thread" class="arch-thread"></div>
-            <form id="arch-form" class="arch-composer">
-              <input id="arch-input" autocomplete="off" spellcheck="false"
-                     placeholder="name a module or package to scope the scene…" />
-              <button type="submit" class="arch-act">→</button>
-            </form>
-          </aside>
+            <div id="graph-legend" class="legend"></div>
+          </div>
+          <div id="graph" class="graph"></div>
+        </div>
 
+        <div id="model-architecture" class="pane arch" hidden>
           <div class="arch-scene">
             <div id="arch-svg" class="arch-svg"></div>
             <div id="arch-projection" class="segmented arch-seg">
@@ -151,19 +95,83 @@
               <span><i class="swatch glyph-none"></i>nobody has said</span>
             </div>
           </div>
+        </div>
+      </section>
 
-          <aside class="arch-reading">
-            <div class="arch-ask-head"><span class="arch-k">BOUNDARIES</span></div>
-            <div id="arch-boundaries" class="arch-cards"></div>
-            <div class="arch-ask-head arch-split">
-              <span class="arch-k">PROPOSED</span>
-              <span id="arch-verdicts" class="arch-data arch-ghost"></span>
+      <!-- ============================ REVIEW =========================== -->
+      <!-- The one surface this restructure adds rather than moves. Dialogue 17
+           Q1: three storage states, three acts, drawn distinctly — and Q5: the
+           rate is reported, because a criterion nothing measures is not one. -->
+      <section id="v-review" class="view" hidden>
+        <div id="review-rate" class="rate"></div>
+        <div id="review-bands" class="bands"></div>
+      </section>
+
+      <!-- ============================= ASK ============================= -->
+      <section id="v-ask" class="view" hidden>
+        <div id="ask-personal" class="pane conversation">
+          <div class="picker">
+            <label for="session-picker">session</label>
+            <select id="session-picker"></select>
+            <button id="new-session" type="button" class="ghost">new</button>
+          </div>
+          <div id="transcript" class="transcript"></div>
+          <p id="pending" class="pending" hidden></p>
+          <form id="composer" class="composer" hidden>
+            <textarea
+              id="message"
+              rows="2"
+              placeholder="message — enter sends, shift+enter breaks the line"
+              required
+            ></textarea>
+            <button id="send" type="submit">send</button>
+          </form>
+        </div>
+
+        <div id="ask-architecture" class="pane arch" hidden>
+          <aside class="arch-ask wide">
+            <div class="arch-ask-head">
+              <span class="arch-k">ASK</span>
+              <span id="arch-ask-note" class="arch-data arch-ghost">every answer moves the scene</span>
             </div>
-            <div id="arch-proposals" class="arch-cards"></div>
+            <div id="arch-thread" class="arch-thread"></div>
+            <form id="arch-form" class="arch-composer">
+              <input id="arch-input" autocomplete="off" spellcheck="false"
+                     placeholder="name a module or package to scope the scene…" />
+              <button type="submit" class="arch-act">→</button>
+            </form>
           </aside>
         </div>
       </section>
+
+      <!-- ============================ RULES ============================ -->
+      <section id="v-rules" class="view" hidden>
+        <div id="rules-personal" class="pane rules">
+          <p class="preamble">
+            What cannot be true at once. A violation is <strong>flagged, never
+            rejected</strong> — both claims stand with their provenance, and the
+            contradiction becomes something you can see and settle.
+          </p>
+          <ul id="graph-conflicts" class="cards"></ul>
+          <details class="diagnostic">
+            <summary>Diagnostics</summary>
+            <dl id="graph-verdict" class="verdict"></dl>
+          </details>
+        </div>
+
+        <div id="rules-architecture" class="pane arch rules" hidden>
+          <div class="arch-ask-head"><span class="arch-k">BOUNDARIES</span></div>
+          <div id="arch-boundaries" class="arch-cards wide"></div>
+          <div id="arch-tallies" class="arch-domains"></div>
+        </div>
+      </section>
     </main>
+
+    <!-- Kept out of the view panels: architecture's proposals are rows in
+         REVIEW now, and `architecture.ts` still writes them here. The list is
+         read by `review.ts` rather than shown. -->
+    <div id="arch-proposals" hidden></div>
+    <span id="arch-verdicts" hidden></span>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

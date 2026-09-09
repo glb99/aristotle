@@ -244,6 +244,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/chat/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read All Proposals
+         * @description Everything awaiting a decision, in every conversation this caller owns.
+         *
+         *     **The route that makes a review surface possible.** Until now proposals were
+         *     listed one session at a time, so answering *what is waiting anywhere*
+         *     required already knowing every session id -- recorded as a gap in
+         *     `docs/status.md` and, per dialogue 17, the reason a queue can accumulate
+         *     unseen while the console reports a count for whichever conversation happens
+         *     to be open.
+         *
+         *     **No session id, so ownership is a filter rather than a check** -- the same
+         *     shape as ``list_sessions`` above, and the same reason: this route has no id
+         *     to compare, so a bug here is a missing ``WHERE`` and not a missing
+         *     comparison, and a missing ``WHERE`` returns other people's suggestions. The
+         *     filter lives in ``list_sessions``, which ``waiting_for`` walks; nothing here
+         *     takes a user id from the caller.
+         */
+        get: operations["read_all_proposals_chat_proposals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/chat/sessions": {
         parameters: {
             query?: never;
@@ -522,186 +556,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/graph": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Read Graph
-         * @description The caller's own graph as it currently stands.
-         *
-         *     "Currently" means believed now — ``recorded_until IS NULL`` — not everything
-         *     ever claimed. The log keeps superseded claims so a past belief stays
-         *     recoverable; a reader looking at their memory wants what it holds, and the
-         *     history is a different question with a different route when someone needs it.
-         *
-         *     Conflicts are computed on read rather than stored. They are a function of
-         *     what is believed and which rules exist, so a stored copy would be a cache
-         *     that goes stale the moment either changes — and the thing it would be
-         *     caching is a comparison over a set small enough to walk.
-         */
-        get: operations["read_graph_graph_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/graph/assertions/{assertion_id}/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Confirm Assertion
-         * @description Endorse a claim the extractor proposed, so a prompt may be told it.
-         *
-         *     The only act on this graph that *keeps* something. Everything else takes
-         *     away, which is why its absence was invisible: the graph worked, quietly,
-         *     without ever mattering.
-         *
-         *     Appends rather than editing. The proposal stays and the two rows differ in
-         *     ``origin``, so the log records the endorsement as its own event — and
-         *     confirming twice writes nothing, because saying yes twice is one yes.
-         */
-        post: operations["confirm_assertion_graph_assertions__assertion_id__confirm_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/graph/assertions/{assertion_id}/retract": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Retract Assertion
-         * @description Stop believing a claim.
-         *
-         *     A `POST` to a verb rather than a `DELETE` of the resource, because nothing is
-         *     deleted: the row stays, its belief interval closes, and `state_at` still
-         *     reconstructs what was believed before. `DELETE` would name the wrong act, and
-         *     a route's shape is the first thing anyone reads about what it does.
-         */
-        post: operations["retract_assertion_graph_assertions__assertion_id__retract_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/graph/conclusions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Read Conclusions
-         * @description Beliefs the system drew, including the ones that have gone stale.
-         *
-         *     Stale ones are returned rather than filtered, because "this rested on
-         *     something that has since changed" is the most useful thing this layer can
-         *     tell a person, and hiding it would leave them looking at a shorter list with
-         *     no indication anything had been withdrawn.
-         */
-        get: operations["read_conclusions_graph_conclusions_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/graph/conclusions/{conclusion_id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Reject Conclusion
-         * @description Withdraw an inferred belief the owner disagrees with.
-         *
-         *     The conflict it was explaining returns to *possible*, which is the honest
-         *     state it held before anyone assumed anything — and it will not be explained
-         *     the same way again.
-         */
-        post: operations["reject_conclusion_graph_conclusions__conclusion_id__reject_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/graph/links": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Link Nodes
-         * @description Say two nodes are the same thing.
-         *
-         *     201, because this creates an assertion — the link is a claim like any other
-         *     and can be retracted through the route above, which is the whole argument for
-         *     linking rather than merging.
-         */
-        post: operations["link_nodes_graph_links_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/graph/nodes/{node_id}/rename": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Rename Node
-         * @description Correct what a node is called.
-         *
-         *     409 when the name is taken, and the message is the point: two nodes that
-         *     should share a name are two nodes to link, so the refusal is an invitation
-         *     rather than a wall.
-         */
-        post: operations["rename_node_graph_nodes__node_id__rename_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/health": {
         parameters: {
             query?: never;
@@ -798,6 +652,216 @@ export interface paths {
          *         depends on the result.
          */
         post: operations["defer_batch_ingestion_batches_defer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Ontologies
+         * @description Every model this caller can open, personal first.
+         *
+         *     **The route a domain switcher needs and nothing could answer.** Which
+         *     ontologies exist was implicit in which packages happened to have a
+         *     catalogue, and the console hardcoded two tabs against that.
+         *
+         *     Personal is always present because it exists when the principal does --
+         *     which is [ADR 0013](../../../../../../docs/adr/0013-the-console-is-domain-by-view-and-the-api-is-ontologies.md)
+         *     §6's reason creation stays domain-specific: there is nothing to create.
+         *     Architecture's are one per checkout, and reading them is a query against
+         *     that domain's own table, so it is asked rather than assumed.
+         */
+        get: operations["list_ontologies_ontologies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Graph
+         * @description The caller's own graph as it currently stands.
+         *
+         *     "Currently" means believed now — ``recorded_until IS NULL`` — not everything
+         *     ever claimed. The log keeps superseded claims so a past belief stays
+         *     recoverable; a reader looking at their memory wants what it holds, and the
+         *     history is a different question with a different route when someone needs it.
+         *
+         *     Conflicts are computed on read rather than stored. They are a function of
+         *     what is believed and which rules exist, so a stored copy would be a cache
+         *     that goes stale the moment either changes — and the thing it would be
+         *     caching is a comparison over a set small enough to walk.
+         */
+        get: operations["read_graph_ontologies__ontology__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}/assertions/{assertion_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm Assertion
+         * @description Endorse a claim the extractor proposed, so a prompt may be told it.
+         *
+         *     The only act on this graph that *keeps* something. Everything else takes
+         *     away, which is why its absence was invisible: the graph worked, quietly,
+         *     without ever mattering.
+         *
+         *     Appends rather than editing. The proposal stays and the two rows differ in
+         *     ``origin``, so the log records the endorsement as its own event — and
+         *     confirming twice writes nothing, because saying yes twice is one yes.
+         */
+        post: operations["confirm_assertion_ontologies__ontology__assertions__assertion_id__confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}/assertions/{assertion_id}/retract": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Retract Assertion
+         * @description Stop believing a claim.
+         *
+         *     A `POST` to a verb rather than a `DELETE` of the resource, because nothing is
+         *     deleted: the row stays, its belief interval closes, and `state_at` still
+         *     reconstructs what was believed before. `DELETE` would name the wrong act, and
+         *     a route's shape is the first thing anyone reads about what it does.
+         */
+        post: operations["retract_assertion_ontologies__ontology__assertions__assertion_id__retract_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}/conclusions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read Conclusions
+         * @description Beliefs the system drew, including the ones that have gone stale.
+         *
+         *     Stale ones are returned rather than filtered, because "this rested on
+         *     something that has since changed" is the most useful thing this layer can
+         *     tell a person, and hiding it would leave them looking at a shorter list with
+         *     no indication anything had been withdrawn.
+         */
+        get: operations["read_conclusions_ontologies__ontology__conclusions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}/conclusions/{conclusion_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject Conclusion
+         * @description Withdraw an inferred belief the owner disagrees with.
+         *
+         *     The conflict it was explaining returns to *possible*, which is the honest
+         *     state it held before anyone assumed anything — and it will not be explained
+         *     the same way again.
+         */
+        post: operations["reject_conclusion_ontologies__ontology__conclusions__conclusion_id__reject_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Link Nodes
+         * @description Say two nodes are the same thing.
+         *
+         *     201, because this creates an assertion — the link is a claim like any other
+         *     and can be retracted through the route above, which is the whole argument for
+         *     linking rather than merging.
+         */
+        post: operations["link_nodes_ontologies__ontology__links_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ontologies/{ontology}/nodes/{node_id}/rename": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rename Node
+         * @description Correct what a node is called.
+         *
+         *     409 when the name is taken, and the message is the point: two nodes that
+         *     should share a name are two nodes to link, so the refusal is an invitation
+         *     rather than a wall.
+         */
+        post: operations["rename_node_ontologies__ontology__nodes__node_id__rename_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1192,6 +1256,18 @@ export interface components {
             node_id: string;
         };
         /**
+         * OntologyOut
+         * @description One model this caller has, and which domain governs it.
+         */
+        OntologyOut: {
+            /** Domain */
+            domain: string;
+            /** Label */
+            label: string;
+            /** Ontology */
+            ontology: string;
+        };
+        /**
          * Order
          * @description A statement that one layer sits above another.
          */
@@ -1479,6 +1555,37 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /**
+         * WaitingOut
+         * @description A suggestion, said across conversations rather than within one.
+         *
+         *     ``ProposalOut`` plus the session it came from. Inheriting rather than
+         *     repeating six fields keeps the two listings the same shape on the wire: a
+         *     client that renders one row renders both, which is the point of the review
+         *     surface being one place.
+         */
+        WaitingOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Held By
+             * @default []
+             */
+            held_by: components["schemas"]["HeldOut"][];
+            /** Key */
+            key: string;
+            /** Reason */
+            reason: string;
+            /** Session Id */
+            session_id: string;
+            /** Source */
+            source: string;
+            /** Value */
+            value: unknown;
         };
     };
     responses: never;
@@ -1819,6 +1926,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_all_proposals_chat_proposals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitingOut"][];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -2206,239 +2344,6 @@ export interface operations {
             };
         };
     };
-    read_graph_graph_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GraphOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    confirm_assertion_graph_assertions__assertion_id__confirm_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                assertion_id: string;
-            };
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OutcomeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    retract_assertion_graph_assertions__assertion_id__retract_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                assertion_id: string;
-            };
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OutcomeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    read_conclusions_graph_conclusions_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConclusionOut"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reject_conclusion_graph_conclusions__conclusion_id__reject_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                conclusion_id: string;
-            };
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OutcomeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    link_nodes_graph_links_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LinkIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OutcomeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    rename_node_graph_nodes__node_id__rename_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                node_id: string;
-            };
-            cookie?: {
-                bacteria_session?: string | null;
-            };
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RenameIn"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NodeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     health_health_get: {
         parameters: {
             query?: never;
@@ -2518,6 +2423,280 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BatchQueued"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_ontologies_ontologies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OntologyOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_graph_ontologies__ontology__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GraphOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_assertion_ontologies__ontology__assertions__assertion_id__confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+                assertion_id: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutcomeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retract_assertion_ontologies__ontology__assertions__assertion_id__retract_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+                assertion_id: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutcomeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    read_conclusions_ontologies__ontology__conclusions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConclusionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_conclusion_ontologies__ontology__conclusions__conclusion_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+                conclusion_id: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutcomeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    link_nodes_ontologies__ontology__links_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutcomeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_node_ontologies__ontology__nodes__node_id__rename_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ontology: string;
+                node_id: string;
+            };
+            cookie?: {
+                bacteria_session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NodeOut"];
                 };
             };
             /** @description Validation Error */

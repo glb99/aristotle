@@ -37,7 +37,7 @@ from bacteria.agent.session.store import (
     SessionState,
     UnknownSessionError,
 )
-from bacteria.app.personal.repository import SqlSessionRepository
+from bacteria.app.sessions.repository import SqlSessionRepository
 
 SCOPES: tuple[MemoryScope, ...] = (SESSION_SCOPE, USER_SCOPE)
 """The scopes a person may activate into, in the order they are offered.
@@ -210,6 +210,58 @@ async def pending(repository: SqlSessionRepository, session_id: str) -> Pending 
         return NoSuchSession(session_id)
 
     return pending_from(state)
+
+
+@dataclass(frozen=True)
+class Waiting:
+    """One suggestion, and which conversation produced it.
+
+    Carries ``session_id`` where :class:`PendingEntry` does not, because there
+    the answer was in the URL. A listing that spans conversations has to say
+    which one it is offering to change, or accepting is a decision taken blind.
+    """
+
+    session_id: str
+    entry: PendingEntry
+
+
+async def waiting_for(repository: SqlSessionRepository, user_id: str) -> tuple[Waiting, ...]:
+    """Everything awaiting a decision, across every session this principal owns.
+
+    **The question nothing could answer.** `docs/status.md` records it as a gap:
+    proposals are listed one conversation at a time, so *what is waiting
+    anywhere* meant already knowing every session id. The nudge gave a count for
+    the session you were in and nothing about the rest -- which is the
+    accumulating queue ADR 0017 warns about, arriving through the one door
+    nobody was watching.
+
+    **This is N+1 and that is a choice rather than an oversight.** One query per
+    session, through :func:`pending`, because memory is read through the port
+    ADR 0010 gave it and that port's only read is ``entries(session_id,
+    user_id)``. A single query over ``chat_memory_proposal`` would be faster and
+    would reach past the port into tables that are one of two possible backings
+    -- the graph-backed store implements the same protocol and has no such
+    table. Skipping the port for a listing is how an abstraction stops being
+    true while every test still passes.
+
+    **The trigger for changing it**, named so it cannot be invoked on taste: a
+    principal whose session count makes this listing slow enough to notice. The
+    fix then is a cross-session read *on the port*, implemented by both
+    backings, not a query that goes around it.
+    """
+    listings = []
+    for summary in await repository.list_sessions(user_id):
+        listing = await pending(repository, summary.session_id)
+        if isinstance(listing, NoSuchSession):
+            # Closed between listing the sessions and reading this one. Skipped
+            # rather than raised: a review queue that refuses to render because
+            # one conversation went away is worse than one that is briefly short.
+            continue
+        listings.extend(Waiting(summary.session_id, entry) for entry in listing.entries)
+
+    # Oldest first, across sessions. A queue is worked through in the order
+    # things arrived, and which conversation each came from is not an ordering.
+    return tuple(sorted(listings, key=lambda waiting: waiting.entry.created_at))
 
 
 async def accept(

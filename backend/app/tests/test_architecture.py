@@ -281,7 +281,7 @@ class TestBoundariesCanFail:
         """
         offending = Import(
             src="bacteria.app.core.db",
-            dst="bacteria.app.personal.models",
+            dst="bacteria.app.sessions.models",
             deferred=False,
             line=7,
         )
@@ -316,8 +316,8 @@ class TestBoundariesCanFail:
                     package="bacteria.app.core",
                     tables=("chat_session",),
                 ),
-                "bacteria.app.personal.models": Module(
-                    name="bacteria.app.personal.models",
+                "bacteria.app.sessions.models": Module(
+                    name="bacteria.app.sessions.models",
                     path="chat/models.py",
                     package="bacteria.app.personal",
                     tables=("chat_transcript_item",),
@@ -360,7 +360,7 @@ class TestVerdict:
         """One crossing is enough to fail, which is what makes this a gate."""
         offending = Import(
             src="bacteria.agent.tools.memory",
-            dst="bacteria.app.personal.models",
+            dst="bacteria.app.sessions.models",
             deferred=False,
             line=2,
         )

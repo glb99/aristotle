@@ -1,6 +1,6 @@
 """Keyed memory, backed by the assertion graph instead of by two tables.
 
-The second implementation of :class:`~bacteria.app.personal.memory.MemoryStore`, and
+The second implementation of :class:`~bacteria.app.sessions.memory.MemoryStore`, and
 the reason the port exists. Everything it needs was built by ADR 0008 — a
 preference is a functional relation from the owner to a value node, so the
 relation name *is* the key — and by ADR 0009, which gave the graph a way to be
@@ -63,7 +63,7 @@ from bacteria.app.graph.service import (
 )
 from bacteria.app.graph.temporal import OPEN_ENDED, Interval
 from bacteria.app.personal.catalogue import VOCABULARY
-from bacteria.app.personal.memory import MemoryView
+from bacteria.app.sessions.memory import MemoryView
 
 _REFUSAL = "this store keeps only a fixed set of keys, and that is not one of them"
 """What the model is told when a key is refused.
@@ -306,7 +306,7 @@ class GraphMemoryStore:
         await self._db.commit()
 
     async def _session_owner(self, session_id: str) -> str:
-        from bacteria.app.personal.models import ChatSession
+        from bacteria.app.sessions.models import ChatSession
 
         row = await self._db.get(ChatSession, session_id)
         if row is None:

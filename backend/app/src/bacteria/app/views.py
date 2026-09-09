@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from bacteria.app.architecture.views import router as architecture_router
 from bacteria.app.auth.views import router as auth_router
 from bacteria.app.ingestion.views import router as ingestion_router
-from bacteria.app.personal.graph_views import router as graph_router
+from bacteria.app.ontologies.views import router as ontologies_router
 from bacteria.app.personal.views import router as chat_router
 
 CONSOLE_DIR = Path(__file__).parent / "console"
@@ -62,7 +62,7 @@ def create_app(lifespan=None, console_dir: Path | None = None) -> FastAPI:
     app.include_router(architecture_router)
     app.include_router(auth_router)
     app.include_router(chat_router)
-    app.include_router(graph_router)
+    app.include_router(ontologies_router)
     app.include_router(ingestion_router)
 
     @app.get("/health", tags=["ops"])

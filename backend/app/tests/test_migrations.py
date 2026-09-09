@@ -34,7 +34,7 @@ from bacteria.app.core.db import include_name
 from bacteria.app.core.settings import get_settings
 from bacteria.app.graph import models as _graph_models  # noqa: F401
 from bacteria.app.ingestion import models as _ingestion_models  # noqa: F401
-from bacteria.app.personal import models as _chat_models  # noqa: F401
+from bacteria.app.sessions import models as _session_models  # noqa: F401
 
 ALEMBIC_INI = pathlib.Path(__file__).parent.parent / "alembic.ini"
 
@@ -160,7 +160,7 @@ def test_every_memory_table_carries_the_same_content_columns():
     Compares content columns only. The keys are *supposed* to differ; that
     difference is what ADR 0021 and ADR 0017 are about.
     """
-    from bacteria.app.personal.models import (
+    from bacteria.app.sessions.models import (
         ChatMemoryEntry,
         ChatMemoryProposal,
         ChatUserMemoryEntry,

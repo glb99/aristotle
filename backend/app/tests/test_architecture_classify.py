@@ -194,3 +194,41 @@ class TestAgainstThisRepository:
 
         layers = {p.subject for p in propose(derived) if p.claim == "layer"}
         assert "bacteria.app.core" in layers
+
+    def test_the_transport_imports_no_domain(self) -> None:
+        """`sessions -> personal` is zero edges, and this is why the package exists.
+
+        ADR 0013 §9 makes it the acceptance test: if `sessions/` imports a
+        domain to serve a route, it is the wart dialogue 14 recorded -- four
+        tables whose columns name nothing personal -- in a new spelling and
+        worse for having moved.
+
+        It was not zero when the package was first split. `repository.py` chose
+        its own memory backing, and the graph-backed one reads the personal
+        vocabulary, so the transport's single import of a domain sat in the one
+        line deciding which domain was in use. The choice moved to
+        `personal/backing.py`; this is what stops it moving back.
+
+        Asserted over the real tree rather than a fixture, like the test above:
+        a synthetic graph would only ever contain the edges somebody wrote into
+        it, and the edge this guards against is one nobody would write on
+        purpose.
+        """
+        from bacteria.app.architecture.derive import derive
+        from bacteria.app.architecture.layout import source_roots
+
+        repo = Path(__file__).resolve().parents[3]
+        derived = derive(source_roots(repo))
+
+        package = lambda name: ".".join(name.split(".")[:3])  # noqa: E731
+        reached = {
+            package(edge.dst)
+            for edge in derived.imports
+            if package(edge.src) == "bacteria.app.sessions"
+        }
+
+        assert "bacteria.app.personal" not in reached
+        assert "bacteria.app.architecture" not in reached
+        # Not vacuous: the package does import things, so an empty result would
+        # mean the parse found nothing rather than that the rule holds.
+        assert "bacteria.agent.session" in reached
