@@ -17,7 +17,7 @@
 
 import { expect, test, type Page } from "@playwright/test";
 
-const KEY = process.env["BACTERIA_KEY"] ?? "";
+const KEY = process.env["ARISTOTLE_KEY"] ?? "";
 
 async function openArchitecture(page: Page): Promise<void> {
   await page.goto("/");
@@ -35,7 +35,7 @@ async function openArchitecture(page: Page): Promise<void> {
 }
 
 test.describe("architecture", () => {
-  test.skip(!KEY, "needs BACTERIA_KEY and a project already added");
+  test.skip(!KEY, "needs ARISTOTLE_KEY and a project already added");
 
   test("the scene draws a package per glyph, not one pile", async ({ page }) => {
     await openArchitecture(page);
@@ -93,7 +93,7 @@ test.describe("architecture", () => {
 });
 
 test.describe("judging a proposal", () => {
-  test.skip(!KEY, "needs BACTERIA_KEY and a project already added");
+  test.skip(!KEY, "needs ARISTOTLE_KEY and a project already added");
 
   test("agreeing and disagreeing both stick, and both are counted", async ({ page }) => {
     await openArchitecture(page);
@@ -138,7 +138,7 @@ test.describe("judging a proposal", () => {
     await expect(glyph).not.toHaveClass(/agreed/);
 
     // The whole sentence, not the subject alone. A role card lists its evidence
-    // as module names, so `hasText: "bacteria.app.architecture"` matched a role
+    // as module names, so `hasText: "aristotle.app.architecture"` matched a role
     // proposal first and agreed to that instead — the click landed, the tally
     // moved, and the glyph correctly did not.
     await page
@@ -171,7 +171,7 @@ test.describe("judging a proposal", () => {
 });
 
 test.describe("running the tests", () => {
-  test.skip(!KEY, "needs BACTERIA_KEY and a project with a test command");
+  test.skip(!KEY, "needs ARISTOTLE_KEY and a project with a test command");
 
   test("a reading appears and is marked as a reading", async ({ page }) => {
     await openArchitecture(page);

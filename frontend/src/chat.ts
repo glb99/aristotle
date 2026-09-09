@@ -12,7 +12,7 @@
  * abstraction over it. A turn is not one message: it is the user's message, any
  * tool calls, the reply, and a `run_meta` describing how the run was configured
  * — and a console that hid the last three would be a worse view of this system
- * than `bacteria-admin chat` already is.
+ * than `aristotle-admin chat` already is.
  */
 
 import {

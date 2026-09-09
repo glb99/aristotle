@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 
 // The build lands inside the Python package rather than beside this directory,
-// because that is where `bacteria.app.views` looks for it and package data is
+// because that is where `aristotle.app.views` looks for it and package data is
 // the only location that resolves the same in development and in production.
-// See `backend/app/src/bacteria/app/views.py` for why it cannot be a setting.
-const CONSOLE_DIR = "../backend/app/src/bacteria/app/console";
+// See `backend/app/src/aristotle/app/views.py` for why it cannot be a setting.
+const CONSOLE_DIR = "../backend/app/src/aristotle/app/console";
 
 export default defineConfig({
   build: {

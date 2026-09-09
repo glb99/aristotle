@@ -394,7 +394,7 @@ export interface paths {
          *     recorded as such in ADR 0017 — proposals accumulate, nothing activates, and
          *     the agent appears to have no memory while behaving exactly as designed.
          *
-         *     Built through :func:`~bacteria.app.personal.review.pending_from` rather than by
+         *     Built through :func:`~aristotle.app.personal.review.pending_from` rather than by
          *     reading ``state.proposals`` here, and that was a real gap rather than tidying.
          *     ``held_by`` — what accepting a proposal would replace — existed only in the
          *     admin CLI's review walk, so the console listed two suggestions for one key as
@@ -481,7 +481,7 @@ export interface paths {
          *     here for a human — see the review routes below. The distinction is a
          *     security boundary: memory is injected into the system prompt on every later
          *     turn, so a model able to write it directly could write its own future
-         *     instructions. See bacteria's ADR 0017.
+         *     instructions. See aristotle's ADR 0017.
          *
          *     Only the most recent entries reach the model — see ``DEFAULT_MEMORY_LIMIT``
          *     in the agent's context assembly. Writing an unbounded number here does not
@@ -606,7 +606,7 @@ export interface paths {
          *     owned by the principal that submitted it, so any authenticated caller
          *     could read another's records once a read route exists. That is tolerable
          *     while every key belongs to one operator and is the first thing to fix if
-         *     that changes -- see the tenancy gap in `bacteria.app.ingestion`.
+         *     that changes -- see the tenancy gap in `aristotle.app.ingestion`.
          *
          *     A batch where nothing passes validation is still a 201, and still gets a
          *     batch row: the submission was received and recorded, and "your records were
@@ -1085,7 +1085,7 @@ export interface components {
          *
          *     The value is carried, not just the scope. Warning that something will be
          *     replaced without saying what is a note that reads as informative and decides
-         *     nothing -- recorded in :class:`~bacteria.app.personal.review.Held` from a review
+         *     nothing -- recorded in :class:`~aristotle.app.personal.review.Held` from a review
          *     walk where it cost a good value.
          */
         HeldOut: {
@@ -1127,7 +1127,7 @@ export interface components {
         KeyExchange: {
             /**
              * Key
-             * @description An API key issued by `bacteria-admin issue-key`.
+             * @description An API key issued by `aristotle-admin issue-key`.
              */
             key: string;
         };
@@ -1174,7 +1174,7 @@ export interface components {
          * @description A fact to preserve, and why.
          *
          *     ``reason`` is required here because it is required by the agent's own
-         *     :class:`~bacteria.agent.session.store.MemoryEntry`, and for the same purpose: a
+         *     :class:`~aristotle.agent.session.store.MemoryEntry`, and for the same purpose: a
          *     memory whose justification was never recorded cannot be reviewed later, so
          *     it is kept forever by default. Making the caller supply one is what turns
          *     "should this still be here?" into an answerable question.
@@ -1503,7 +1503,7 @@ export interface components {
          *     layer below already had them. Without the first, the items belonging to one
          *     turn -- the user message, the tool calls, the reply, the `run_meta` -- are an
          *     undifferentiated list; without the second, nothing can say when. Both are on
-         *     :class:`~bacteria.agent.session.store.TranscriptItem` and were simply not
+         *     :class:`~aristotle.agent.session.store.TranscriptItem` and were simply not
          *     exposed, so this widens a projection rather than adding a record.
          *
          *     ``seq`` is deliberately absent, and its absence is not an oversight to fix
@@ -1602,7 +1602,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -1633,7 +1633,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -1670,7 +1670,7 @@ export interface operations {
                 project_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -1707,7 +1707,7 @@ export interface operations {
                 project_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -1744,7 +1744,7 @@ export interface operations {
                 project_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -1777,7 +1777,7 @@ export interface operations {
                 project_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -1814,7 +1814,7 @@ export interface operations {
                 project_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -1847,7 +1847,7 @@ export interface operations {
                 project_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -1915,7 +1915,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -1944,7 +1944,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -1975,7 +1975,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2006,7 +2006,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2039,7 +2039,7 @@ export interface operations {
                 session_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2072,7 +2072,7 @@ export interface operations {
                 session_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2105,7 +2105,7 @@ export interface operations {
                 session_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2142,7 +2142,7 @@ export interface operations {
                 key: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2177,7 +2177,7 @@ export interface operations {
                 key: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2211,7 +2211,7 @@ export interface operations {
                 key: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -2251,7 +2251,7 @@ export interface operations {
                 key: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2282,7 +2282,7 @@ export interface operations {
                 session_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2315,7 +2315,7 @@ export interface operations {
                 session_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -2372,7 +2372,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -2407,7 +2407,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -2442,7 +2442,7 @@ export interface operations {
             header?: never;
             path?: never;
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2475,7 +2475,7 @@ export interface operations {
                 ontology: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2509,7 +2509,7 @@ export interface operations {
                 assertion_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2543,7 +2543,7 @@ export interface operations {
                 assertion_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2576,7 +2576,7 @@ export interface operations {
                 ontology: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2610,7 +2610,7 @@ export interface operations {
                 conclusion_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody?: never;
@@ -2643,7 +2643,7 @@ export interface operations {
                 ontology: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {
@@ -2681,7 +2681,7 @@ export interface operations {
                 node_id: string;
             };
             cookie?: {
-                bacteria_session?: string | null;
+                aristotle_session?: string | null;
             };
         };
         requestBody: {

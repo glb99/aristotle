@@ -152,7 +152,7 @@ const packageOf = (moduleName: string, packages: Set<string>): string => {
 /**
  * The packages worth drawing: the shallowest level that gives a readable count.
  *
- * Depth is chosen rather than fixed because repositories differ. `bacteria.app`
+ * Depth is chosen rather than fixed because repositories differ. `aristotle.app`
  * has its features two segments down; a flat project has everything at one. The
  * rule is the first depth that yields more than two groups, capped so a very
  * wide repository still fits.

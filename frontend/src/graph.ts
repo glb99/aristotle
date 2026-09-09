@@ -624,7 +624,7 @@ export async function refresh(_sessionId: string | null): Promise<void> {
       text(
         "p",
         "Relations are recorded by a background job, and only when " +
-          "BACTERIA_GRAPH_EXTRACTION_ENABLED is on and a worker is running.",
+          "ARISTOTLE_GRAPH_EXTRACTION_ENABLED is on and a worker is running.",
         "note",
       ),
     );
